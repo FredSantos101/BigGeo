@@ -1,0 +1,69 @@
+extends layout
+block content
+    #map
+    script.
+        var timeB4draw = Math.floor( new Date().getTime()/1000);
+        //var myData = jsonData;
+        var myData = !{JSON.stringify(jsonData)};
+        console.log("LOAD DATA MOTHERFUCKER!!!!");
+        var timeAdraw1 = Math.floor( new Date().getTime()/1000);
+        console.log(timeAdraw1-timeB4draw);
+        // Create variable to hold map element, give initial settings to map
+       
+        var map = L.map('map',{preferCanvas: true, center: [116.33251,39.96964], zoom: 2});
+
+        L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            subdomains: 'abcd',
+            minZoom: 0,
+            maxZoom: 20,
+            ext: 'png'
+        }).addTo(map);
+
+        
+
+        var color;
+        var r = Math.floor(Math.random() * 255);
+        var g = Math.floor(Math.random() * 255);
+        var b = Math.floor(Math.random() * 255);
+        color= "rgb("+r+" ,"+g+","+ b+")"; 
+        var myLayer = L.geoJSON().addTo(map);
+        var myStyle = {
+            "color": color,
+            "weight": 1,
+            "opacity": 0.05
+        };
+        
+
+
+        /*var lineCoordinate = [];
+        for(var i in jsonData.features){
+            console.log("cheguei aqui tambem");
+            if (i+1 == jsonData.features.Length){
+                break
+            }
+            var pointJson1 = jsonData.features[i];
+            var pointJson2 = jsonData.features[i+1];
+            console.log(myData.features[i]);
+            var coord1 = pointJson1.coordinates;
+            var coord2 = pointJson2.coordinates;
+            //L.marker([coord[1],coord[0]]).addTo(map);
+            lineCoordinate.push([[coord1[0],coord1[1]],[coord2[0],coord2[1]]]);
+            console.log(lineCoordinate);
+            
+        }*/
+        // Add JSON to map
+        
+       L.geoJson(myData,myStyle).addTo(map);
+        
+
+        
+        /*L.glify.lines({
+            map: map,
+            latitudeKey: 1,
+            longitudeKey: 0,
+            data: myData
+            });*/
+        console.log("After drawing EVERYTHING!!!!");
+        var timeAdraw2 = Math.floor( new Date().getTime()/1000);
+        console.log(timeAdraw2-timeB4draw);
