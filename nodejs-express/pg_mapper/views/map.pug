@@ -5,7 +5,6 @@ block content
         var timeB4draw = Math.floor( new Date().getTime()/1000);
         //var myData = jsonData;
         var myData = !{JSON.stringify(jsonData)};
-        console.log("LOAD DATA MOTHERFUCKER!!!!");
         var timeAdraw1 = Math.floor( new Date().getTime()/1000);
         console.log(timeAdraw1-timeB4draw);
         // Create variable to hold map element, give initial settings to map
@@ -16,7 +15,7 @@ block content
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             subdomains: 'abcd',
             minZoom: 0,
-            maxZoom: 20,
+            maxZoom: 25,
             ext: 'png'
         }).addTo(map);
 
@@ -64,6 +63,13 @@ block content
             longitudeKey: 0,
             data: myData
             });*/
-        console.log("After drawing EVERYTHING!!!!");
+            
         var timeAdraw2 = Math.floor( new Date().getTime()/1000);
         console.log(timeAdraw2-timeB4draw);
+
+
+
+        map.on('click', function(e) {        
+            var location= e.latlng;
+            queryLenses()        
+        });
