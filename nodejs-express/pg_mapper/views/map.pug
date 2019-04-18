@@ -30,10 +30,10 @@ block content
         var b = Math.floor(Math.random() * 255);
         color= "rgb("+r+" ,"+g+","+ b+")"; 
         var defaultLayer = L.geoJSON().addTo(map);
-        var myStyle = {
+        var firstStyle = {
             "color": color,
             "weight": 1,
-            "opacity": 0.9
+            "opacity": 0.01
         };
         
 
@@ -56,7 +56,7 @@ block content
         }*/
         // Add JSON to map
         
-       L.geoJson(myData,myStyle).addTo(defaultLayer);
+       L.geoJson(myData,firstStyle).addTo(defaultLayer);
         
 
         
@@ -82,19 +82,40 @@ block content
 
             var urlString = "query/" + location.lng + "/" + location.lat;
             
+            var color2;
+            var r = Math.floor(Math.random() * 255);
+            var g = Math.floor(Math.random() * 255);
+            var b = Math.floor(Math.random() * 255);
+            color2= "rgb("+r+" ,"+g+","+ b+")"; 
+
+            var queryLayer = L.geoJSON().addTo(map);
+
+            var individualStyle = {
+                "color": color2,
+                "weight": 1,
+                "opacity": 0.7
+            };
+            
             var newData = $.ajax({
                 url: urlString,
                 type: 'GET',
                 dataType:'json',
-                success: function(){console.log("ola");
-                    console.log("Data successfully loaded!");},
+                success: console.log("Data successfully loaded!"),
                 error: function (xhr) {
                     alert(xhr.statusText)
                 }
                 
               }) 
             $.when(newData).done(function() {
+                
+                console.log("Im removing the map now and adding new ones afterwards")
                 map.removeLayer(defaultLayer);
-                L.geoJson(newData.responseJSON,myStyle).addTo(map);
+                L.geoJson(newData.responseJSON,individualStyle).addTo(queryLayer);
+                var circle = L.circle([location.lat, location.lng], {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.1,
+                    radius: 500
+                }).addTo(queryLayer);
             });    
         });

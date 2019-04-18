@@ -146,8 +146,8 @@ router.get('/query/:long/:lat', function(req, res) {
   // Pass the result to the map page
   query.on("end", function (result) {
       //var data = require('../public/data/geoJSON.json')
-      var data = result.rows[0].row_to_json // Save the JSON as variable data
-      res.send(data);
+      var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
+      res.send(dataNew);
       /*res.render('map', {
           title: "BigGeo", // Give a title to our page
           jsonData: data // Pass data to the View
