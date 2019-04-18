@@ -2,13 +2,7 @@ extends layout
 block content
     #map
     script.
-        var timeB4draw = Math.floor( new Date().getTime()/1000);
-        //var myData = jsonData;
-        var myData = !{JSON.stringify(jsonData)};
-        var timeAdraw1 = Math.floor( new Date().getTime()/1000);
-        console.log(timeAdraw1-timeB4draw);
-        // Create variable to hold map element, give initial settings to map
-       
+
         var map = L.map('map',{preferCanvas: true, center: [116.33251,39.96964], zoom: 2});
 
         L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
@@ -19,6 +13,15 @@ block content
             ext: 'png'
         }).addTo(map);
 
+        var timeB4draw = Math.floor( new Date().getTime()/1000);
+        //var myData = jsonData;
+        var myData = !{JSON.stringify(jsonData)};
+        var timeAdraw1 = Math.floor( new Date().getTime()/1000);
+        console.log(timeAdraw1-timeB4draw);
+        // Create variable to hold map element, give initial settings to map
+       
+       
+
         
 
         var color;
@@ -26,11 +29,11 @@ block content
         var g = Math.floor(Math.random() * 255);
         var b = Math.floor(Math.random() * 255);
         color= "rgb("+r+" ,"+g+","+ b+")"; 
-        var myLayer = L.geoJSON().addTo(map);
+        var defaultLayer = L.geoJSON().addTo(map);
         var myStyle = {
             "color": color,
             "weight": 1,
-            "opacity": 0.5
+            "opacity": 0.9
         };
         
 
@@ -53,7 +56,7 @@ block content
         }*/
         // Add JSON to map
         
-       L.geoJson(myData,myStyle).addTo(map);
+       L.geoJson(myData,myStyle).addTo(defaultLayer);
         
 
         
@@ -73,12 +76,25 @@ block content
             
             var location= e.latlng;
             
-            console.log(location);
+            console.log(location.lat);
+
+            // Create URL
+
+            var urlString = "query/" + location.lng + "/" + location.lat;
             
-            $.ajax({
-                url: 'map/12',
+            var newData = $.ajax({
+                url: urlString,
                 type: 'GET',
-                dataType:'json'
+                dataType:'json',
+                success: function(){console.log("ola");
+                    console.log("Data successfully loaded!");},
+                error: function (xhr) {
+                    alert(xhr.statusText)
+                }
                 
-              })       
+              }) 
+            $.when(newData).done(function() {
+                map.removeLayer(defaultLayer);
+                L.geoJson(newData.responseJSON,myStyle).addTo(map);
+            });    
         });

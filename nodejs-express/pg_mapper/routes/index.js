@@ -23,7 +23,7 @@ var drawLines = "SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As typ
                   As fc ";*/
 
 var drawTracks    = "SELECT row_to_json(fc) FROM (SELECT 'Trajectoria' As type, array_to_json(array_agg(track_indi)) As features FROM (SELECT 'P' As type, ST_AsGeoJSON(lg.geomline)::json As geometry, row_to_json((lg.taxi_id,lg.data_time)) As properties FROM (SELECT taxi_id, data_time FROM trajectory_lines GROUP BY taxi_id,data_time ORDER BY taxi_id,data_time) As t JOIN trajectory_lines As lg ON lg.taxi_id = t.taxi_id AND lg.data_time = t.data_time LIMIT 1400000) As track_indi ) As fc ";
-var drawTracksMap ="SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (	SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg LIMIT 90000) 	As f) As fc ";
+var drawTracksMap ="SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (	SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg LIMIT 100000) 	As f) As fc ";
 
 /*WITH multis AS (
                  SELECT taxi_id, min(data_time) AS time_start, max(data_time)
@@ -59,7 +59,6 @@ GROUP BY ID, ValueV*/
 // 1 degree = 60 * 1852 meters = 111.120 kilometers
 // ST_DWithin geom geom, distance (in units of sgrid)--- should be meters but it aint, 0.0009 == 100meters sort of
 
-var first_try_query = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(geom,ST_SetSRID(ST_MakePoint(116.46383,39.95497),32650),0.0009) LIMIT 5000000) 	As f) As fc"
 
 
 
@@ -126,7 +125,12 @@ router.get('/map', function(req, res) {
 
 });
 
-router.get('/map/:valores', function(req, res) {
+router.get('/query/:long/:lat', function(req, res) {
+  console.log(req.params.long);
+  console.log(req.params.lat);
+
+  var first_try_query = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ req.params.long + "," + req.params.lat+ "),32650),0.0019) LIMIT 5000000) 	As f) As fc"
+
 
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
@@ -143,11 +147,11 @@ router.get('/map/:valores', function(req, res) {
   query.on("end", function (result) {
       //var data = require('../public/data/geoJSON.json')
       var data = result.rows[0].row_to_json // Save the JSON as variable data
-
-      res.render('map', {
+      res.send(data);
+      /*res.render('map', {
           title: "BigGeo", // Give a title to our page
           jsonData: data // Pass data to the View
-      });
+      });*/
       console.log("DATA PASSED TO BE DRAWN");
       var timeAdraw = Math.floor( new Date().getTime()/1000);
       console.log(timeAdraw-timefetch);
