@@ -30,7 +30,7 @@ block content
         var myStyle = {
             "color": color,
             "weight": 1,
-            "opacity": 0.05
+            "opacity": 0.5
         };
         
 
@@ -69,7 +69,16 @@ block content
 
 
 
-        map.on('click', function(e) {        
+        map.on('click', function(e) { 
+            
             var location= e.latlng;
-            queryLenses()        
+            
+            console.log(location);
+            
+            $.ajax({
+                url: 'map/12',
+                type: 'GET',
+                dataType:'json'
+                
+              })       
         });
