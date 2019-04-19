@@ -1,11 +1,21 @@
 extends layout
 block content
+
     #map
     script.
-        //Flag to determine if mouse is overing a lens or not
-        var overLens = true;     
+        //Array that will save all the layers
+        var layerArray = [];
+        
+        
         
         var map = L.map('map',{preferCanvas: true, center: [39.96964,116.33251], zoom: 12});
+        
+        //create array with all layers?
+
+        
+        var lensesLayer = L.geoJSON().addTo(map);
+
+
 
         L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -58,9 +68,9 @@ block content
         }*/
         // Add JSON to map
         
-       L.geoJson(myData,firstStyle).addTo(defaultLayer);
+        L.geoJson(myData,firstStyle).addTo(defaultLayer);
         
-
+        
         
         /*L.glify.lines({
             map: map,
@@ -73,7 +83,7 @@ block content
         console.log(timeAdraw2-timeB4draw);
 
 
-
+      
         map.on('click', function(e) { 
             var queryLayer = L.geoJSON().addTo(map);
             var location= e.latlng;
@@ -113,16 +123,16 @@ block content
                 console.log("Im removing the map now and adding new ones afterwards")
                 map.removeLayer(defaultLayer);
                 L.geoJson(newData.responseJSON,individualStyle).addTo(queryLayer);
-                var lens = L.circle([location.lat, location.lng], {
+                var lens = { layer : queryLayer, AreaQuery : L.circle([location.lat, location.lng], {
                     color: 'red',
                     fillColor: '#f03',
                     fillOpacity: 0.1,
                     radius: 500
-                }).addTo(map).bindPopup(("Olaaaa devia de haver um botao debaixo de moi" +
-                '<br/><button type="buttonDelete" onclick="map.addLayer(defaultLayer);" class="btn btn-primary sidebar-open-button" data = "' + "Yoooooo" + '" ' + '>Click for more</button>'));
-                
-                
-            });    
+                }).addTo(lensesLayer).bindPopup(("Olaaaa devia de haver um botao debaixo de moi" +
+                '<br/><button type="buttonDelete" number="0" onclick="var x = document.getElementById(lens).innerHTML; map.addLayer(x.layer);" class="btn btn-primary sidebar-open-button" data = "' + "Yoooooo" + '" ' + '>Click for more</button>'))
+              };
+              lensesLayer.bringToFront();  
+            })    
         
             
         });
