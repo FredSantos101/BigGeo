@@ -125,7 +125,7 @@ router.get('/map', function(req, res) {
 
 });
 
-router.get('/query/:long/:lat/:radius', function(req, res) {
+router.get('/query/:long/:lat/:radius/:type', function(req, res) {
   console.log(req.params.long);
   console.log(req.params.lat);
 
@@ -133,14 +133,10 @@ router.get('/query/:long/:lat/:radius', function(req, res) {
   //Radius in meters to degrees
   var radiusDegrees = req.params.radius/ 111120;
 
-  //QUERY CONSTRUCTOR
-  var first_try_query = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ req.params.long + "," + req.params.lat+ "),32650)," + radiusDegrees + ") LIMIT 5000000) 	As f) As fc"
-
-
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
 
-  var query = client.query(new Query(first_try_query)); // Run our Query
+  var query = client.query(new Query(query_0_args_ContructorQUERIES(req.params.long, req.params.lat, radiusDegrees, req.params.type)  )); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
   });
@@ -163,3 +159,26 @@ router.get('/query/:long/:lat/:radius', function(req, res) {
   });
 
 });
+
+//QUERY CONSTRUCTOR
+function query_0_args_ContructorQUERIES (long, lat, radius, type){
+  if (type == "Default"){
+    console.log("Im on a Pass by Lens")
+    var queryDB = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") LIMIT 5000000) 	As f) As fc"
+    return queryDB;
+  }
+
+  if (type == "Start"){
+    console.log("Im on a Start Points Lens")
+
+    var queryDB = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End, ST_AsGeoJSON(lg.startPointGeom)::json, ST_AsGeoJSON(lg.endPointGeom)::json)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") LIMIT 5000000) 	As f) As fc"
+    return queryDB;
+  }
+
+  if (type == "End"){
+    console.log("Im on a Start Points Lens")
+
+    var queryDB = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") LIMIT 5000000) 	As f) As fc"
+    return queryDB;
+  }
+}

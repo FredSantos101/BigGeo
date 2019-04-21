@@ -100,7 +100,7 @@ block content
                         .openOn(map);
                 }
                 else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val());
+                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"End");
                 }
             });
             
@@ -109,10 +109,10 @@ block content
         map.on('click', onMapClick);
        
 
-        function createQuery(lng, lat, radiusQuery){
+        function createQuery(lng, lat, radiusQuery, typeLens){
                         // Create URL
 
-            var urlString = "query/" + lng + "/" + lat + "/" + radiusQuery;
+            var urlString = "query/" + lng + "/" + lat + "/" + radiusQuery + "/" + typeLens;
             
             var color2;
             var r = Math.floor(Math.random() * 255);
@@ -127,6 +127,13 @@ block content
                 "weight": 1,
                 "opacity": 0.7
             };
+            var circleVar = L.circle([lat, lng], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.08,
+                radius: radiusQuery
+            });
+            circleVar.addTo(lensesLayer);
             
             var newData = $.ajax({
                 url: urlString,
@@ -146,21 +153,15 @@ block content
                 tracksToDraw.addTo(markerGroup);
                 var idTracks = tracksToDraw._leaflet_id;
                 console.log("Im gonna draw the lens now")
-                createLens(lng, lat, radiusQuery, idTracks);
+                createLens(circleVar, radiusQuery, idTracks, typeLens);
                 lensesLayer.bringToFront();
             });  
             
             
         }
 
-        function createLens(lng, lat, radiusQuery, idTracks){
-            var lens = { id : idTracks, areaQuery : L.circle([lat, lng], {
-                color: 'red',
-                fillColor: '#f03',
-                fillOpacity: 0.08,
-                radius: radiusQuery
-            }).addTo(lensesLayer)
-            };
+        function createLens(circleObj, radiusQuery, idTracks, _type){
+            var lens = { type: _type, id : idTracks, areaQuery : circleObj};
             lens.areaQuery.bindPopup("<input type='button' value='Delete this lens' class='marker-delete-button'/>")
             lens.areaQuery.on("popupopen", function() {
             var tempMarker = lens;
