@@ -83,16 +83,36 @@ block content
         var timeAdraw2 = Math.floor( new Date().getTime()/1000);
         console.log(timeAdraw2-timeB4draw);
 
-
-      
-        map.on('click', function(e) { 
+        var popup = L.popup();
+        var popup2 = L.popup();
+        function onMapClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the map at " + e.latlng.toString() + "<input id='radiusBox' type='text' size='20'/>" + "<input type='button' value='Create Lens' class='marker-create-button'/>") //"\n Insert a radius to create Lens:" + "<input type='button' value='Create Lens' class='marker-create-button'/>")
+                .openOn(map);
             var location= e.latlng;
+            $('.marker-create-button').click(function () {
+                console.log ($('#radiusBox').val() );
+                if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 6000) {
+                    popup2
+                        .setLatLng(e.latlng)
+                        .setContent("Fill with a value of 1 until 6000" )
+                        .openOn(map);
+                }
+                else {
+                    createQuery(location.lng, location.lat, $('#radiusBox').val());
+                }
+            });
             
-            console.log(location.lat);
+        }
 
-            // Create URL
+        map.on('click', onMapClick);
+       
 
-            var urlString = "query/" + location.lng + "/" + location.lat;
+        function createQuery(lng, lat, radiusQuery){
+                        // Create URL
+
+            var urlString = "query/" + lng + "/" + lat + "/" + radiusQuery;
             
             var color2;
             var r = Math.floor(Math.random() * 255);
@@ -125,35 +145,38 @@ block content
                 var tracksToDraw = L.geoJson(newData.responseJSON,individualStyle);
                 tracksToDraw.addTo(markerGroup);
                 var idTracks = tracksToDraw._leaflet_id;
-                var lens = { id : idTracks, areaQuery : L.circle([location.lat, location.lng], {
-                    color: 'red',
-                    fillColor: '#f03',
-                    fillOpacity: 0.1,
-                    radius: 500
-                }).addTo(lensesLayer)
-              };
-              lens.areaQuery.bindPopup("<input type='button' value='Delete this lens' class='marker-delete-button'/>")
-              lens.areaQuery.on("popupopen", function() {
-                var tempMarker = lens;
-
-                //var tempMarkerGeoJSON = this.toGeoJSON();
-
-                //var lID = tempMarker._leaflet_id; // Getting Leaflet ID of this marker
-
-                // To remove marker on click of delete
-                $('.marker-delete-button:visible').click(function () {
-                    console.log("Yoo Im inside the button s click function now")
-                    lensesLayer.removeLayer(tempMarker.areaQuery);
-                    markerGroup.removeLayer(tempMarker.id);
-                    });
-                  
-                }) ; 
+                console.log("Im gonna draw the lens now")
+                createLens(lng, lat, radiusQuery, idTracks);
                 lensesLayer.bringToFront();
             });  
             
             
-        });
+        }
 
+        function createLens(lng, lat, radiusQuery, idTracks){
+            var lens = { id : idTracks, areaQuery : L.circle([lat, lng], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.08,
+                radius: radiusQuery
+            }).addTo(lensesLayer)
+            };
+            lens.areaQuery.bindPopup("<input type='button' value='Delete this lens' class='marker-delete-button'/>")
+            lens.areaQuery.on("popupopen", function() {
+            var tempMarker = lens;
 
+            //var tempMarkerGeoJSON = this.toGeoJSON();
+
+            //var lID = tempMarker._leaflet_id; // Getting Leaflet ID of this marker
+
+            // To remove marker on click of delete
+            $('.marker-delete-button:visible').click(function () {
+                lensesLayer.removeLayer(tempMarker.areaQuery);
+                markerGroup.removeLayer(tempMarker.id);
+                });
+                
+            }) ; 
+        }
+        
 
 

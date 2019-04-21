@@ -125,11 +125,16 @@ router.get('/map', function(req, res) {
 
 });
 
-router.get('/query/:long/:lat', function(req, res) {
+router.get('/query/:long/:lat/:radius', function(req, res) {
   console.log(req.params.long);
   console.log(req.params.lat);
 
-  var first_try_query = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ req.params.long + "," + req.params.lat+ "),32650),0.0019) LIMIT 5000000) 	As f) As fc"
+
+  //Radius in meters to degrees
+  var radiusDegrees = req.params.radius/ 111120;
+
+  //QUERY CONSTRUCTOR
+  var first_try_query = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ req.params.long + "," + req.params.lat+ "),32650)," + radiusDegrees + ") LIMIT 5000000) 	As f) As fc"
 
 
   var client = new Client(conString); // Setup our Postgres Client
