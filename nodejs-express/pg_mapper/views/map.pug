@@ -12,7 +12,8 @@ block content
         
         //create array with all layers?
 
-        
+        var markerGroup = L.layerGroup().addTo(map);
+
         var lensesLayer = L.geoJSON().addTo(map);
 
 
@@ -85,7 +86,6 @@ block content
 
       
         map.on('click', function(e) { 
-            var queryLayer = L.geoJSON().addTo(map);
             var location= e.latlng;
             
             console.log(location.lat);
@@ -122,21 +122,38 @@ block content
                 
                 console.log("Im removing the map now and adding new ones afterwards")
                 map.removeLayer(defaultLayer);
-                L.geoJson(newData.responseJSON,individualStyle).addTo(queryLayer);
-                var lens = { layer : queryLayer, AreaQuery : L.circle([location.lat, location.lng], {
+                var tracksToDraw = L.geoJson(newData.responseJSON,individualStyle);
+                tracksToDraw.addTo(markerGroup);
+                var idTracks = tracksToDraw._leaflet_id;
+                var lens = { id : idTracks, areaQuery : L.circle([location.lat, location.lng], {
                     color: 'red',
                     fillColor: '#f03',
                     fillOpacity: 0.1,
                     radius: 500
-                }).addTo(lensesLayer).bindPopup(("Olaaaa devia de haver um botao debaixo de moi" +
-                '<br/><button type="buttonDelete" number="0" onclick="var x = document.getElementById(lens).innerHTML; map.addLayer(x.layer);" class="btn btn-primary sidebar-open-button" data = "' + "Yoooooo" + '" ' + '>Click for more</button>'))
+                }).addTo(lensesLayer)
               };
-              lensesLayer.bringToFront();  
-            })    
-        
+              lens.areaQuery.bindPopup("<input type='button' value='Delete this lens' class='marker-delete-button'/>")
+              lens.areaQuery.on("popupopen", function() {
+                var tempMarker = lens;
+
+                //var tempMarkerGeoJSON = this.toGeoJSON();
+
+                //var lID = tempMarker._leaflet_id; // Getting Leaflet ID of this marker
+
+                // To remove marker on click of delete
+                $('.marker-delete-button:visible').click(function () {
+                    console.log("Yoo Im inside the button s click function now")
+                    lensesLayer.removeLayer(tempMarker.areaQuery);
+                    markerGroup.removeLayer(tempMarker.id);
+                    });
+                  
+                }) ; 
+                lensesLayer.bringToFront();
+            });  
+            
             
         });
 
 
 
-        
+
