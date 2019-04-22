@@ -176,7 +176,7 @@ function query_0_args_ContructorQUERIES (long, lat, radius, type){
   }
 
   if (type == "End"){
-    console.log("Im on a Start Points Lens")
+    console.log("Im on a End Points Lens")
 
     var queryDB = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") LIMIT 5000000) 	As f) As fc"
     return queryDB;
