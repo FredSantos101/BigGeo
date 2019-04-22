@@ -186,6 +186,49 @@ block content
             
         }
 
+        function deleteQuery(lng, lat, radius, type){
+            var urlString = "queryRemoval/" + lng + "/" + lat + "/" + radius + "/" + type;
+
+            var color2;
+            var r = Math.floor(Math.random() * 255);
+            var g = Math.floor(Math.random() * 255);
+            var b = Math.floor(Math.random() * 255);
+            color2= "rgb("+r+" ,"+g+","+ b+")"; 
+
+            
+
+            var individualStyle = {
+                "color": color2,
+                "weight": 3,
+                "opacity": 1
+            };
+
+            var newData = $.ajax({
+                url: urlString,
+                type: 'GET',
+                dataType:'json',
+                success: console.log("Data successfully loaded!"),
+                error: function (xhr) {
+                    alert(xhr.statusText)
+                }
+                
+            })
+            $.when(newData).done(function() {
+                
+                console.log("Im removing the map now and adding new ones afterwards")
+                
+                if(newData.responseJSON.features != null){
+                    var tracksToDraw = L.geoJson(newData.responseJSON,individualStyle);
+                    tracksToDraw.addTo(markerGroup);
+                    var idTracks = tracksToDraw._leaflet_id;
+                    lastMarkerGroupID = tracksToDraw._leaflet_id;
+                    
+                }
+                
+                lensesLayer.bringToFront();
+            });
+        }
+
         function createLens(lng, lat, radiusQuery, _type){
             var lens = { type: _type, 
                 id :  null, 
@@ -223,8 +266,9 @@ block content
             // To remove marker on click of delete
             $('.marker-delete-button:visible').click(function () {
                 lensesLayer.removeLayer(tempMarker.areaQuery);
-                if(tempMarker.id !=null){
-                    markerGroup.removeLayer(tempMarker.id);
+                deleteQuery(lng, lat, radiusQuery, _type);
+                if(lastMarkerGroupID !=null){
+                    markerGroup.removeLayer(lastMarkerGroupID);
                 }
                 });
                 

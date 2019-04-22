@@ -162,8 +162,49 @@ router.get('/query/:long/:lat/:radius/:type', function(req, res) {
 
 });
 
-//QUERY CONSTRUCTOR
+router.get('/queryRemoval/:long/:lat/:radius/:type', function(req, res) {
+  console.log(req.params.long);
+  console.log(req.params.lat);
+
+
+  //Radius in meters to degrees
+  var radiusDegrees = req.params.radius/ 111120;
+
+  var client = new Client(conString); // Setup our Postgres Client
+  client.connect(); // connect to the client
+  var query = client.query(new Query(query_0_args_DecontructorQUERIES(req.params.long, req.params.lat, radiusDegrees, req.params.type))); // Run our Query
+  query.on("row", function (row, result) {
+      result.addRow(row);
+  });
+
+  var timefetch = Math.floor( new Date().getTime()/1000);
+  var timeafterGet = timefetch-timeB4draw;
+  console.log("Updating map");
+  // Pass the result to the map page
+  query.on("end", function (result) {
+      //var data = require('../public/data/geoJSON.json')
+      var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
+      res.send(dataNew);
+      /*res.render('map', {
+          title: "BigGeo", // Give a title to our page
+          jsonData: data // Pass data to the View
+      });*/
+      console.log("DATA PASSED TO BE DRAWN");
+      var timeAdraw = Math.floor( new Date().getTime()/1000);
+      console.log(timeAdraw-timefetch);
+  });
+
+});
+
+//
+//QUERY CONSTRUCTORS
+//
+
 function query_0_args_ContructorQUERIES (long, lat, radius, type){
+
+  if (activeQuery.length == 0){
+    activeQuery = " WHERE ";
+  }
 
   var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg";
   var secondPart = " LIMIT 5000000) 	As f) As fc";
@@ -194,6 +235,110 @@ function query_0_args_ContructorQUERIES (long, lat, radius, type){
     
     activeQuery = activeQuery + queryDB;
 
+    return firstPart + activeQuery + secondPart;
+  }
+
+  
+  return "";
+}
+
+
+//
+//QUERY DECONSTRUCTORS
+//
+
+function replaceGlobally(original, searchTxt, replaceTxt) {
+  original = original.split(searchTxt).join(replaceTxt);
+  return original;
+}
+
+function query_0_args_DecontructorQUERIES (long, lat, radius, type){
+  
+  var andString = " AND ";
+  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg";
+  var secondPart = " LIMIT 40000) 	As f) As fc";
+  
+  if (type == "Default"){
+    var queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
+  
+    console.log("Im on a Pass by Lens");
+    if (activeQuery.indexOf(" AND ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")") !=-1){
+      console.log("Im on an AND one");
+    }
+    else if (activeQuery.indexOf("ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")") !=-1){
+      console.log("Im not on an AND one");
+      queryDB ="ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
+    }
+    else{
+      console.log("There was an error as it didnt recognize any of them")
+    }
+    
+    activeQuery = replaceGlobally(activeQuery, queryDB, "");
+    console.log(activeQuery);
+
+    if (activeQuery.indexOf(" WHERE  AND ") != -1){
+      activeQuery = replaceGlobally(activeQuery, " WHERE  AND ", " WHERE ");
+    }
+    if (activeQuery.length == 7){
+      activeQuery = "";
+    }
+
+    return firstPart + activeQuery + secondPart;
+  }
+
+  if (type == "Start"){
+    var queryDB = andString + "ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
+  
+    console.log("Im on a Start Point Lens");
+    if (activeQuery.indexOf(" AND ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")") !=-1){
+      console.log("Im on an AND one");
+    }
+    else if (activeQuery.indexOf("ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")") !=-1){
+      console.log("Im not on an AND one");
+      queryDB ="ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
+    }
+    else{
+      console.log("There was an error as it didnt recognize any of them")
+    }
+    
+    activeQuery = replaceGlobally(activeQuery, queryDB, "");
+    console.log(activeQuery);
+
+    if (activeQuery.indexOf(" WHERE  AND ") != -1){
+      activeQuery = replaceGlobally(activeQuery, " WHERE  AND ", " WHERE ");
+    }
+    if (activeQuery.length == 7){
+      activeQuery = "";
+    }
+
+    return firstPart + activeQuery + secondPart;
+  }
+
+  if (type == "End"){
+    var queryDB = andString + "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
+  
+    console.log("Im on a End Point Lens");
+    if (activeQuery.indexOf(" AND ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")") !=-1){
+      console.log("Im on an AND one");
+    }
+    else if (activeQuery.indexOf("ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")") !=-1){
+      console.log("Im not on an AND one");
+      queryDB ="ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
+    }
+    else{
+      console.log("There was an error as it didnt recognize any of them")
+    }
+    
+    activeQuery = replaceGlobally(activeQuery, queryDB, "");
+    console.log(activeQuery);
+
+    if (activeQuery.indexOf(" WHERE  AND ") != -1){
+      activeQuery = replaceGlobally(activeQuery, " WHERE  AND ", " WHERE ");
+    }
+    if (activeQuery.length == 7){
+      activeQuery = "";
+    }
+    
     return firstPart + activeQuery + secondPart;
   }
 
