@@ -15,7 +15,8 @@ block content
         var markerGroup = L.layerGroup().addTo(map);
 
         var lensesLayer = L.geoJSON().addTo(map);
-
+        
+        var lastMarkerGroupID = null ;
 
 
         L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
@@ -151,14 +152,7 @@ block content
                 "weight": 3,
                 "opacity": 1
             };
-            var circleVar = L.circle([lat, lng], {
-                color: 'red',
-                fillColor: '#f03',
-                fillOpacity: 0.08,
-                radius: radiusQuery
-            });
-            circleVar.addTo(lensesLayer);
-            
+            var lensesVar = createLens(lng, lat, radiusQuery, typeLens);
             var newData = $.ajax({
                 url: urlString,
                 type: 'GET',
@@ -173,19 +167,51 @@ block content
                 
                 console.log("Im removing the map now and adding new ones afterwards")
                 map.removeLayer(defaultLayer);
-                var tracksToDraw = L.geoJson(newData.responseJSON,individualStyle);
-                tracksToDraw.addTo(markerGroup);
-                var idTracks = tracksToDraw._leaflet_id;
-                console.log("Im gonna draw the lens now")
-                createLens(circleVar, radiusQuery, idTracks, typeLens);
+                console.log(newData.responseJSON);
+                if(lastMarkerGroupID !=null){
+                    markerGroup.removeLayer(lastMarkerGroupID);
+                }
+                if(newData.responseJSON.features != null){
+                    var tracksToDraw = L.geoJson(newData.responseJSON,individualStyle);
+                    tracksToDraw.addTo(markerGroup);
+                    var idTracks = tracksToDraw._leaflet_id;
+                    lastMarkerGroupID = tracksToDraw._leaflet_id;
+                    lensesVar.id = idTracks;
+                    lensesVar.colorSuccess();
+                }
+                
                 lensesLayer.bringToFront();
             });  
             
             
         }
 
-        function createLens(circleObj, radiusQuery, idTracks, _type){
-            var lens = { type: _type, id : idTracks, areaQuery : circleObj};
+        function createLens(lng, lat, radiusQuery, _type){
+            var lens = { type: _type, 
+                id :  null, 
+                areaQuery : L.circle([lat, lng], {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.5,
+                    radius: radiusQuery
+                }).addTo(lensesLayer),
+                colorSuccess : function() {
+                    if(_type == "Default"){
+                        console.log("I will now paint the Pass by circle again ....")
+                        lens.areaQuery.setStyle({color: 'blue', fillColor: 'blue', fillOpacity: 0.2});
+                    }
+                    else if(_type == "Start"){
+                        console.log("I will now paint the Start circle again ....")
+                        lens.areaQuery.setStyle({color: 'green', fillColor: 'green', fillOpacity: 0.2});
+                    }
+                    else if(_type == "End"){
+                        console.log("I will now paint the End circle again ....")
+                        lens.areaQuery.setStyle({color: 'yellow', fillColor: 'yellow', fillOpacity: 0.2});
+                    }
+                }
+            };
+            
+            
             lens.areaQuery.bindPopup("<input type='button' value='Delete this lens' class='marker-delete-button'/>")
             lens.areaQuery.on("popupopen", function() {
             var tempMarker = lens;
@@ -197,10 +223,13 @@ block content
             // To remove marker on click of delete
             $('.marker-delete-button:visible').click(function () {
                 lensesLayer.removeLayer(tempMarker.areaQuery);
-                markerGroup.removeLayer(tempMarker.id);
+                if(tempMarker.id !=null){
+                    markerGroup.removeLayer(tempMarker.id);
+                }
                 });
                 
             }) ; 
+            return lens
         }
         
 

@@ -60,7 +60,7 @@ GROUP BY ID, ValueV*/
 // ST_DWithin geom geom, distance (in units of sgrid)--- should be meters but it aint, 0.0009 == 100meters sort of
 
 
-
+var activeQuery = "";
 
 
 /* QUERIES TO UTILIZE ON LENSES MECHANISMS*/
@@ -107,6 +107,9 @@ router.get('/map', function(req, res) {
   var timefetch = Math.floor( new Date().getTime()/1000);
   var timeafterGet = timefetch-timeB4draw;
 
+  //SET QUERY STRING TO RESET FOR EACH CLIENT
+
+  activeQuery = " WHERE ";
 
 
   // Pass the result to the map page
@@ -135,8 +138,7 @@ router.get('/query/:long/:lat/:radius/:type', function(req, res) {
 
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-
-  var query = client.query(new Query(query_0_args_ContructorQUERIES(req.params.long, req.params.lat, radiusDegrees, req.params.type)  )); // Run our Query
+  var query = client.query(new Query(query_0_args_ContructorQUERIES(req.params.long, req.params.lat, radiusDegrees, req.params.type))); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
   });
@@ -162,23 +164,39 @@ router.get('/query/:long/:lat/:radius/:type', function(req, res) {
 
 //QUERY CONSTRUCTOR
 function query_0_args_ContructorQUERIES (long, lat, radius, type){
+
+  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg";
+  var secondPart = " LIMIT 5000000) 	As f) As fc";
+  if (activeQuery.length != 7){
+    activeQuery = activeQuery + " AND ";
+  }
   if (type == "Default"){
-    console.log("Im on a Pass by Lens")
-    var queryDB = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") LIMIT 5000000) 	As f) As fc"
-    return queryDB;
+    console.log("Im on a Pass by Lens");
+    var queryDB =  "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
+    
+    activeQuery = activeQuery + queryDB;
+
+    return firstPart + activeQuery + secondPart;
   }
 
   if (type == "Start"){
-    console.log("Im on a Start Points Lens")
+    console.log("Im on a Start Points Lens");
+    var queryDB = "ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
+    
+    activeQuery = activeQuery + queryDB;
 
-    var queryDB = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End, ST_AsGeoJSON(lg.startPointGeom)::json, ST_AsGeoJSON(lg.endPointGeom)::json)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") LIMIT 5000000) 	As f) As fc"
-    return queryDB;
+    return firstPart + activeQuery + secondPart;
   }
 
   if (type == "End"){
-    console.log("Im on a End Points Lens")
+    console.log("Im on a End Points Lens");
+    var queryDB = "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
+    
+    activeQuery = activeQuery + queryDB;
 
-    var queryDB = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg WHERE ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") LIMIT 5000000) 	As f) As fc"
-    return queryDB;
+    return firstPart + activeQuery + secondPart;
   }
+
+  
+  return "";
 }
