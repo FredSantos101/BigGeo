@@ -28,12 +28,12 @@ var drawTracksMap ="SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As 
 /*WITH multis AS (
                  SELECT taxi_id, min(data_time) AS time_start, max(data_time)
  as time_end, track_id, ST_MakeLine(array_agg(geom ORDER BY
-taxi_id,data_time)) AS mylines
-                 FROM track_divided_by_time
+taxi_id,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg
+                 FROM track_divided_by_time_30s
  GROUP BY taxi_id, track_id
  )
 
- SELECT taxi_id, (ST_Dump(mylines)).geom,time_start, time_end, track_id
+ SELECT taxi_id, (ST_Dump(mylines)).geom,time_start, time_end, track_id, sPGeom, ePGeom, veloc_avg
  FROM multis;*/
 
 
@@ -128,7 +128,7 @@ router.get('/map', function(req, res) {
 
 });
 
-router.get('/query/:long/:lat/:radius/:type', function(req, res) {
+router.get('/query/:long/:lat/:radius/:type/:minValue/:maxValue', function(req, res) {
   console.log(req.params.long);
   console.log(req.params.lat);
 
@@ -138,7 +138,7 @@ router.get('/query/:long/:lat/:radius/:type', function(req, res) {
 
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-  var query = client.query(new Query(query_0_args_ContructorQUERIES(req.params.long, req.params.lat, radiusDegrees, req.params.type))); // Run our Query
+  var query = client.query(new Query(query_args_ContructorQUERIES(req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
   });
@@ -162,7 +162,7 @@ router.get('/query/:long/:lat/:radius/:type', function(req, res) {
 
 });
 
-router.get('/queryRemoval/:long/:lat/:radius/:type', function(req, res) {
+router.get('/queryRemoval/:long/:lat/:radius/:type/:minValue/:maxValue', function(req, res) {
   console.log(req.params.long);
   console.log(req.params.lat);
 
@@ -172,7 +172,7 @@ router.get('/queryRemoval/:long/:lat/:radius/:type', function(req, res) {
 
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-  var query = client.query(new Query(query_0_args_DecontructorQUERIES(req.params.long, req.params.lat, radiusDegrees, req.params.type))); // Run our Query
+  var query = client.query(new Query(query_args_DecontructorQUERIES(req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
   });
@@ -200,7 +200,7 @@ router.get('/queryRemoval/:long/:lat/:radius/:type', function(req, res) {
 //QUERY CONSTRUCTORS
 //
 
-function query_0_args_ContructorQUERIES (long, lat, radius, type){
+function query_args_ContructorQUERIES (long, lat, radius, type, minValue, maxValue){
 
   if (activeQuery.length == 0){
     activeQuery = " WHERE ";
@@ -220,7 +220,7 @@ function query_0_args_ContructorQUERIES (long, lat, radius, type){
     return firstPart + activeQuery + secondPart;
   }
 
-  if (type == "Start"){
+  else if (type == "Start"){
     console.log("Im on a Start Points Lens");
     var queryDB = "ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
     
@@ -229,7 +229,7 @@ function query_0_args_ContructorQUERIES (long, lat, radius, type){
     return firstPart + activeQuery + secondPart;
   }
 
-  if (type == "End"){
+  else if (type == "End"){
     console.log("Im on a End Points Lens");
     var queryDB = "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
     
@@ -237,8 +237,15 @@ function query_0_args_ContructorQUERIES (long, lat, radius, type){
 
     return firstPart + activeQuery + secondPart;
   }
+  else if (type == "Vel_avg"){
+    console.log("Im on an average Velocity Lens");
 
-  
+    var queryDB = "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minValue + ") AND (veloc_avg <=" + maxValue + ")";
+    
+    activeQuery = activeQuery + queryDB;
+
+    return firstPart + activeQuery + secondPart;
+  }
   return "";
 }
 
@@ -252,7 +259,7 @@ function replaceGlobally(original, searchTxt, replaceTxt) {
   return original;
 }
 
-function query_0_args_DecontructorQUERIES (long, lat, radius, type){
+function query_args_DecontructorQUERIES (long, lat, radius, type, minVal, maxVal){
   
   var andString = " AND ";
   var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.taxi_id,lg.data_time_Start,lg.data_time_End)) As properties FROM trajectory_lines As lg";
@@ -262,7 +269,7 @@ function query_0_args_DecontructorQUERIES (long, lat, radius, type){
     var queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
   
     console.log("Im on a Pass by Lens");
-    if (activeQuery.indexOf(" AND ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")") !=-1){
+    if (activeQuery.indexOf(queryDB) !=-1){
       console.log("Im on an AND one");
     }
     else if (activeQuery.indexOf("ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")") !=-1){
@@ -275,18 +282,9 @@ function query_0_args_DecontructorQUERIES (long, lat, radius, type){
     
     activeQuery = replaceGlobally(activeQuery, queryDB, "");
     console.log(activeQuery);
-
-    if (activeQuery.indexOf(" WHERE  AND ") != -1){
-      activeQuery = replaceGlobally(activeQuery, " WHERE  AND ", " WHERE ");
-    }
-    if (activeQuery.length == 7){
-      activeQuery = "";
-    }
-
-    return firstPart + activeQuery + secondPart;
   }
 
-  if (type == "Start"){
+  else if (type == "Start"){
     var queryDB = andString + "ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
   
     console.log("Im on a Start Point Lens");
@@ -304,17 +302,9 @@ function query_0_args_DecontructorQUERIES (long, lat, radius, type){
     activeQuery = replaceGlobally(activeQuery, queryDB, "");
     console.log(activeQuery);
 
-    if (activeQuery.indexOf(" WHERE  AND ") != -1){
-      activeQuery = replaceGlobally(activeQuery, " WHERE  AND ", " WHERE ");
-    }
-    if (activeQuery.length == 7){
-      activeQuery = "";
-    }
-
-    return firstPart + activeQuery + secondPart;
   }
 
-  if (type == "End"){
+  else if (type == "End"){
     var queryDB = andString + "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
   
     console.log("Im on a End Point Lens");
@@ -332,16 +322,34 @@ function query_0_args_DecontructorQUERIES (long, lat, radius, type){
     activeQuery = replaceGlobally(activeQuery, queryDB, "");
     console.log(activeQuery);
 
-    if (activeQuery.indexOf(" WHERE  AND ") != -1){
-      activeQuery = replaceGlobally(activeQuery, " WHERE  AND ", " WHERE ");
-    }
-    if (activeQuery.length == 7){
-      activeQuery = "";
-    }
-    
-    return firstPart + activeQuery + secondPart;
   }
 
-  
-  return "";
+  else if (type == "Vel_avg"){
+    var queryDB = andString + "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")";
+    
+    console.log("Im on a End Point Lens");
+    if (activeQuery.indexOf(" AND ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")") !=-1){
+      console.log("Im on an AND one");
+    }
+    else if (activeQuery.indexOf("ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")") !=-1){
+      console.log("Im not on an AND one");
+      queryDB ="ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")";
+    }
+    else{
+      console.log("There was an error as it didnt recognize any of them")
+    }
+    
+    activeQuery = replaceGlobally(activeQuery, queryDB, "");
+    console.log(activeQuery);
+
+  }
+
+  if (activeQuery.indexOf(" WHERE  AND ") != -1){
+    activeQuery = replaceGlobally(activeQuery, " WHERE  AND ", " WHERE ");
+  }
+  if (activeQuery.length == 7){
+    activeQuery = "";
+  }
+
+  return firstPart + activeQuery + secondPart;
 }
