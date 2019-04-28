@@ -240,13 +240,25 @@ function query_args_ContructorQUERIES (long, lat, radius, type, minValue, maxVal
   else if (type == "Vel_avg"){
     console.log("Im on an average Velocity Lens");
 
-    var queryDB = "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minValue + ") AND (veloc_avg <=" + maxValue + ")";
+    var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minValue + ") AND (veloc_avg <=" + maxValue + ")";
     
     activeQuery = activeQuery + queryDB;
 
     return firstPart + activeQuery + secondPart;
   }
-  return "";
+  else if (type == "Length"){
+    console.log("Im on an average Velocity Lens");
+    
+    var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValue + ") AND (ST_Length(geom) <=" + maxValue + ")";
+    
+    activeQuery = activeQuery + queryDB;
+    
+    return firstPart + activeQuery + secondPart;
+  }
+  else{
+    console.log("The string is empty");
+    return "";}
+  
 }
 
 
@@ -325,15 +337,15 @@ function query_args_DecontructorQUERIES (long, lat, radius, type, minVal, maxVal
   }
 
   else if (type == "Vel_avg"){
-    var queryDB = andString + "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")";
+    var queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")";
     
-    console.log("Im on a End Point Lens");
-    if (activeQuery.indexOf(" AND ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")") !=-1){
+    console.log("Im on a Velocity Lens");
+    if (activeQuery.indexOf(" AND ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")") !=-1){
       console.log("Im on an AND one");
     }
-    else if (activeQuery.indexOf("ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")") !=-1){
+    else if (activeQuery.indexOf("ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")") !=-1){
       console.log("Im not on an AND one");
-      queryDB ="ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")";
+      queryDB ="ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")";
     }
     else{
       console.log("There was an error as it didnt recognize any of them")
@@ -342,6 +354,25 @@ function query_args_DecontructorQUERIES (long, lat, radius, type, minVal, maxVal
     activeQuery = replaceGlobally(activeQuery, queryDB, "");
     console.log(activeQuery);
 
+  }
+
+  else if (type == "Length"){
+    var queryDB = andString + "(ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValue + ") AND (ST_Length(geom) <=" + maxValue + ")";
+    
+    console.log("Im on a Length  Lens");
+    if (activeQuery.indexOf(queryDB) !=-1){
+      console.log("Im on an AND one");
+    }
+    else if (activeQuery.indexOf("(ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValue + ") AND (ST_Length(geom) <=" + maxValue + ")") !=-1){
+      console.log("Im not on an AND one");
+      queryDB ="ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValue + ") AND (ST_Length(geom) <=" + maxValue + ")";
+    }
+    else{
+      console.log("There was an error as it didnt recognize any of them")
+    }
+    
+    activeQuery = replaceGlobally(activeQuery, queryDB, "");
+    console.log("The active query is:" + activeQuery);
   }
 
   if (activeQuery.indexOf(" WHERE  AND ") != -1){

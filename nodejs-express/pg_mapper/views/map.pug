@@ -18,7 +18,7 @@ block content
         
         var lastMarkerGroupID = null ;
 
-
+        //black and white, when it is a greyish color its hard to see
         /*L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             subdomains: 'abcd',
@@ -27,12 +27,20 @@ block content
             ext: 'png'
         }).addTo(map);*/
 
-        L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}', {
+        //Terrain is coloured, colors sometimes hard to see
+       /* L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}', {
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             subdomains: 'abcd',
             minZoom: 0,
             maxZoom: 18,
             ext: 'png'
+        }).addTo(map);*/
+
+        //ALL black and dark grey
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
         }).addTo(map);
 
         var timeB4draw = Math.floor( new Date().getTime()/1000);
@@ -47,9 +55,9 @@ block content
         
 
         var color;
-        var r = Math.floor(Math.random() * 255);
-        var g = Math.floor(Math.random() * 255);
-        var b = Math.floor(Math.random() * 255);
+        var r = Math.min(Math.max(Math.floor(Math.random() * 255), 50), 255);
+        var g = Math.min(Math.max(Math.floor(Math.random() * 255), 50), 255);
+        var b = Math.min(Math.max(Math.floor(Math.random() * 255), 50), 255);
         color= "rgb("+r+" ,"+g+","+ b+")"; 
         var defaultLayer = L.geoJSON().addTo(map);
         var firstStyle = {
@@ -97,7 +105,7 @@ block content
         function onMapClick(e) {
             popup
                 .setLatLng(e.latlng)
-                .setContent("You clicked the map at " + e.latlng.toString() + "<input id='radiusBox' type='text' size='20'/>" + "<input type='button' value='Create Pass by Lens' class='marker-create-button'/>" + "<input type='button' value='Create Start point Lens' class='marker-create-Start-button'/>" + "<input type='button' value='Create End point Lens' class='marker-create-End-button'/>" + "<input type='button' value='Create average Velocity Lens' class='marker-create-VelocityAVG-button'/>")
+                .setContent("You clicked the map at " + e.latlng.toString() + "<input id='radiusBox' type='text' size='20'/>" + "<input type='button' value='Create Pass by Lens' class='marker-create-button'/>" + "<input type='button' value='Create Start point Lens' class='marker-create-Start-button'/>" + "<input type='button' value='Create End point Lens' class='marker-create-End-button'/>" + "<input type='button' value='Create average Velocity Lens' class='marker-create-VelocityAVG-button'/>" + "<input type='button' value='Create Length Lens' class='marker-create-length-button'/>")
                 .openOn(map);
             var location= e.latlng;
             $('.marker-create-button').click(function () {
@@ -148,6 +156,18 @@ block content
                     createQuery(location.lng, location.lat, $('#radiusBox').val(),"Vel_avg",20,50);
                 }
             });
+            $('.marker-create-length-button').click(function () {
+                console.log ($('#radiusBox').val() );
+                if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 6000) {
+                    popup2
+                        .setLatLng(e.latlng)
+                        .setContent("Fill with a value of 1 until 6000" )
+                        .openOn(map);
+                }
+                else {
+                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Length",99/111120,100/111120);
+                }
+            });
             
         }
 
@@ -190,6 +210,7 @@ block content
                 console.log(newData.responseJSON);
                 if(lastMarkerGroupID !=null){
                     markerGroup.removeLayer(lastMarkerGroupID);
+                    lastMarkerGroupID = null;
                 }
                 if(newData.responseJSON.features != null){
                     var tracksToDraw = L.geoJson(newData.responseJSON,individualStyle);
@@ -275,6 +296,10 @@ block content
                         console.log("I will now paint the End circle again ....")
                         lens.areaQuery.setStyle({color: 'orange', fillColor: 'orange', fillOpacity: 0.2});
                     }
+                    else if(_type == "Length"){
+                        console.log("I will now paint the End circle again ....")
+                        lens.areaQuery.setStyle({color: 'orange', fillColor: 'orange', fillOpacity: 0.2});
+                    }
                 }
             };
             
@@ -293,6 +318,7 @@ block content
                 deleteQuery(lng, lat, radiusQuery, _type, minVal, maxVal);
                 if(lastMarkerGroupID !=null){
                     markerGroup.removeLayer(lastMarkerGroupID);
+                    lastMarkerGroupID = null;
                 }
                 });
                 
