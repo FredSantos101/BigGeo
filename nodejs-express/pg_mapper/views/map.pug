@@ -211,7 +211,7 @@ block content
                 " - Meters" + $( "#slider-range" ).slider( "values", 1 ) );
             } );
 
-            $('#radiusBox').change(function(){
+            $('#radiusBox').on('input',function(){
                 var myVar = $(this).val();
                 lensPreCreationLayer.clearLayers();
                 L.circle(e.latlng, {
