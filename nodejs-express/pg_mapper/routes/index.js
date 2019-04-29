@@ -136,6 +136,8 @@ router.get('/query/:long/:lat/:radius/:type/:minValue/:maxValue', function(req, 
   //Radius in meters to degrees
   var radiusDegrees = req.params.radius/ 111120;
 
+  //var minDegrees = req.params.minValue/ 111120;
+
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
   var query = client.query(new Query(query_args_ContructorQUERIES(req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
@@ -248,8 +250,9 @@ function query_args_ContructorQUERIES (long, lat, radius, type, minValue, maxVal
   }
   else if (type == "Length"){
     console.log("Im on a Length Lens");
-    
-    var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValue + ") AND (ST_Length(geom) <=" + maxValue + ")";
+    var minValDegree = minValue / 111120;
+    var maxValDegree = maxValue / 111120;
+    var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValDegree + ") AND (ST_Length(geom) <=" + maxValDegree + ")";
     
     activeQuery = activeQuery + queryDB;
     
@@ -357,15 +360,17 @@ function query_args_DecontructorQUERIES (long, lat, radius, type, minVal, maxVal
   }
 
   else if (type == "Length"){
-    var queryDB = andString + "(ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValue + ") AND (ST_Length(geom) <=" + maxValue + ")";
+    var minValDegree = minVal / 111120;
+    var maxValDegree = maxVal / 111120;
+    var queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValDegree + ") AND (ST_Length(geom) <=" + maxValDegree + ")";
     
     console.log("Im on a Length  Lens");
     if (activeQuery.indexOf(queryDB) !=-1){
       console.log("Im on an AND one");
     }
-    else if (activeQuery.indexOf("(ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValue + ") AND (ST_Length(geom) <=" + maxValue + ")") !=-1){
+    else if (activeQuery.indexOf("ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValDegree + ") AND (ST_Length(geom) <=" + maxValDegree + ")") !=-1){
       console.log("Im not on an AND one");
-      queryDB ="ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValue + ") AND (ST_Length(geom) <=" + maxValue + ")";
+      queryDB ="ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValDegree + ") AND (ST_Length(geom) <=" + maxValDegree + ")";
     }
     else{
       console.log("There was an error as it didnt recognize any of them")
