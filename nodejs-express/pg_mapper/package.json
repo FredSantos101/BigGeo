@@ -12,9 +12,11 @@
     "express": "~4.16.0",
     "geojson-vt": "^3.2.1",
     "http-errors": "~1.6.2",
+    "ion-rangeslider": "^2.3.0",
     "leaflet.glify": "^2.1.2",
     "mapbox-gl": "^0.53.1",
     "morgan": "~1.9.0",
+    "nouislider": "^13.1.5",
     "pg": "*",
     "pug": "^2.0.3",
     "randomcolor": "^0.5.4"

@@ -221,7 +221,7 @@ function query_args_ContructorQUERIES (long, lat, radius, type, minValue, maxVal
   }
 
   else if (type == "Start"){
-    console.log("Im on a Start Points Lens");
+    console.log("Im on a Start Point Lens");
     var queryDB = "ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
     
     activeQuery = activeQuery + queryDB;
@@ -230,7 +230,7 @@ function query_args_ContructorQUERIES (long, lat, radius, type, minValue, maxVal
   }
 
   else if (type == "End"){
-    console.log("Im on a End Points Lens");
+    console.log("Im on an End Point Lens");
     var queryDB = "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650)," + radius + ")";
     
     activeQuery = activeQuery + queryDB;
@@ -247,7 +247,7 @@ function query_args_ContructorQUERIES (long, lat, radius, type, minValue, maxVal
     return firstPart + activeQuery + secondPart;
   }
   else if (type == "Length"){
-    console.log("Im on an average Velocity Lens");
+    console.log("Im on a Length Lens");
     
     var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (ST_Length(geom) >=" + minValue + ") AND (ST_Length(geom) <=" + maxValue + ")";
     

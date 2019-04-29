@@ -15,6 +15,8 @@ block content
         var markerGroup = L.layerGroup().addTo(map);
 
         var lensesLayer = L.geoJSON().addTo(map);
+
+        var lensPreCreationLayer = L.layerGroup().addTo(map);
         
         var lastMarkerGroupID = null ;
 
@@ -99,14 +101,22 @@ block content
             
         var timeAdraw2 = Math.floor( new Date().getTime()/1000);
         console.log(timeAdraw2-timeB4draw);
-
+        
         var popup = L.popup();
         var popup2 = L.popup();
-        function onMapClick(e) {
+
+        var minValueVel;
+        var maxValueVel;
+        var minValueLength;
+        var maxValueLength;
+
+        function onMapClick(e) {// + "<input id='radiusBox' type='text' size='20'/>"
+            lensPreCreationLayer.clearLayers();
             popup
                 .setLatLng(e.latlng)
-                .setContent("You clicked the map at " + e.latlng.toString() + "<input id='radiusBox' type='text' size='20'/>" + "<input type='button' value='Create Pass by Lens' class='marker-create-button'/>" + "<input type='button' value='Create Start point Lens' class='marker-create-Start-button'/>" + "<input type='button' value='Create End point Lens' class='marker-create-End-button'/>" + "<input type='button' value='Create average Velocity Lens' class='marker-create-VelocityAVG-button'/>" + "<input type='button' value='Create Length Lens' class='marker-create-length-button'/>")
+                .setContent("You clicked the map at " + e.latlng.toString() + "<input id='radiusBox' type='range' min='1' max='6000' val='500' />" + "<input type='text' id='amountVel' readonly style='border:0; color:#f6931f; font-weight:bold;'>" + "<div id='maxMinBoundsVel'></div>" + "<input type='text' id='amountLength' readonly style='border:0; color:#f6931f; font-weight:bold;'>" + "<div id='maxMinBoundsLength'></div>" + "<input type='button' value='Create Pass by Lens' class='marker-create-button'/>" + "<input type='button' value='Create Start point Lens' class='marker-create-Start-button'/>" + "<input type='button' value='Create End point Lens' class='marker-create-End-button'/>" + "<input type='button' value='Create average Velocity Lens' class='marker-create-VelocityAVG-button'/>" + "<input type='button' value='Create Length Lens' class='marker-create-length-button'/>")
                 .openOn(map);
+            
             var location= e.latlng;
             $('.marker-create-button').click(function () {
                 console.log ($('#radiusBox').val() );
@@ -153,7 +163,7 @@ block content
                         .openOn(map);
                 }
                 else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Vel_avg",20,50);
+                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Vel_avg",minValueVel,maxValueVel);
                 }
             });
             $('.marker-create-length-button').click(function () {
@@ -165,8 +175,52 @@ block content
                         .openOn(map);
                 }
                 else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Length",99/111120,100/111120);
+                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Length",minValueLength,maxValueLength);
                 }
+            });
+            
+            $( function() {
+                $( "#maxMinBoundsVel" ).slider({
+                range: true,
+                min: 0,
+                max: 500,
+                values: [ 0, 500 ],
+                slide: function( event, ui ) {
+                    minValueVel =ui.values[ 0 ];
+                    maxValueVel =ui.values[ 1 ];
+                    $( "#amountVel" ).val( "Km/h" + ui.values[ 0 ] + " - Km/h" + ui.values[ 1 ] );
+                }
+                });
+                $( "#amountVel" ).val( "Km/h" + $( "#slider-range" ).slider( "values", 0 ) +
+                " - Km/h" + $( "#slider-range" ).slider( "values", 1 ) );
+            } );
+
+            $( function() {
+                $( "#maxMinBoundsLength" ).slider({
+                range: true,
+                min: 1,
+                max: 500000,
+                values: [ 75, 300000 ],
+                slide: function( event, ui ) {
+                    minValueLength =ui.values[ 0 ];
+                    maxValueLength =ui.values[ 1 ];
+                    $( "#amountLength" ).val( "Meters" + ui.values[ 0 ] + " - Meters" + ui.values[ 1 ] );
+                }
+                });
+                $( "#amountLength" ).val( "Meters" + $( "#slider-range" ).slider( "values", 0 ) +
+                " - Meters" + $( "#slider-range" ).slider( "values", 1 ) );
+            } );
+
+            $('#radiusBox').change(function(){
+                var myVar = $(this).val();
+                lensPreCreationLayer.clearLayers();
+                L.circle(e.latlng, {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.5,
+                    radius: myVar
+                }).addTo(lensPreCreationLayer)
+                
             });
             
         }
@@ -175,6 +229,7 @@ block content
        
 
         function createQuery(lng, lat, radiusQuery, typeLens, minVal, maxVal){
+            lensPreCreationLayer.clearLayers();
                         // Create URL
 
             var urlString = "query/" + lng + "/" + lat + "/" + radiusQuery + "/" + typeLens + "/" + minVal + "/" + maxVal;
