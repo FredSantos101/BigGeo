@@ -268,6 +268,17 @@ function query_args_ContructorQUERIES (long, lat, radius, type, minValue, maxVal
     
     return firstPart + activeQuery + secondPart;
   }
+
+  else if (type == "Time_Duration"){
+    console.log("Im on a Duration Lens");
+    var minValTime = minValue;  //UNIX TIME
+    var maxValTime = maxValue;  //UNIX TIME
+    var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (extract(epoch from (data_time_end - data_time_start)) BETWEEN  " + minValTime + " AND " +maxValTime + ")";
+    
+    activeQuery = activeQuery + queryDB;
+    
+    return firstPart + activeQuery + secondPart;
+  }
   else{
     console.log("The string is empty");
     return "";}
@@ -402,6 +413,26 @@ function query_args_DecontructorQUERIES (long, lat, radius, type, minVal, maxVal
     else if (activeQuery.indexOf("ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + ") OR data_time_end BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" + maxValTime + "))") !=-1){
       console.log("Im not on an AND one");
       queryDB ="ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + ") OR data_time_end BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" + maxValTime + "))";
+    }
+    else{
+      console.log("There was an error as it didnt recognize any of them")
+    }
+    
+    activeQuery = replaceGlobally(activeQuery, queryDB, "");
+    console.log("The active query is:" + activeQuery);
+  }
+  else if (type == "Time_Duration"){
+    var minValTime = minVal;  //UNIX TIME
+    var maxValTime = maxVal;  //UNIX TIME
+    var queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (extract(epoch from (data_time_end - data_time_start)) BETWEEN  " + minValTime + " AND " +maxValTime + ")";
+    
+    console.log("Im on a Time Duration  Lens");
+    if (activeQuery.indexOf(queryDB) !=-1){
+      console.log("Im on an AND one");
+    }
+    else if (activeQuery.indexOf("ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (extract(epoch from (data_time_end - data_time_start)) BETWEEN  " + minValTime + " AND " +maxValTime + ")") !=-1){
+      console.log("Im not on an AND one");
+      queryDB ="ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),32650),"+ radius +") AND (extract(epoch from (data_time_end - data_time_start)) BETWEEN  " + minValTime + " AND " +maxValTime + ")";
     }
     else{
       console.log("There was an error as it didnt recognize any of them")
