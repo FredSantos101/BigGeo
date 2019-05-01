@@ -169,9 +169,10 @@ block content
                         "<input type='button' value='Create average Velocity Lens' class='marker-create-VelocityAVG-button'/>" + 
                         "<input type='button' value='Create Length Lens' class='marker-create-length-button'/>" + 
                         "<input type='button' value='Create Time Interval Lens' class='marker-create-timeInterval-button'/>" +
-                        "<input type='button' value='Create Time Duration Lens' class='marker-create-timeDuration-button'/>") 
-                        .openOn(map);
-                
+                        "<input type='button' value='Create Time Duration Lens' class='marker-create-timeDuration-button'/>").openOn(map);
+                    map.on('popupclose', function(e) {
+                            lensPreCreationLayer.clearLayers();
+                        })
                     var location= e.latlng;
                     $('.marker-create-button').click(function () {
                         console.log ($('#radiusBox').val() );
