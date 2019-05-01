@@ -20,6 +20,8 @@ block content
         
         var lastMarkerGroupID = null ;
 
+        var createQueryLensesFlag = false;
+
         //black and white, when it is a greyish color its hard to see
         /*L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -51,19 +53,45 @@ block content
         var timeAdraw1 = Math.floor( new Date().getTime()/1000);
         console.log(timeAdraw1-timeB4draw);
         // Create variable to hold map element, give initial settings to map
-       
-       
+        var customControl =  L.Control.extend({
+
+        options: {
+            position: 'topleft'
+        },
+
+        onAdd: function (map) {
+            var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+
+            container.style.backgroundColor = 'white';     
+            container.style.backgroundImage = "url(images/636051.svg)";
+            container.style.backgroundSize = "30px 30px";
+            container.style.width = '30px';
+            container.style.height = '30px';
+
+            container.onclick = function(e){
+                L.DomEvent.stopPropagation(e); 
+                createQueryLensesFlag = !createQueryLensesFlag;
+                if (createQueryLensesFlag){
+                    container.style.backgroundColor = 'grey';
+                }
+                else{
+                    container.style.backgroundColor = 'white';   
+                }
+            }
+
+            return container;
+        }
+        });
+
+        map.addControl(new customControl());
+            
+
+                
 
         
-
-        var color;
-        var r = Math.min(Math.max(Math.floor(Math.random() * 255), 50), 255);
-        var g = Math.min(Math.max(Math.floor(Math.random() * 255), 50), 255);
-        var b = Math.min(Math.max(Math.floor(Math.random() * 255), 50), 255);
-        color= "rgb("+r+" ,"+g+","+ b+")"; 
         var defaultLayer = L.geoJSON().addTo(map);
         var firstStyle = {
-            "color": color,
+            "color": 'tomato',
             "weight": 1,
             "opacity": 0.4
         };
@@ -115,204 +143,222 @@ block content
         var maxValueTimeDuration;
 
         function onMapClick(e) {// + "<input id='radiusBox' type='text' size='20'/>"
-            lensPreCreationLayer.clearLayers();
-            popup
-                .setLatLng(e.latlng)
-                .setContent("You clicked the map at " + e.latlng.toString() + "<input id='radiusBox' type='range' min='1' max='6000' val='500' />" + 
-                "<input type='text' id='amountVel' readonly style=' border:0; color:#f6f31f1; font-weight:bold;'>" + 
-                "<div id='maxMinBoundsVel'></div>" + 
-                "<input type='text' id='amountLength' readonly style='width:250px; border:0; color:#669911; font-weight:bold;'>" + 
-                "<div id='maxMinBoundsLength'></div>" +
-                "<input type='text' id='amountTimeInterval' readonly style='width:310px; border:0; color:#f6931f; font-weight:bold;'>" + 
-                "<div id='maxMinBoundsTimeInterval'></div>" + 
-                "<input type='text' id='amountTimeDuration' readonly style='width:310px; border:0; color:#23339f; font-weight:bold;'>" + 
-                "<div id='maxMinBoundsTimeDuration'></div>" + 
-                "<input type='button' value='Create Pass by Lens' class='marker-create-button'/>" + 
-                "<input type='button' value='Create Start point Lens' class='marker-create-Start-button'/>" + 
-                "<input type='button' value='Create End point Lens' class='marker-create-End-button'/>" + 
-                "<input type='button' value='Create average Velocity Lens' class='marker-create-VelocityAVG-button'/>" + 
-                "<input type='button' value='Create Length Lens' class='marker-create-length-button'/>" + 
-                "<input type='button' value='Create Time Interval Lens' class='marker-create-timeInterval-button'/>" +
-                "<input type='button' value='Create Time Duration Lens' class='marker-create-timeDuration-button'/>") 
-                .openOn(map);
-            
-            var location= e.latlng;
-            $('.marker-create-button').click(function () {
-                console.log ($('#radiusBox').val() );
-                if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 6000) {
-                    popup2
+                if(createQueryLensesFlag){   
+                    lensPreCreationLayer.clearLayers();
+                    var previewCircle = L.circle(e.latlng, {
+                            color: 'red',
+                            fillColor: '#f03',
+                            fillOpacity: 0.5,
+                            radius: 5000
+                        });
+                    previewCircle.addTo(lensPreCreationLayer);
+                    popup
                         .setLatLng(e.latlng)
-                        .setContent("Fill with a value of 1 until 6000" )
+                        .setContent("You clicked the map at " + e.latlng.toString() + "<input id='radiusBox' type='range' min='1' max='10000' val='5000' />" + 
+                        "<input type='text' id='amountVel' readonly style=' border:0; color:#f6f31f1; font-weight:bold;'>" + 
+                        "<div id='maxMinBoundsVel'></div>" + 
+                        "<input type='text' id='amountLength' readonly style='width:250px; border:0; color:#669911; font-weight:bold;'>" + 
+                        "<div id='maxMinBoundsLength'></div>" +
+                        "<input type='text' id='amountTimeInterval' readonly style='width:310px; border:0; color:#f6931f; font-weight:bold;'>" + 
+                        "<div id='maxMinBoundsTimeInterval'></div>" + 
+                        "<input type='text' id='amountTimeDuration' readonly style='width:310px; border:0; color:#23339f; font-weight:bold;'>" + 
+                        "<div id='maxMinBoundsTimeDuration'></div>" + 
+                        "<input type='button' value='Create Pass by Lens' class='marker-create-button'/>" + 
+                        "<input type='button' value='Create Start point Lens' class='marker-create-Start-button'/>" + 
+                        "<input type='button' value='Create End point Lens' class='marker-create-End-button'/>" + 
+                        "<input type='button' value='Create average Velocity Lens' class='marker-create-VelocityAVG-button'/>" + 
+                        "<input type='button' value='Create Length Lens' class='marker-create-length-button'/>" + 
+                        "<input type='button' value='Create Time Interval Lens' class='marker-create-timeInterval-button'/>" +
+                        "<input type='button' value='Create Time Duration Lens' class='marker-create-timeDuration-button'/>") 
                         .openOn(map);
-                }
-                else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Default",0,0);
-                }
-            });
-            $('.marker-create-Start-button').click(function () {
-                console.log ($('#radiusBox').val() );
-                if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 6000) {
-                    popup2
-                        .setLatLng(e.latlng)
-                        .setContent("Fill with a value of 1 until 6000" )
-                        .openOn(map);
-                }
-                else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Start",0,0);
-                }
-            });
-            $('.marker-create-End-button').click(function () {
-                console.log ($('#radiusBox').val() );
-                if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 6000) {
-                    popup2
-                        .setLatLng(e.latlng)
-                        .setContent("Fill with a value of 1 until 6000" )
-                        .openOn(map);
-                }
-                else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"End",0,0);
-                }
-            });
-            $('.marker-create-VelocityAVG-button').click(function () {
-                console.log ($('#radiusBox').val() );
-                if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 6000) {
-                    popup2
-                        .setLatLng(e.latlng)
-                        .setContent("Fill with a value of 1 until 6000" )
-                        .openOn(map);
-                }
-                else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Vel_avg",minValueVel,maxValueVel);
-                }
-            });
-            $('.marker-create-length-button').click(function () {
-                console.log ($('#radiusBox').val() );
-                if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 6000) {
-                    popup2
-                        .setLatLng(e.latlng)
-                        .setContent("Fill with a value of 1 until 6000" )
-                        .openOn(map);
-                }
-                else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Length",minValueLength,maxValueLength);
-                }
-            });
-            $('.marker-create-timeInterval-button').click(function () {
-                console.log ($('#radiusBox').val() );
-                if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 6000) {
-                    popup2
-                        .setLatLng(e.latlng)
-                        .setContent("Fill with a value of 1 until 6000" )
-                        .openOn(map);
-                }
-                else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Time_Interval",minValueTime,maxValueTime);
-                }
-            });
-            $('.marker-create-timeDuration-button').click(function () {
-                console.log ($('#radiusBox').val() );
-                if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 6000) {
-                    popup2
-                        .setLatLng(e.latlng)
-                        .setContent("Fill with a value of 1 until 6000" )
-                        .openOn(map);
-                }
-                else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Time_Duration",minValueTimeDuration,maxValueTimeDuration);
-                }
-            });
-            
-            $( function() {
-                $( "#maxMinBoundsVel" ).slider({
-                range: true,
-                min: 0,
-                max: 500,
-                values: [ 0, 500 ],
-                slide: function( event, ui ) {
-                    minValueVel =ui.values[ 0 ];
-                    maxValueVel =ui.values[ 1 ];
-                    $( "#amountVel" ).val( "Km/h " + ui.values[ 0 ] + " - Km/h " + ui.values[ 1 ] );
-                }
-                });
-                $( "#amountVel" ).val( "Km/h" + $( "#slider-range" ).slider( "values", 0 ) +
-                " - Km/h" + $( "#slider-range" ).slider( "values", 1 ) );
-            } );
-
-            $( function() {
-                $( "#maxMinBoundsLength" ).slider({
-                range: true,
-                min: 1,
-                max: 500000,
-                values: [ 1, 300000 ],
-                slide: function( event, ui ) {
-                    minValueLength =ui.values[ 0 ];
-                    maxValueLength =ui.values[ 1 ];
-                    $( "#amountLength" ).val( "Meters" + ui.values[ 0 ] + " - Meters" + ui.values[ 1 ] );
-                }
-                });
-                $( "#amountLength" ).val( "Meters " + $( "#slider-range" ).slider( "values", 0 ) +
-                " - Meters " + $( "#slider-range" ).slider( "values", 1 ) );
-            } );
-
-            function Unix_timestamp(t){
-                var dt = new Date(t);
-                var stringDate = dt.toUTCString();
-                /*var year = dt.getFullYear();
-                var month = dt.getMonth();
-                var day = dt.getDay();
-                var hour = dt.getHours();
-                var minute = dt.getMinutes();
-                var seconds = dt.getSeconds();*/
-
-                return stringDate;
-            }
-
-            
-
-            $( function() {
-                $( "#maxMinBoundsTimeInterval" ).slider({
-                range: true,
-                min: 1201959044 * 1000, // 2008-02-02 13:30:44
-                max: 1202492358 * 1000, // 2008-02-08 17:39:18
-                values: [ 1201959044 * 1000, 1202492358 * 1000 ],
-                slide: function( event, ui ) {
-                    minValueTime =ui.values[ 0 ];
-                    maxValueTime =ui.values[ 1 ];
-                    $( "#amountTimeInterval" ).val(Unix_timestamp(minValueTime) + " - " + Unix_timestamp(maxValueTime) );
-                }
-                });
-                $( "#amountTimeInterval" ).val($( "#slider-range" ).slider( "values", 0 ) +
-                " - " + $( "#slider-range" ).slider( "values", 1 ) );
-            } );
-
-            $( function() {
-                $( "#maxMinBoundsTimeDuration" ).slider({
-                range: true,
-                min: 0, // 2008-02-02 13:30:44
-                max: 85839, // 2008-02-08 17:39:18
-                values: [ 0, 85839 ],
-                slide: function( event, ui ) {
-                    minValueTimeDuration =ui.values[ 0 ];
-                    maxValueTimeDuration =ui.values[ 1 ];
-                    $( "#amountTimeDuration" ).val(minValueTimeDuration + " - " + maxValueTimeDuration);
-                }
-                });
-                $( "#amountTimeDuration" ).val( "Min duration " + $( "#slider-range" ).slider( "values", 0 ) +
-                " - Max time " + $( "#slider-range" ).slider( "values", 1 ) );
-            } );
-
-            $('#radiusBox').on('input',function(){
-                var myVar = $(this).val();
-                lensPreCreationLayer.clearLayers();
-                L.circle(e.latlng, {
-                    color: 'red',
-                    fillColor: '#f03',
-                    fillOpacity: 0.5,
-                    radius: myVar
-                }).addTo(lensPreCreationLayer)
                 
-            });
-            
+                    var location= e.latlng;
+                    $('.marker-create-button').click(function () {
+                        console.log ($('#radiusBox').val() );
+                        if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 10000) {
+                            popup2
+                                .setLatLng(e.latlng)
+                                .setContent("Fill with a value of 1 until 10000" )
+                                .openOn(map);
+                        }
+                        else {
+                            createQuery(location.lng, location.lat, $('#radiusBox').val(),"Default",0,0);
+                        }
+                    });
+                    $('.marker-create-Start-button').click(function () {
+                        console.log ($('#radiusBox').val() );
+                        if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 10000) {
+                            popup2
+                                .setLatLng(e.latlng)
+                                .setContent("Fill with a value of 1 until 10000" )
+                                .openOn(map);
+                        }
+                        else {
+                            createQuery(location.lng, location.lat, $('#radiusBox').val(),"Start",0,0);
+                        }
+                    });
+                    $('.marker-create-End-button').click(function () {
+                        console.log ($('#radiusBox').val() );
+                        if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 10000) {
+                            popup2
+                                .setLatLng(e.latlng)
+                                .setContent("Fill with a value of 1 until 10000" )
+                                .openOn(map);
+                        }
+                        else {
+                            createQuery(location.lng, location.lat, $('#radiusBox').val(),"End",0,0);
+                        }
+                    });
+                    $('.marker-create-VelocityAVG-button').click(function () {
+                        console.log ($('#radiusBox').val() );
+                        if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 10000) {
+                            popup2
+                                .setLatLng(e.latlng)
+                                .setContent("Fill with a value of 1 until 10000" )
+                                .openOn(map);
+                        }
+                        else {
+                            createQuery(location.lng, location.lat, $('#radiusBox').val(),"Vel_avg",minValueVel,maxValueVel);
+                        }
+                    });
+                    $('.marker-create-length-button').click(function () {
+                        console.log ($('#radiusBox').val() );
+                        if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 10000) {
+                            popup2
+                                .setLatLng(e.latlng)
+                                .setContent("Fill with a value of 1 until 10000" )
+                                .openOn(map);
+                        }
+                        else {
+                            createQuery(location.lng, location.lat, $('#radiusBox').val(),"Length",minValueLength,maxValueLength);
+                        }
+                    });
+                    $('.marker-create-timeInterval-button').click(function () {
+                        console.log ($('#radiusBox').val() );
+                        if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 10000) {
+                            popup2
+                                .setLatLng(e.latlng)
+                                .setContent("Fill with a value of 1 until 10000" )
+                                .openOn(map);
+                        }
+                        else {
+                            createQuery(location.lng, location.lat, $('#radiusBox').val(),"Time_Interval",minValueTime,maxValueTime);
+                        }
+                    });
+                    $('.marker-create-timeDuration-button').click(function () {
+                        console.log ($('#radiusBox').val() );
+                        if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 10000) {
+                            popup2
+                                .setLatLng(e.latlng)
+                                .setContent("Fill with a value of 1 until 10000" )
+                                .openOn(map);
+                        }
+                        else {
+                            createQuery(location.lng, location.lat, $('#radiusBox').val(),"Time_Duration",minValueTimeDuration,maxValueTimeDuration);
+                        }
+                    });
+                    
+                    $( function() {
+                        $( "#radiusValue" ).slider({
+                        range: true,
+                        min: 0,
+                        max: 500,
+                        values: [ 0, 500 ],
+                        slide: function( event, ui ) {
+                            minValueVel =ui.values[ 0 ];
+                            maxValueVel =ui.values[ 1 ];
+                            $( "#amountVel" ).val( "Km/h " + ui.values[ 0 ] + " - Km/h " + ui.values[ 1 ] );
+                        }
+                        });
+                        $( "#amountVel" ).val( "Km/h" + $( "#slider-range" ).slider( "values", 0 ) +
+                        " - Km/h" + $( "#slider-range" ).slider( "values", 1 ) );
+                    } );
+
+                    $( function() {
+                        $( "#maxMinBoundsVel" ).slider({
+                        range: true,
+                        min: 0,
+                        max: 500,
+                        values: [ 0, 500 ],
+                        slide: function( event, ui ) {
+                            minValueVel =ui.values[ 0 ];
+                            maxValueVel =ui.values[ 1 ];
+                            $( "#amountVel" ).val( "Km/h " + ui.values[ 0 ] + " - Km/h " + ui.values[ 1 ] );
+                        }
+                        });
+                        $( "#amountVel" ).val( "Km/h" + $( "#slider-range" ).slider( "values", 0 ) +
+                        " - Km/h" + $( "#slider-range" ).slider( "values", 1 ) );
+                    } );
+
+                    $( function() {
+                        $( "#maxMinBoundsLength" ).slider({
+                        range: true,
+                        min: 1,
+                        max: 500000,
+                        values: [ 1, 300000 ],
+                        slide: function( event, ui ) {
+                            minValueLength =ui.values[ 0 ];
+                            maxValueLength =ui.values[ 1 ];
+                            $( "#amountLength" ).val( "Meters" + ui.values[ 0 ] + " - Meters" + ui.values[ 1 ] );
+                        }
+                        });
+                        $( "#amountLength" ).val( "Meters " + $( "#slider-range" ).slider( "values", 0 ) +
+                        " - Meters " + $( "#slider-range" ).slider( "values", 1 ) );
+                    } );
+
+                    function Unix_timestamp(t){
+                        var dt = new Date(t);
+                        var stringDate = dt.toUTCString();
+                        /*var year = dt.getFullYear();
+                        var month = dt.getMonth();
+                        var day = dt.getDay();
+                        var hour = dt.getHours();
+                        var minute = dt.getMinutes();
+                        var seconds = dt.getSeconds();*/
+
+                        return stringDate;
+                    }
+
+                    
+
+                    $( function() {
+                        $( "#maxMinBoundsTimeInterval" ).slider({
+                        range: true,
+                        min: 1201959044 , // 2008-02-02 13:30:44
+                        max: 1202492358 , // 2008-02-08 17:39:18
+                        values: [ 1201959044 , 1202492358  ],
+                        slide: function( event, ui ) {
+                            minValueTime =ui.values[ 0 ];
+                            maxValueTime =ui.values[ 1 ];
+                            $( "#amountTimeInterval" ).val(Unix_timestamp(minValueTime * 1000) + " - " + Unix_timestamp(maxValueTime * 1000) );
+                        }
+                        });
+                        $( "#amountTimeInterval" ).val($( "#slider-range" ).slider( "values", 0 ) +
+                        " - " + $( "#slider-range" ).slider( "values", 1 ) );
+                    } );
+
+                    $( function() {
+                        $( "#maxMinBoundsTimeDuration" ).slider({
+                        range: true,
+                        min: 0, // 2008-02-02 13:30:44
+                        max: 85839, // 2008-02-08 17:39:18
+                        values: [ 0, 85839 ],
+                        slide: function( event, ui ) {
+                            minValueTimeDuration =ui.values[ 0 ];
+                            maxValueTimeDuration =ui.values[ 1 ];
+                            $( "#amountTimeDuration" ).val(minValueTimeDuration + " - " + maxValueTimeDuration);
+                        }
+                        });
+                        $( "#amountTimeDuration" ).val( "Min duration " + $( "#slider-range" ).slider( "values", 0 ) +
+                        " - Max time " + $( "#slider-range" ).slider( "values", 1 ) );
+                    } );
+
+                    $('#radiusBox').on('input',function(){
+                        var myVar = $(this).val();
+                        previewCircle.setRadius( myVar);
+                        
+                    });
+            }
         }
 
         map.on('click', onMapClick);
@@ -325,9 +371,9 @@ block content
             var urlString = "query/" + lng + "/" + lat + "/" + radiusQuery + "/" + typeLens + "/" + minVal + "/" + maxVal;
             
             var color2;
-            var r = Math.floor(Math.random() * 255);
-            var g = Math.floor(Math.random() * 255);
-            var b = Math.floor(Math.random() * 255);
+            var r = Math.min(Math.max(Math.floor(Math.random() * 255), 100), 200);
+            var g = Math.min(Math.max(Math.floor(Math.random() * 255), 75), 255);
+            var b = Math.min(Math.max(Math.floor(Math.random() * 255), 120), 225);
             color2= "rgb("+r+" ,"+g+","+ b+")"; 
 
             
@@ -335,7 +381,7 @@ block content
             var individualStyle = {
                 "color": color2,
                 "weight": 2,
-                "opacity": 0.2
+                "opacity": 0.5
             };
             var lensesVar = createLens(lng, lat, radiusQuery, typeLens, minVal, maxVal);
             var newData = $.ajax({
@@ -376,9 +422,9 @@ block content
             var urlString = "queryRemoval/" + lng + "/" + lat + "/" + radius + "/" + type + "/" + minVal + "/" + maxVal;
 
             var color2;
-            var r = Math.floor(Math.random() * 255);
-            var g = Math.floor(Math.random() * 255);
-            var b = Math.floor(Math.random() * 255);
+            var r = Math.min(Math.max(Math.floor(Math.random() * 255), 55), 200);
+            var g = Math.min(Math.max(Math.floor(Math.random() * 255), 75), 255);
+            var b = Math.min(Math.max(Math.floor(Math.random() * 255), 100), 225);
             color2= "rgb("+r+" ,"+g+","+ b+")"; 
 
             
@@ -386,7 +432,7 @@ block content
             var individualStyle = {
                 "color": color2,
                 "weight": 1,
-                "opacity": 0.1
+                "opacity": 0.2
             };
 
             var newData = $.ajax({
@@ -419,23 +465,23 @@ block content
             var lens = { type: _type, 
                 id :  null, 
                 areaQuery : L.circle([lat, lng], {
-                    color: 'red',
-                    fillColor: '#f03',
-                    fillOpacity: 0.5,
+                    color: 'DarkRed',
+                    fillColor: 'red',
+                    fillOpacity: 0.6,
                     radius: radiusQuery
                 }).addTo(lensesLayer),
                 colorSuccess : function() {
                     if(_type == "Default"){
                         console.log("I will now paint the Pass by circle again ....")
-                        lens.areaQuery.setStyle({color: 'blue', fillColor: 'blue', fillOpacity: 0.2});
+                        lens.areaQuery.setStyle({color: 'DodgerBlue', fillColor: 'DodgerBlue', fillOpacity: 0.2});
                     }
                     else if(_type == "Start"){
                         console.log("I will now paint the Start circle again ....")
-                        lens.areaQuery.setStyle({color: 'green', fillColor: 'green', fillOpacity: 0.2});
+                        lens.areaQuery.setStyle({color: 'MediumSeaGreen', fillColor: 'MediumSeaGreen', fillOpacity: 0.2});
                     }
                     else if(_type == "End"){
                         console.log("I will now paint the End circle again ....")
-                        lens.areaQuery.setStyle({color: 'yellow', fillColor: 'yellow', fillOpacity: 0.2});
+                        lens.areaQuery.setStyle({color: 'Violet', fillColor: 'Violet', fillOpacity: 0.2});
                     }
                     else if(_type == "Vel_avg"){
                         console.log("I will now paint the End circle again ....")
@@ -443,7 +489,7 @@ block content
                     }
                     else if(_type == "Length"){
                         console.log("I will now paint the End circle again ....")
-                        lens.areaQuery.setStyle({color: 'purple', fillColor: 'purple', fillOpacity: 0.2});
+                        lens.areaQuery.setStyle({color: 'SlateBlue', fillColor: 'SlateBlue', fillOpacity: 0.2});
                     }
                     else if(_type == "Time_Interval"){
                         console.log("I will now paint the End circle again ....")
@@ -451,7 +497,7 @@ block content
                     }
                     else if(_type == "Time_Duration"){
                         console.log("I will now paint the End circle again ....")
-                        lens.areaQuery.setStyle({color: 'white', fillColor: 'white', fillOpacity: 0.2});
+                        lens.areaQuery.setStyle({color: 'DarkTurquoise ', fillColor: 'DarkTurquoise ', fillOpacity: 0.2});
                     }
                 }
             };
