@@ -140,7 +140,7 @@ block content
                 
 
         
-        var defaultLayer = L.geoJSON().addTo(map);
+        //var defaultLayer = new L.GeoJSON().addTo(map);
         var firstStyle = {
             "color": 'tomato',
             "weight": 2,
@@ -163,7 +163,7 @@ block content
      
         // Add JSON to map
         
-        L.geoJson(myData,firstStyle).addTo(defaultLayer);
+        var defaultLayer = new L.geoJson(myData,firstStyle).addTo(map);
     
         map.on('zoomend', function() {
             console.log(map.getZoom())
@@ -425,83 +425,7 @@ block content
             
         }
 
-        function createLens(lng, lat, radiusQuery, _type, minVal, maxVal){
-            var lens = { type: _type, 
-                areaQuery : L.circle([lat, lng], {
-                    color: 'DarkRed',
-                    fillColor: 'red',
-                    fillOpacity: 0.6,
-                    radius: radiusQuery
-                }).addTo(lensesLayer),
-                colorSuccess : function() {
-                    if(_type == "Default"){
-                        console.log("I will now paint the Pass by circle again ....")
-                        lens.areaQuery.setStyle({color: 'DodgerBlue', fillColor: 'DodgerBlue', fillOpacity: 0.2});
-                    }
-                    else if(_type == "Start"){
-                        console.log("I will now paint the Start circle again ....")
-                        lens.areaQuery.setStyle({color: 'MediumSeaGreen', fillColor: 'MediumSeaGreen', fillOpacity: 0.2});
-                    }
-                    else if(_type == "End"){
-                        console.log("I will now paint the End circle again ....")
-                        lens.areaQuery.setStyle({color: 'Violet', fillColor: 'Violet', fillOpacity: 0.2});
-                    }
-                    else if(_type == "Vel_avg"){
-                        console.log("I will now paint the End circle again ....")
-                        lens.areaQuery.setStyle({color: 'orange', fillColor: 'orange', fillOpacity: 0.2});
-                    }
-                    else if(_type == "Length"){
-                        console.log("I will now paint the End circle again ....")
-                        lens.areaQuery.setStyle({color: 'SlateBlue', fillColor: 'SlateBlue', fillOpacity: 0.2});
-                    }
-                    else if(_type == "Time_Interval"){
-                        console.log("I will now paint the End circle again ....")
-                        lens.areaQuery.setStyle({color: 'purple', fillColor: 'purple', fillOpacity: 0.2});
-                    }
-                    else if(_type == "Time_Duration"){
-                        console.log("I will now paint the End circle again ....")
-                        lens.areaQuery.setStyle({color: 'DarkTurquoise ', fillColor: 'DarkTurquoise ', fillOpacity: 0.2});
-                    }
-                }
-            };
-            
-            
-            lens.areaQuery.bindPopup("<input type='button' value='Delete this lens' class='marker-delete-button'/>")
-            lens.areaQuery.on("popupopen", function() {
-            var tempMarker = lens;
-
-            //var tempMarkerGeoJSON = this.toGeoJSON();
-
-            //var lID = tempMarker._leaflet_id; // Getting Leaflet ID of this marker
-
-            // To remove marker on click of delete
-            $('.marker-delete-button:visible').click(function () {
-                lensesLayer.removeLayer(tempMarker.areaQuery);
-                
-                if(lastMarkerGroupID !=null){
-                    markerGroup.removeLayer(lastMarkerGroupID);
-                    lastMarkerGroupID = null;
-                }
-                if(lastMarkerGroupID1 !=null){
-                    markerGroup1.removeLayer(lastMarkerGroupID1);
-                    lastMarkerGroupID1 = null;
-                }
-                if(lastMarkerGroupID2 !=null){
-                    markerGroup2.removeLayer(lastMarkerGroupID2);
-                    lastMarkerGroupID2 = null;
-                }
-                if(lastMarkerGroupID3 !=null){
-                    markerGroup3.removeLayer(lastMarkerGroupID3);
-                    lastMarkerGroupID3 = null;
-                }
-                deleteQuery(lng, lat, radiusQuery, _type, minVal, maxVal);
-                });
-                
-            }) ; 
-            return lens
-        }
-
-
+        
         /////
         ///// Menus for lens creation
         /////
@@ -517,7 +441,8 @@ block content
             previewCircle.addTo(lensPreCreationLayer);
             popup
                 .setLatLng(e.latlng)
-                .setContent("You clicked the map at " + e.latlng.toString() + "<input id='radiusBox' type='range' min='1' max='10000' val='5000' />" + 
+                .setContent("You clicked the map at " + e.latlng.toString() + 
+                "<input id='radiusBox' type='range' min='1' max='10000' val='5000' />" + 
                 "<input type='text' id='amountVel' readonly style=' border:0; color:#f6f31f1; font-weight:bold;'>" + 
                 "<div id='maxMinBoundsVel'></div>" + 
                 "<input type='text' id='amountLength' readonly style='width:250px; border:0; color:#669911; font-weight:bold;'>" + 
@@ -719,13 +644,14 @@ block content
             previewCircle.addTo(lensPreCreationLayer);
             popup
                 .setLatLng(e.latlng)
-                .setContent("You clicked the map at " + e.latlng.toString() + "<input id='radiusBox' type='range' min='1' max='10000' val='5000' />" + 
-                "<input type='button' value='Create Pass by Lens' class='marker-create-button'/>").openOn(map);
+                .setContent("You clicked the map at " + e.latlng.toString() + 
+                "<input id='radiusBox' type='range' min='1' max='10000' val='5000' />" + 
+                "<input type='button' value='Create Attribute Lens' class='attribute-button'/>").openOn(map);
             map.on('popupclose', function(e) {
                     lensPreCreationLayer.clearLayers();
                 })
             var location= e.latlng;
-            $('.marker-create-button').click(function () {
+            $('.attribute-button').click(function () {
                 console.log ($('#radiusBox').val() );
                 if ($('#radiusBox').val() == "" || $('#radiusBox').val() <= 0 || $('#radiusBox').val() > 10000) {
                     popup2
@@ -734,25 +660,10 @@ block content
                         .openOn(map);
                 }
                 else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Default",0,0);
+                    attributeLensCreation(location, $('#radiusBox').val(),"Attribute","Encoding");
                 }
             });
 
-            $( function() {
-                $( "#radiusValue" ).slider({
-                range: true,
-                min: 0,
-                max: 500,
-                values: [ 0, 500 ],
-                slide: function( event, ui ) {
-                    minValueVel =ui.values[ 0 ];
-                    maxValueVel =ui.values[ 1 ];
-                    $( "#amountVel" ).val( "Km/h " + ui.values[ 0 ] + " - Km/h " + ui.values[ 1 ] );
-                }
-                });
-                $( "#amountVel" ).val( "Km/h" + $( "#slider-range" ).slider( "values", 0 ) +
-                " - Km/h" + $( "#slider-range" ).slider( "values", 1 ) );
-            } );
 
             $('#radiusBox').on('input',function(){
                 var myVar = $(this).val();
@@ -762,8 +673,100 @@ block content
         }
 
         /////
-        ///// 
+        ///// Create Lens' circle (lens it self)
         /////
+
+        function createLens(lng, lat, radiusQuery, _type, minVal, maxVal){
+            var lens = { type: _type, 
+                areaQuery : L.circle([lat, lng], {
+                    color: 'DarkRed',
+                    fillColor: 'red',
+                    fillOpacity: 0.6,
+                    radius: radiusQuery
+                }).addTo(lensesLayer),
+                colorSuccess : function() {
+                    if(_type == "Default"){
+                        console.log("I will now paint the Pass by circle again ....")
+                        lens.areaQuery.setStyle({color: 'DodgerBlue', fillColor: 'DodgerBlue', fillOpacity: 0.2});
+                    }
+                    else if(_type == "Start"){
+                        console.log("I will now paint the Start circle again ....")
+                        lens.areaQuery.setStyle({color: 'MediumSeaGreen', fillColor: 'MediumSeaGreen', fillOpacity: 0.2});
+                    }
+                    else if(_type == "End"){
+                        console.log("I will now paint the End circle again ....")
+                        lens.areaQuery.setStyle({color: 'Violet', fillColor: 'Violet', fillOpacity: 0.2});
+                    }
+                    else if(_type == "Vel_avg"){
+                        console.log("I will now paint the End circle again ....")
+                        lens.areaQuery.setStyle({color: 'orange', fillColor: 'orange', fillOpacity: 0.2});
+                    }
+                    else if(_type == "Length"){
+                        console.log("I will now paint the End circle again ....")
+                        lens.areaQuery.setStyle({color: 'SlateBlue', fillColor: 'SlateBlue', fillOpacity: 0.2});
+                    }
+                    else if(_type == "Time_Interval"){
+                        console.log("I will now paint the End circle again ....")
+                        lens.areaQuery.setStyle({color: 'purple', fillColor: 'purple', fillOpacity: 0.2});
+                    }
+                    else if(_type == "Time_Duration"){
+                        console.log("I will now paint the End circle again ....")
+                        lens.areaQuery.setStyle({color: 'DarkTurquoise ', fillColor: 'DarkTurquoise ', fillOpacity: 0.2});
+                    }
+                }
+            };
+            
+            
+            lens.areaQuery.bindPopup("<input type='button' value='Delete this lens' class='marker-delete-button'/>")
+            lens.areaQuery.on("popupopen", function() {
+            var tempMarker = lens;
+
+            //var tempMarkerGeoJSON = this.toGeoJSON();
+
+            //var lID = tempMarker._leaflet_id; // Getting Leaflet ID of this marker
+
+            // To remove marker on click of delete
+            $('.marker-delete-button:visible').click(function () {
+                lensesLayer.removeLayer(tempMarker.areaQuery);
+                
+                if(lastMarkerGroupID !=null){
+                    markerGroup.removeLayer(lastMarkerGroupID);
+                    lastMarkerGroupID = null;
+                }
+                if(lastMarkerGroupID1 !=null){
+                    markerGroup1.removeLayer(lastMarkerGroupID1);
+                    lastMarkerGroupID1 = null;
+                }
+                if(lastMarkerGroupID2 !=null){
+                    markerGroup2.removeLayer(lastMarkerGroupID2);
+                    lastMarkerGroupID2 = null;
+                }
+                if(lastMarkerGroupID3 !=null){
+                    markerGroup3.removeLayer(lastMarkerGroupID3);
+                    lastMarkerGroupID3 = null;
+                }
+                deleteQuery(lng, lat, radiusQuery, _type, minVal, maxVal);
+                });
+                
+            }) ; 
+            return lens
+        }
+
+
+        function attributeLensCreation(lngLat,radius,attribute,encoding){
+            
+            defaultLayer.eachLayer(function (layer) {
+                var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                if ( yourDistance <= 1000){
+                    //if(layer.feature.properties.f1 >= 100000) {
+                    console.log("IM IN!");    
+                    layer.setStyle({color :'blue'}) 
+                //}
+                }
+            });
+        }
+
+
 
         function Unix_timestamp(t){
             var dt = new Date(t);
