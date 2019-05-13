@@ -756,13 +756,17 @@ block content
         function attributeLensCreation(lngLat,radius,attribute,encoding){
             
             defaultLayer.eachLayer(function (layer) {
+                var metresPerPixel = 40075016.686 * Math.abs(Math.cos(lngLat.lat * 180/Math.PI)) / Math.pow(2, map.getZoom()+8);
+                var pixelsInRadius = radius / metresPerPixel;
                 var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
-                if ( yourDistance <= 1000){
+                //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                if ( yourDistance <= pixelsInRadius){
                     //if(layer.feature.properties.f1 >= 100000) {
                     console.log("IM IN!");    
                     layer.setStyle({color :'blue'}) 
                 //}
                 }
+                
             });
         }
 
