@@ -142,9 +142,9 @@ block content
         
         //var defaultLayer = new L.GeoJSON().addTo(map);
         var firstStyle = {
-            "color": 'tomato',
-            "weight": 2,
-            "opacity": 0.5
+            "color": '#FF6347',
+            "weight": 1.5
+            
         };
         /*var color2;
             var r = Math.min(Math.max(Math.floor(Math.random() * 255), 55), 200);
@@ -660,7 +660,7 @@ block content
                         .openOn(map);
                 }
                 else {
-                    attributeLensCreation(location, $('#radiusBox').val(),"Attribute","Encoding");
+                    attributeLensCreation(location, $('#radiusBox').val(),"length","brightness");
                 }
             });
 
@@ -754,16 +754,74 @@ block content
 
 
         function attributeLensCreation(lngLat,radius,attribute,encoding){
-            
+            var metresPerPixel = 40075016.686 * Math.abs(Math.cos(lngLat.lat * 180/Math.PI)) / Math.pow(2, map.getZoom()+8);
+            var pixelsInRadius = radius / metresPerPixel;
             defaultLayer.eachLayer(function (layer) {
-                var metresPerPixel = 40075016.686 * Math.abs(Math.cos(lngLat.lat * 180/Math.PI)) / Math.pow(2, map.getZoom()+8);
-                var pixelsInRadius = radius / metresPerPixel;
                 var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
                 //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
                 if ( yourDistance <= pixelsInRadius){
-                    //if(layer.feature.properties.f1 >= 100000) {
-                    console.log("IM IN!");    
-                    layer.setStyle({color :'blue'}) 
+                    switch(attribute) {
+                        case "length":
+                            // code block
+                            var len = layer.feature.properties.f1;
+                            switch(encoding){
+                                case "color":
+                                    if(len <= 200)          layer.setStyle({color :'#FFF8DC'}) 
+                                    else if(len <= 500)     layer.setStyle({color :'#FFE4C4'}) 
+                                    else if(len <= 1000)    layer.setStyle({color :'#F5DEB3'})
+                                    else if(len <= 3000)    layer.setStyle({color :'#DAA520'}) 
+                                    else if(len <=  7000)   layer.setStyle({color :'#D2691E'}) 
+                                    else                    layer.setStyle({color :'#A52A2A'}) 
+                                    break;
+                                case "brightness":
+                                    if(len <= 200)          {
+                                        var colr = increase_brightness(layer.options.color,10);
+                                        layer.setStyle({"color":colr});
+                                    }
+                                    else if(len <= 500)     {
+                                        var colr = increase_brightness(layer.options.color,20);
+                                        layer.setStyle({"color":colr});}
+                                    else if(len <= 1000)    {
+                                        var colr = increase_brightness(layer.options.color,40);
+                                        layer.setStyle({"color":colr});}
+                                    else if(len <= 3000)    {
+                                        var colr = increase_brightness(layer.options.color,60);
+                                        layer.setStyle({"color":colr});}
+                                    else if(len <=  7000)   {
+                                        var colr = increase_brightness(layer.options.color,80);
+                                        layer.setStyle({"color":colr});}
+                                    else                    console.log
+                                    break;
+                                case "opacity":
+                                    if(len <= 200)          layer.setStyle({opacity:0.05});
+                                    else if(len <= 500)     layer.setStyle({opacity:0.15}); 
+                                    else if(len <= 1000)    layer.setStyle({opacity:0.3});
+                                    else if(len <= 3000)    layer.setStyle({opacity:0.5});
+                                    else if(len <=  7000)   layer.setStyle({opacity:0.7});
+                                    else                    console.log("Opcacity already at 1")
+                                    break;
+                                case "width":
+                                    if(len <= 200)          layer.setStyle({"weight": 0.2});
+                                    else if(len <= 500)     layer.setStyle({"weight": 0.8});
+                                    else if(len <= 1000)    layer.setStyle({"weight": 1.5});
+                                    else if(len <= 3000)    layer.setStyle({"weight": 2.5});
+                                    else if(len <=  7000)   layer.setStyle({"weight": 3.5});
+                                    else                    layer.setStyle({"weight": 5});
+                                    break;
+                            }
+                            break;
+                        case "duration":
+                            // code block
+                            var dur = layer.feature.properties.f2;
+                            break;
+                        case "vel":
+                        //TODO
+                            break;
+                        case "time":
+                            var tim = layer.feature.properties.f3;
+                            break;
+                    }   
+                    
                 //}
                 }
                 
@@ -783,6 +841,26 @@ block content
             var seconds = dt.getSeconds();*/
 
             return stringDate;
+        }
+
+        function increase_brightness(hex, percent){
+            console.log(hex);
+            // strip the leading # if it's there
+            hex = hex.replace(/^\s*#|\s*$/g, '');
+
+            // convert 3 char codes --> 6, e.g. `E0F` --> `EE00FF`
+            if(hex.length == 3){
+                hex = hex.replace(/(.)/g, '$1$1');
+            }
+
+            var r = parseInt(hex.substr(0, 2), 16),
+                g = parseInt(hex.substr(2, 2), 16),
+                b = parseInt(hex.substr(4, 2), 16);
+            
+            return '#' +
+            ((0|(1<<8) + r + (256 - r) * percent / 100).toString(16)).substr(1) +
+            ((0|(1<<8) + g + (256 - g) * percent / 100).toString(16)).substr(1) +
+            ((0|(1<<8) + b + (256 - b) * percent / 100).toString(16)).substr(1);
         }
         
 
