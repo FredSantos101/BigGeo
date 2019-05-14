@@ -24,10 +24,10 @@ block content
 
         //create array with all layers?
 
-        var markerGroup  = L.layerGroup().addTo(map);
-        var markerGroup1 = L.layerGroup();
-        var markerGroup2 = L.layerGroup();
-        var markerGroup3 = L.layerGroup();
+        var markerGroup  = L.featureGroup().addTo(map);
+        var markerGroup1 = L.featureGroup().addTo(map);
+        var markerGroup2 = L.featureGroup().addTo(map);
+        var markerGroup3 = L.featureGroup().addTo(map);
 
         var lensesLayer = L.geoJSON().addTo(map);
 
@@ -37,9 +37,13 @@ block content
         var lastMarkerGroupID1 = null ;
         var lastMarkerGroupID2 = null ;
         var lastMarkerGroupID3 = null ;
+        var defaultLayerFlag = true;
 
         var createQueryLensesFlag = false;
         var createAttributeLensesFlag = false;
+
+        var attributeFuncVar = "length";
+        var encodingFuncVar = "color";
 
         //black and white, when it is a greyish color its hard to see
         /*L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
@@ -218,7 +222,10 @@ block content
         function createQuery(lng, lat, radiusQuery, typeLens, minVal, maxVal){
             lensPreCreationLayer.clearLayers();
             console.log("Im removing the map now and adding new ones afterwards")
-            map.removeLayer(defaultLayer);
+            if(defaultLayerFlag){
+                defaultLayerFlag = false;
+                map.removeLayer(defaultLayer);
+            }
 
             if(lastMarkerGroupID !=null){
                 markerGroup.removeLayer(lastMarkerGroupID);
@@ -424,6 +431,10 @@ block content
             });
             
         }
+
+        /////
+        /////
+        /////
 
         
         /////
@@ -646,6 +657,17 @@ block content
                 .setLatLng(e.latlng)
                 .setContent("You clicked the map at " + e.latlng.toString() + 
                 "<input id='radiusBox' type='range' min='1' max='10000' val='5000' />" + 
+                "<div class='dropdown'><button class='dropbtn'>Dropdown</button><div class='dropdown-content'>" + 
+                "<button class='dropbtnOpt-length'>Length</button>"+
+                "<button class='dropbtnOpt-time'>Time</button>"+
+                "<button class='dropbtnOpt-duration'>Duration</button>"+
+                "</div></div>" +
+                "<div class='dropdown'><button class='dropbtn'>Dropdown</button><div class='dropdown-content'>" + 
+                "<button class='dropbtnOpt-color'>Color</button>"+
+                "<button class='dropbtnOpt-width'>Width</button>"+
+                "<button class='dropbtnOpt-brightness'>Brightness</button>"+
+                "<button class='dropbtnOpt-opacity'>Opacity</button>"+
+                "</div></div>" +
                 "<input type='button' value='Create Attribute Lens' class='attribute-button'/>").openOn(map);
             map.on('popupclose', function(e) {
                     lensPreCreationLayer.clearLayers();
@@ -660,9 +682,32 @@ block content
                         .openOn(map);
                 }
                 else {
-                    attributeLensCreation(location, $('#radiusBox').val(),"length","brightness");
+                    attributeLensCreation(location, $('#radiusBox').val(),attributeFuncVar,encodingFuncVar);
                 }
             });
+            $('.dropbtnOpt-length').click(function () {
+                    attributeFuncVar = "length"
+            });
+            $('.dropbtnOpt-time').click(function () {
+                    attributeFuncVar = "time"
+            });
+            $('.dropbtnOpt-duration').click(function () {
+                    attributeFuncVar = "duration"
+            });
+
+            $('.dropbtnOpt-color').click(function () {
+                    encodingFuncVar = "color"
+            });
+            $('.dropbtnOpt-width').click(function () {
+                    encodingFuncVar = "width"
+            });
+            $('.dropbtnOpt-brightness').click(function () {
+                    encodingFuncVar = "brightness"
+            });
+            $('.dropbtnOpt-opacity').click(function () {
+                    encodingFuncVar = "opacity"
+            });
+
 
 
             $('#radiusBox').on('input',function(){
@@ -671,6 +716,12 @@ block content
 
             });
         }
+
+        /////
+        /////
+        /////
+
+
 
         /////
         ///// Create Lens' circle (lens it self)
@@ -752,83 +803,353 @@ block content
             return lens
         }
 
+        function createAttributeLens(lng, lat, radiusQuery, _attribute, _encoding, pixelSize){
+            var lens = { type: _type, 
+                areaQuery : L.circle([lat, lng], {
+                    color: 'DarkRed',
+                    fillColor: 'red',
+                    fillOpacity: 0.6,
+                    radius: radiusQuery
+                }).addTo(lensesLayer),
+                colorSuccess : function() {
+                    if(_type == "Default"){
+                        console.log("I will now paint the Pass by circle again ....")
+                        lens.areaQuery.setStyle({color: '#FFFFFF', fillColor: '#FFFFFF', fillOpacity: 0});
+                    }
+                    
+                }
+            };
+            
+            
+            lens.areaQuery.bindPopup("<input type='button' value='Delete this lens' class='marker-delete-button'/>")
+            lens.areaQuery.on("popupopen", function() {
+            var tempMarker = lens;
+
+            //var tempMarkerGeoJSON = this.toGeoJSON();
+
+            //var lID = tempMarker._leaflet_id; // Getting Leaflet ID of this marker
+
+            // To remove marker on click of delete
+            $('.marker-delete-button:visible').click(function () {
+                lensesLayer.removeLayer(tempMarker.areaQuery);
+                
+                //deleteAttribute(lng, lat, pixelSize, _attribute, _encoding);
+                });
+                
+            }) ; 
+            return lens
+        }
+
 
         function attributeLensCreation(lngLat,radius,attribute,encoding){
             var metresPerPixel = 40075016.686 * Math.abs(Math.cos(lngLat.lat * 180/Math.PI)) / Math.pow(2, map.getZoom()+8);
             var pixelsInRadius = radius / metresPerPixel;
-            defaultLayer.eachLayer(function (layer) {
-                var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
-                //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
-                if ( yourDistance <= pixelsInRadius){
-                    switch(attribute) {
-                        case "length":
-                            // code block
-                            var len = layer.feature.properties.f1;
-                            switch(encoding){
-                                case "color":
-                                    if(len <= 200)          layer.setStyle({color :'#FFF8DC'}) 
-                                    else if(len <= 500)     layer.setStyle({color :'#FFE4C4'}) 
-                                    else if(len <= 1000)    layer.setStyle({color :'#F5DEB3'})
-                                    else if(len <= 3000)    layer.setStyle({color :'#DAA520'}) 
-                                    else if(len <=  7000)   layer.setStyle({color :'#D2691E'}) 
-                                    else                    layer.setStyle({color :'#A52A2A'}) 
-                                    break;
-                                case "brightness":
-                                    if(len <= 200)          {
-                                        var colr = increase_brightness(layer.options.color,10);
-                                        layer.setStyle({"color":colr});
-                                    }
-                                    else if(len <= 500)     {
-                                        var colr = increase_brightness(layer.options.color,20);
-                                        layer.setStyle({"color":colr});}
-                                    else if(len <= 1000)    {
-                                        var colr = increase_brightness(layer.options.color,40);
-                                        layer.setStyle({"color":colr});}
-                                    else if(len <= 3000)    {
-                                        var colr = increase_brightness(layer.options.color,60);
-                                        layer.setStyle({"color":colr});}
-                                    else if(len <=  7000)   {
-                                        var colr = increase_brightness(layer.options.color,80);
-                                        layer.setStyle({"color":colr});}
-                                    else                    console.log
-                                    break;
-                                case "opacity":
-                                    if(len <= 200)          layer.setStyle({opacity:0.05});
-                                    else if(len <= 500)     layer.setStyle({opacity:0.15}); 
-                                    else if(len <= 1000)    layer.setStyle({opacity:0.3});
-                                    else if(len <= 3000)    layer.setStyle({opacity:0.5});
-                                    else if(len <=  7000)   layer.setStyle({opacity:0.7});
-                                    else                    console.log("Opcacity already at 1")
-                                    break;
-                                case "width":
-                                    if(len <= 200)          layer.setStyle({"weight": 0.2});
-                                    else if(len <= 500)     layer.setStyle({"weight": 0.8});
-                                    else if(len <= 1000)    layer.setStyle({"weight": 1.5});
-                                    else if(len <= 3000)    layer.setStyle({"weight": 2.5});
-                                    else if(len <=  7000)   layer.setStyle({"weight": 3.5});
-                                    else                    layer.setStyle({"weight": 5});
-                                    break;
-                            }
-                            break;
-                        case "duration":
-                            // code block
-                            var dur = layer.feature.properties.f2;
-                            break;
-                        case "vel":
-                        //TODO
-                            break;
-                        case "time":
-                            var tim = layer.feature.properties.f3;
-                            break;
-                    }   
-                    
-                //}
-                }
+            if(defaultLayerFlag){
+                defaultLayer.eachLayer(function (layer) {
+                    var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                    //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                    if ( yourDistance <= pixelsInRadius){
+                        switch(attribute) {
+                            case "length":
+                                lengthAtt(layer, encoding);
+                                break;
+                            case "duration":
+                                // code block
+                                durationAtt(layer, encoding);
+                                break;
+                            case "vel":
+                            //TODO
+                                break;
+                            case "time":
+                                timeAtt(layer, encoding);
+                                break;
+                        }   
+                        
+                    //}
+                    }
                 
-            });
+                });
+            }
+            else{
+                markerGroup.getLayer(lastMarkerGroupID).eachLayer(function (layer) {
+                    var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                    //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                    if ( yourDistance <= pixelsInRadius){
+                        switch(attribute) {
+                            case "length":
+                                lengthAtt(layer, encoding);
+                                break;
+                            case "duration":
+                                // code block
+                                durationAtt(layer, encoding);
+                                break;
+                            case "vel":
+                            //TODO
+                                break;
+                            case "time":
+                                timeAtt(layer, encoding);
+                                break;
+                        }   
+                        
+                    //}
+                    }
+                    
+                });
+                markerGroup1.getLayer(lastMarkerGroupID1).eachLayer(function (layer) {
+                    var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                    //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                    if ( yourDistance <= pixelsInRadius){
+                        switch(attribute) {
+                            case "length":
+                                lengthAtt(layer, encoding);
+                                break;
+                            case "duration":
+                                // code block
+                                durationAtt(layer, encoding);
+                                break;
+                            case "vel":
+                            //TODO
+                                break;
+                            case "time":
+                                timeAtt(layer, encoding);
+                                break;
+                        }   
+                        
+                    //}
+                    }
+                    
+                });
+                markerGroup2.getLayer(lastMarkerGroupID2).eachLayer(function (layer) {
+                    var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                    //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                    if ( yourDistance <= pixelsInRadius){
+                        switch(attribute) {
+                            case "length":
+                                lengthAtt(layer, encoding);
+                                break;
+                            case "duration":
+                                // code block
+                                durationAtt(layer, encoding);
+                                break;
+                            case "vel":
+                            //TODO
+                                break;
+                            case "time":
+                                timeAtt(layer, encoding);
+                                break;
+                        }   
+                        
+                    //}
+                    }
+                    
+                });
+                markerGroup3.getLayer(lastMarkerGroupID3).eachLayer(function (layer) {
+                    var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                    //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                    if ( yourDistance <= pixelsInRadius){
+                        switch(attribute) {
+                            case "length":
+                                lengthAtt(layer, encoding);
+                                break;
+                            case "duration":
+                                // code block
+                                durationAtt(layer, encoding);
+                                break;
+                            case "vel":
+                            //TODO
+                                break;
+                            case "time":
+                                timeAtt(layer, encoding);
+                                break;
+                        }   
+                        
+                    //}
+                    }
+                    
+                });
+            }
+            
         }
 
+        /////
+        /////
+        /////
 
+        /////
+        /////  Functions per attribute
+        /////
+
+        function lengthAtt(layer, encoding){
+             // code block
+            var len = layer.feature.properties.f1;
+            switch(encoding){
+                case "color":
+                    if(len <= 200)          layer.setStyle({color :'#FFF8DC'}) 
+                    else if(len <= 500)     layer.setStyle({color :'#FFE4C4'}) 
+                    else if(len <= 1000)    layer.setStyle({color :'#F5DEB3'})
+                    else if(len <= 3000)    layer.setStyle({color :'#DAA520'}) 
+                    else if(len <=  7000)   layer.setStyle({color :'#D2691E'}) 
+                    else                    layer.setStyle({color :'#A52A2A'}) 
+                    break;
+                case "brightness":
+                    if(len <= 200)          {
+                        var colr = increase_brightness(layer.options.color,5);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(len <= 500)     {
+                        var colr = increase_brightness(layer.options.color,15);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(len <= 1000)    {
+                        var colr = increase_brightness(layer.options.color,30);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(len <= 3000)    {
+                        var colr = increase_brightness(layer.options.color,55);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(len <=  7000)   {
+                        var colr = increase_brightness(layer.options.color,80);
+                        layer.setStyle({"color":colr});
+                    }
+                    else                    console.log("brightness already at 1")
+                    break;
+                case "opacity":
+                    if(len <= 200)          layer.setStyle({opacity:0.05});
+                    else if(len <= 500)     layer.setStyle({opacity:0.15}); 
+                    else if(len <= 1000)    layer.setStyle({opacity:0.3});
+                    else if(len <= 3000)    layer.setStyle({opacity:0.55});
+                    else if(len <=  7000)   layer.setStyle({opacity:0.8});
+                    else                    console.log("Opcacity already at 1")
+                    break;
+                case "width":
+                    if(len <= 200)          layer.setStyle({"weight": 0.2});
+                    else if(len <= 500)     layer.setStyle({"weight": 0.8});
+                    else if(len <= 1000)    layer.setStyle({"weight": 1.5});
+                    else if(len <= 3000)    layer.setStyle({"weight": 2.5});
+                    else if(len <=  7000)   layer.setStyle({"weight": 3.5});
+                    else                    layer.setStyle({"weight": 5});
+                    break;
+            }
+        }
+        
+        function durationAtt(layer, encoding){
+             // code block
+            var dur = layer.feature.properties.f2;
+            switch(encoding){
+                case "color":
+                    if(dur <= "00:01:00")           layer.setStyle({color :'#FFF8DC'}) 
+                    else if(dur <= "00:02:00")      layer.setStyle({color :'#FFE4C4'}) 
+                    else if(dur <= "00:05:00")      layer.setStyle({color :'#F5DEB3'})
+                    else if(dur <= "00:010:00")     layer.setStyle({color :'#DAA520'}) 
+                    else if(dur <=  "00:30:00")     layer.setStyle({color :'#D2691E'}) 
+                    else                            layer.setStyle({color :'#A52A2A'}) 
+                    break;
+                case "brightness":
+                    if(dur <= "00:01:00")          {
+                        var colr = increase_brightness(layer.options.color,5);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(dur <= "00:02:00")     {
+                        var colr = increase_brightness(layer.options.color,15);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(dur <= "00:05:00")    {
+                        var colr = increase_brightness(layer.options.color,30);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(dur <= "00:10:00")    {
+                        var colr = increase_brightness(layer.options.color,55);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(dur <=  "00:30:00")   {
+                        var colr = increase_brightness(layer.options.color,80);
+                        layer.setStyle({"color":colr});
+                    }
+                    else                    console.log("brightness already at 1")
+                    break;
+                case "opacity":
+                    if(dur <= "00:01:00")           layer.setStyle({opacity:0.05});
+                    else if(dur <= "00:02:00")      layer.setStyle({opacity:0.15}); 
+                    else if(dur <= "00:05:00")      layer.setStyle({opacity:0.3});
+                    else if(dur <= "00:10:00")      layer.setStyle({opacity:0.55});
+                    else if(dur <=  "00:30:00")     layer.setStyle({opacity:0.8});
+                    else                            console.log("Opcacity already at 1")
+                    break;
+                case "width":
+                    if(dur <= "00:01:00")           layer.setStyle({"weight": 0.2});
+                    else if(dur <= "00:02:00")      layer.setStyle({"weight": 0.8});
+                    else if(dur <= "00:05:00")      layer.setStyle({"weight": 1.5});
+                    else if(dur <= "00:10:00")      layer.setStyle({"weight": 2.5});
+                    else if(dur <=  "00:30:00")     layer.setStyle({"weight": 3.5});
+                    else                            layer.setStyle({"weight": 5});
+                    break;
+            }
+        }
+
+         function timeAtt(layer, encoding){
+            // 2008-02-02 13:30:44
+            // 2008-02-08 17:39:18
+            // code block
+            var tim = layer.feature.properties.f3;
+            switch(encoding){
+                case "color":
+                    if(tim <= "2008-02-03 13:30:44")            layer.setStyle({color :'#FFF8DC'}) 
+                    else if(tim <= "2008-02-04 13:30:44")       layer.setStyle({color :'#FFE4C4'}) 
+                    else if(tim <= "2008-02-05 13:30:44")       layer.setStyle({color :'#F5DEB3'})
+                    else if(tim <= "2008-02-06 13:30:44")       layer.setStyle({color :'#DAA520'}) 
+                    else if(tim <=  "2008-02-07 13:30:44")      layer.setStyle({color :'#D2691E'}) 
+                    else                                        layer.setStyle({color :'#A52A2A'}) 
+                    break;
+                case "brightness":
+                    if(tim <= "2008-02-03 13:30:44")          {
+                        var colr = increase_brightness(layer.options.color,5);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(tim <= "2008-02-04 13:30:44")     {
+                        var colr = increase_brightness(layer.options.color,15);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(tim <= "2008-02-05 13:30:44")    {
+                        var colr = increase_brightness(layer.options.color,30);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(tim <= "2008-02-06 13:30:44")    {
+                        var colr = increase_brightness(layer.options.color,55);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(tim <= "2008-02-07 13:30:44")   {
+                        var colr = increase_brightness(layer.options.color,80);
+                        layer.setStyle({"color":colr});
+                    }
+                    else                    console.log("brightness already at 1")
+                    break;
+                case "opacity":
+                    if(tim <= "2008-02-03 13:30:44")            layer.setStyle({opacity:0.05});
+                    else if(tim <= "2008-02-04 13:30:44")       layer.setStyle({opacity:0.15}); 
+                    else if(tim <= "2008-02-05 13:30:44")       layer.setStyle({opacity:0.3});
+                    else if(tim <= "2008-02-06 13:30:44")       layer.setStyle({opacity:0.55});
+                    else if(tim <= "2008-02-07 13:30:44")       layer.setStyle({opacity:0.8});
+                    else                                        console.log("Opcacity already at 1")
+                    break;
+                case "width":
+                    if(tim <= "2008-02-03 13:30:44")            layer.setStyle({"weight": 0.2});
+                    else if(tim <= "2008-02-04 13:30:44")       layer.setStyle({"weight": 0.8});
+                    else if(tim <= "2008-02-05 13:30:44")       layer.setStyle({"weight": 1.5});
+                    else if(tim <= "2008-02-06 13:30:44")       layer.setStyle({"weight": 2.5});
+                    else if(tim <= "2008-02-07 13:30:44")       layer.setStyle({"weight": 3.5});
+                    else                                        layer.setStyle({"weight": 5});
+                    break;
+            }
+        }
+        /////
+        /////
+        /////
+
+
+        /////
+        ///// support
+        /////
 
         function Unix_timestamp(t){
             var dt = new Date(t);
@@ -862,6 +1183,7 @@ block content
             ((0|(1<<8) + g + (256 - g) * percent / 100).toString(16)).substr(1) +
             ((0|(1<<8) + b + (256 - b) * percent / 100).toString(16)).substr(1);
         }
+
         
 
 
