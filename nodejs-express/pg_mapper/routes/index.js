@@ -23,18 +23,17 @@ var drawLines = "SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As typ
                   As fc ";*/
 
 var drawTracks    = "SELECT row_to_json(fc) FROM (SELECT 'Trajectoria' As type, array_to_json(array_agg(track_indi)) As features FROM (SELECT 'P' As type, ST_AsGeoJSON(lg.geomline)::json As geometry, row_to_json((lg.taxi_id,lg.data_time)) As properties FROM (SELECT taxi_id, data_time FROM trajectory_lines GROUP BY taxi_id,data_time ORDER BY taxi_id,data_time) As t JOIN trajectory_lines As lg ON lg.taxi_id = t.taxi_id AND lg.data_time = t.data_time LIMIT 1400000) As track_indi ) As fc ";
-var drawTracksMap ="SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (	SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End)) As properties FROM trajectory_lines3 As lg LIMIT 10000) 	As f) As fc ";
+var drawTracksMap ="SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (	SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.vel)) As properties FROM trajectory_lines3 As lg LIMIT 10000) 	As f) As fc ";
 
 /*WITH multis AS (
-                 SELECT taxi_id, min(data_time) AS time_start, max(data_time)
- as time_end, track_id, ST_MakeLine(array_agg(geom ORDER BY
-taxi_id,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg
+                 SELECT tid, min(data_time) AS time_start, max(data_time)
+ as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo
                  FROM track_divided_by_time_30s
- GROUP BY taxi_id, track_id
+ GROUP BY tid
  )
 
- SELECT taxi_id, (ST_Dump(mylines)).geom,time_start, time_end, track_id, sPGeom, ePGeom, veloc_avg
- FROM multis;*/
+ SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) , velo
+ FROM multis*/
 
 
 var select_first = "SELECT taxi_id from (SELECT taxi_id,row_number() as rn,count(*) over () as total_countFROM tracks) t where rn = 1 or rn = total_count";
@@ -202,7 +201,7 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
     activeQuery = " WHERE ";
   }
 
-  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End)) As properties FROM " + tab + " As lg";
+  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.vel)) As properties FROM " + tab + " As lg";
   var secondPart = " LIMIT 5000000) 	As f) As fc";
   if (activeQuery.length != 7){
     activeQuery = activeQuery + " AND ";
@@ -320,7 +319,7 @@ function replaceGlobally(original, searchTxt, replaceTxt) {
 function query_args_DecontructorQUERIES (tab ,long, lat, radius, type, minVal, maxVal){
   
   var andString = " AND ";
-  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End)) As properties FROM " + tab + " As lg";
+  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.vel)) As properties FROM " + tab + " As lg";
   var secondPart = " LIMIT 40000) 	As f) As fc";
   
   if(activeQuery == ""){

@@ -28,6 +28,8 @@ block content
         var markerGroup1 = L.featureGroup().addTo(map);
         var markerGroup2 = L.featureGroup().addTo(map);
         var markerGroup3 = L.featureGroup().addTo(map);
+        
+        var attLenResults = L.featureGroup().addTo(map);
 
         var lensesLayer = L.geoJSON().addTo(map);
 
@@ -173,7 +175,7 @@ block content
     
         map.on('zoomend', function() {
             console.log(map.getZoom())
-            if (map.getZoom() >= 18){
+            if (map.getZoom() >= 19){
                     map.addLayer(markerGroup3);
             }
             else {
@@ -182,7 +184,7 @@ block content
                 } else {
                     console.log("MarkerGroup3 not active");
                 }
-                if (map.getZoom() >= 15){
+                if (map.getZoom() >= 17){
                     map.addLayer(markerGroup2);
                 }
                 else {
@@ -191,7 +193,7 @@ block content
                     } else {
                         console.log("MarkerGroup2 not active");
                     }
-                    if (map.getZoom() >= 12){
+                    if (map.getZoom() >= 15){
                         map.addLayer(markerGroup1);
                     }
                     else {
@@ -798,6 +800,7 @@ block content
                 "<input id='radiusBox' type='range' min='1' max='10000' val='5000' />" + 
                 "<div class='dropdown'><button class='dropbtn'>Dropdown</button><div class='dropdown-content'>" + 
                 "<button class='dropbtnOpt-length'>Length</button>"+
+                "<button class='dropbtnOpt-velocity'>Velocity</button>"+
                 "<button class='dropbtnOpt-time'>Time</button>"+
                 "<button class='dropbtnOpt-duration'>Duration</button>"+
                 "</div></div>" +
@@ -826,6 +829,9 @@ block content
             });
             $('.dropbtnOpt-length').click(function () {
                     attributeFuncVar = "length"
+            });
+            $('.dropbtnOpt-velocity').click(function () {
+                    attributeFuncVar = "vel"
             });
             $('.dropbtnOpt-time').click(function () {
                     attributeFuncVar = "time"
@@ -982,7 +988,7 @@ block content
                                 durationAtt(layer, _encoding);
                                 break;
                             case "vel":
-                            //TODO
+                                velocityAtt(aLens,layer,encoding);
                                 break;
                             case "time":
                                 timeAtt(layer, _encoding);
@@ -1035,7 +1041,7 @@ block content
                                 durationAtt(layer, encoding);
                                 break;
                             case "vel":
-                            //TODO
+                                velocityAtt(aLens,layer,encoding);
                                 break;
                             case "time":
                                 timeAtt(layer, encoding);
@@ -1062,7 +1068,7 @@ block content
                                     durationAtt(layer, encoding);
                                     break;
                                 case "vel":
-                                //TODO
+                                    velocityAtt(aLens,layer,encoding);
                                     break;
                                 case "time":
                                     timeAtt(layer, encoding);
@@ -1088,7 +1094,7 @@ block content
                                     durationAtt(layer, encoding);
                                     break;
                                 case "vel":
-                                //TODO
+                                    velocityAtt(aLens,layer,encoding);
                                     break;
                                 case "time":
                                     timeAtt(layer, encoding);
@@ -1114,7 +1120,7 @@ block content
                                     durationAtt(layer, encoding);
                                     break;
                                 case "vel":
-                                //TODO
+                                    velocityAtt(aLens,layer,encoding);
                                     break;
                                 case "time":
                                     timeAtt(layer, encoding);
@@ -1140,7 +1146,7 @@ block content
                                     durationAtt(layer, encoding);
                                     break;
                                 case "vel":
-                                //TODO
+                                    velocityAtt(aLens,layer,encoding);
                                     break;
                                 case "time":
                                     timeAtt(layer, encoding);
@@ -1166,20 +1172,101 @@ block content
         /////  Functions per attribute
         /////
 
+        function velocityAtt(master, layer, encoding){
+             // code block
+            var velAtt = layer.feature.properties.f4;
+            switch(encoding){
+                case "color":
+                    
+                    var pointsArray = layer.feature.geometry.coordinates;
+                    
+                    var velArray =  layer.feature.properties.f5;
+
+                    var finalArray = [];
+                    
+                    for(var i = 0;i < velArray.length;i++ ){
+                        finalArray.push(pointsArray[i].push(velArray[i]));
+                    }
+                    var hotlineLayer = L.hotline(finalArray, {
+                        min: 0,
+                        max: 75,
+                        palette: {
+                            0.0: '#ff0000',
+                            0.3: '#ffff00',
+                            1.0: '#008800'
+                        },
+                        weight: 5,
+                        outlineColor: '#000000',
+                        outlineWidth: 1
+                    }).addTo(map);
+
+                    break;
+                case "brightness":
+                    if(velAtt <= 1)          {
+                        var colr = ColorLuminance(layer.options.color,-0.95);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(velAtt <= 2)     {
+                        var colr = ColorLuminance(layer.options.color,-0.9);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(velAtt <= 5)    {
+                        var colr = ColorLuminance(layer.options.color,-0.8);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(velAtt <= 10)    {
+                        var colr = ColorLuminance(layer.options.color,-0.65);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(velAtt <= 15)    {
+                        var colr = ColorLuminance(layer.options.color,-0.5);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(velAtt <= 20)    {
+                        var colr = ColorLuminance(layer.options.color,-0.35);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(velAtt <=  30)   {
+                        var colr = ColorLuminance(layer.options.color,-0.2);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(velAtt <=  50)   {
+                        var colr = ColorLuminance(layer.options.color,-0.1);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(velAtt <=  80)   {
+                        var colr = ColorLuminance(layer.options.color,-0.05);
+                        layer.setStyle({"color":colr});
+                    }
+                    else                    console.log("brightness already at 1")
+                    break;
+                case "opacity":
+                
+                    break;
+                case "width":
+                
+                    break;
+            }
+        }
+
         function lengthAtt(layer, encoding){
              // code block
             var len = layer.feature.properties.f1;
             switch(encoding){
                 case "color":
-                    if(len <= 200)          layer.setStyle({color :'#FFF8DC'}) 
-                    else if(len <= 500)     layer.setStyle({color :'#FFE4C4'}) 
-                    else if(len <= 1000)    layer.setStyle({color :'#F5DEB3'})
-                    else if(len <= 3000)    layer.setStyle({color :'#DAA520'}) 
-                    else if(len <=  7000)   layer.setStyle({color :'#D2691E'}) 
-                    else                    layer.setStyle({color :'#A52A2A'}) 
+                    if(len <= 250)          layer.setStyle({color :'#29FF9A'}) 
+                    else if(len <= 500)     layer.setStyle({color :'#40E49B'})
+                    else if(len <= 1000)    layer.setStyle({color :'#58CA9C'}) 
+                    else if(len <= 2000)    layer.setStyle({color :'#70B09D'})
+                    else if(len <= 4000)    layer.setStyle({color :'#88969E'}) 
+                    else if(len <= 8000)    layer.setStyle({color :'#9F7C9F'}) 
+                    else if(len <= 16000)   layer.setStyle({color :'#B762A0'})
+                    else if(len <= 32000)   layer.setStyle({color :'#CF48A1'})
+                    else if (len <= 128000) layer.setStyle({color :'#E72EA2'})
+                    else                    layer.setStyle({color :'#FF14A3'})
                     break;
                 case "brightness":
-                    if(len <= 200)          {
+                    if(len <= 250)          {
                         var colr = ColorLuminance(layer.options.color,-0.95);
                         layer.setStyle({"color":colr});
                     }
@@ -1191,31 +1278,55 @@ block content
                         var colr = ColorLuminance(layer.options.color,-0.8);
                         layer.setStyle({"color":colr});
                     }
-                    else if(len <= 3000)    {
+                    else if(len <= 2000)    {
+                        var colr = ColorLuminance(layer.options.color,-0.65);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(len <= 4000)    {
                         var colr = ColorLuminance(layer.options.color,-0.5);
                         layer.setStyle({"color":colr});
                     }
-                    else if(len <=  7000)   {
+                    else if(len <= 8000)    {
+                        var colr = ColorLuminance(layer.options.color,-0.35);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(len <=  16000)   {
                         var colr = ColorLuminance(layer.options.color,-0.2);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(len <=  32000)   {
+                        var colr = ColorLuminance(layer.options.color,-0.1);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(len <=  128000)   {
+                        var colr = ColorLuminance(layer.options.color,-0.05);
                         layer.setStyle({"color":colr});
                     }
                     else                    console.log("brightness already at 1")
                     break;
                 case "opacity":
-                    if(len <= 200)          layer.setStyle({opacity:0.05});
-                    else if(len <= 500)     layer.setStyle({opacity:0.15}); 
-                    else if(len <= 1000)    layer.setStyle({opacity:0.3});
-                    else if(len <= 3000)    layer.setStyle({opacity:0.55});
-                    else if(len <=  7000)   layer.setStyle({opacity:0.8});
+                    if(len <= 250)          layer.setStyle({opacity:0.05});
+                    else if(len <= 500)     layer.setStyle({opacity:0.10});
+                    else if(len <= 1000)    layer.setStyle({opacity:0.20}); 
+                    else if(len <= 2000)    layer.setStyle({opacity:0.35});
+                    else if(len <= 4000)    layer.setStyle({opacity:0.5});
+                    else if(len <= 8000)    layer.setStyle({opacity:0.65});
+                    else if(len <= 16000)   layer.setStyle({opacity:0.8});
+                    else if(len <= 32000)   layer.setStyle({opacity:0.9});
+                    else if(len <= 128000)  layer.setStyle({opacity:0.95});
                     else                    console.log("Opcacity already at 1")
                     break;
                 case "width":
-                    if(len <= 200)          layer.setStyle({"weight": 0.2});
-                    else if(len <= 500)     layer.setStyle({"weight": 0.8});
-                    else if(len <= 1000)    layer.setStyle({"weight": 1.5});
-                    else if(len <= 3000)    layer.setStyle({"weight": 2.5});
-                    else if(len <=  7000)   layer.setStyle({"weight": 3.5});
-                    else                    layer.setStyle({"weight": 5});
+                if(len <= 250)              layer.setStyle({"weight": 0.1});
+                    else if(len <= 500)     layer.setStyle({"weight": 0.5});
+                    else if(len <= 1000)    layer.setStyle({"weight": 1});
+                    else if(len <= 2000)    layer.setStyle({"weight": 1.5});
+                    else if(len <= 4000)    layer.setStyle({"weight": 2});
+                    else if(len <= 8000)    layer.setStyle({"weight": 2.5});
+                    else if(len <= 16000)   layer.setStyle({"weight": 3.5});
+                    else if(len <= 32000)   layer.setStyle({"weight": 5});
+                    else if(len <= 128000)  layer.setStyle({"weight": 6.5});
+                    else                    layer.setStyle({"weight": 8});
                     break;
             }
         }

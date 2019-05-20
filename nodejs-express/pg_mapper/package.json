@@ -14,6 +14,7 @@
     "http-errors": "~1.6.2",
     "ion-rangeslider": "^2.3.0",
     "leaflet-geometryutil": "^0.9.1",
+    "leaflet-hotline": "^0.4.0",
     "leaflet.glify": "^2.1.2",
     "mapbox-gl": "^0.53.1",
     "morgan": "~1.9.0",
