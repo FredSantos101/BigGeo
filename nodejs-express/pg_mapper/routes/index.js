@@ -182,7 +182,7 @@ router.get('/attQuery/:tab/:long/:lat/:radius', function(req, res) {
 
 
   //Radius in meters to degrees
-  var radiusDegrees = req.params.radius/ 111120;
+  var radiusDegrees = req.params.radius/ 111100;
 
   //var minDegrees = req.params.minValue/ 111120;
 

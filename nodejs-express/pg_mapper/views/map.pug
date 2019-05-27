@@ -348,6 +348,10 @@ block content
         
         function createAttributeQuery(lngLat, radiusQuery, aTypeLens, encoding){
             var attLayer = L.featureGroup().addTo(attLenResults);
+            var _attLayer = L.featureGroup().addTo(attLayer);
+            var _attLayer1 = L.featureGroup().addTo(attLayer);
+            var _attLayer2 = L.featureGroup().addTo(attLayer);
+            var _attLayer3 = L.featureGroup().addTo(attLayer);
             
                 // Create URL
             var urlString3 = "attQuery/trajectory_lines/"  + lngLat.lng + "/" + lngLat.lat + "/" + radiusQuery;
@@ -389,18 +393,20 @@ block content
                                 break;
                         } 
                         lensesVar.intersections.forEach(function(lensInt, index, array) {
-                            console.log(lensInt, index);
                             if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
+                                console.log("This layer intersects the other lenses");
+                                console.log(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds()));
+                                console.log(lensInt);
+                                console.log(tracksToDraw);
                                 lensInt.updateLayer(tracksToDraw,item.properties)
                             }
                         });
-                        tracksToDraw.addTo(attLayer);
+                        tracksToDraw.addTo(_attLayer);
                     });
                     
-                    lensesVar.colorSuccess();
                 }
             }); 
-            /*var newData1 = $.ajax({
+            var newData1 = $.ajax({
                 url: urlString1,
                 type: 'GET',
                 dataType:'json',
@@ -412,12 +418,34 @@ block content
             }) 
             $.when(newData1).done(function() {
                 if(newData1.responseJSON.features != null){
-                    var tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
-                    tracksToDraw.addTo(markerGroup1);
-                    lastMarkerGroupID1 = tracksToDraw._leaflet_id;
-                    lensesVar.colorSuccess();
+                    console.log(newData1.responseJSON.features);
+                    newData1.responseJSON.features.forEach(function(item, index, array) {
+                        var tracksToDraw = L.geoJson(item,firstStyle);
+                        switch(aTypeLens) {
+                            case "length":
+                                lengthAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "duration":
+                                // code block
+                                durationAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "vel":
+                                velocityAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "time":
+                                timeAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                        } 
+                        lensesVar.intersections.forEach(function(lensInt, index, array) {
+                            console.log(lensInt, index);
+                            if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
+                                lensInt.updateLayer(tracksToDraw,item.properties)
+                            }
+                        });
+                        tracksToDraw.addTo(_attLayer1);
+                    });
+                    
                 }
-                lensesLayer.bringToFront();
             });
             var newData2 = $.ajax({
                 url: urlString2,
@@ -431,12 +459,34 @@ block content
             }) 
             $.when(newData2).done(function() {
                 if(newData2.responseJSON.features != null){
-                    var tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
-                    tracksToDraw.addTo(markerGroup2);
-                    lastMarkerGroupID2 = tracksToDraw._leaflet_id;
-                    lensesVar.colorSuccess();
+                    console.log(newData2.responseJSON.features);
+                    newData2.responseJSON.features.forEach(function(item, index, array) {
+                        var tracksToDraw = L.geoJson(item,firstStyle);
+                        switch(aTypeLens) {
+                            case "length":
+                                lengthAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "duration":
+                                // code block
+                                durationAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "vel":
+                                velocityAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "time":
+                                timeAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                        } 
+                        lensesVar.intersections.forEach(function(lensInt, index, array) {
+                            console.log(lensInt, index);
+                            if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
+                                lensInt.updateLayer(tracksToDraw,item.properties)
+                            }
+                        });
+                        tracksToDraw.addTo(_attLayer2);
+                    });
+                    
                 }
-                lensesLayer.bringToFront();
             });
             var newData3 = $.ajax({
                 url: urlString3,
@@ -450,14 +500,37 @@ block content
             }) 
             $.when(newData3).done(function() {
                 if(newData3.responseJSON.features != null){
-                    var tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
-                    tracksToDraw.addTo(markerGroup3);
-                    lastMarkerGroupID3 = tracksToDraw._leaflet_id;
+                    console.log(newData3.responseJSON.features);
+                    newData3.responseJSON.features.forEach(function(item, index, array) {
+                        var tracksToDraw = L.geoJson(item,firstStyle);
+                        switch(aTypeLens) {
+                            case "length":
+                                lengthAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "duration":
+                                // code block
+                                durationAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "vel":
+                                velocityAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "time":
+                                timeAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                        } 
+                        lensesVar.intersections.forEach(function(lensInt, index, array) {
+                            console.log(lensInt, index);
+                            if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
+                                lensInt.updateLayer(tracksToDraw,item.properties)
+                            }
+                        });
+                        tracksToDraw.addTo(_attLayer3);
+                    });
+                    
                     lensesVar.colorSuccess();
                 }
-                lensesLayer.bringToFront();
-            });*/
-            
+            });
+            lensesVar.colorSuccess();
             
         }
 
@@ -1244,15 +1317,13 @@ block content
             
             lens.areaQuery.bindPopup("<input type='button' value='Delete this lens' class='marker-delete-button'/>")
             lens.areaQuery.on("popupopen", function() {
-            var tempMarker = lens;
-
             //var tempMarkerGeoJSON = this.toGeoJSON();
 
             //var lID = tempMarker._leaflet_id; // Getting Leaflet ID of this marker
 
             // To remove marker on click of delete
             $('.marker-delete-button:visible').click(function () {
-                lensesLayer.removeLayer(tempMarker.areaQuery);
+                lensesLayer.removeLayer(lens.areaQuery);
                 
                 if(lastMarkerGroupID !=null){
                     markerGroup.removeLayer(lastMarkerGroupID);
@@ -1292,7 +1363,7 @@ block content
                 colorSuccess : function() {
                     //if(_attribute == "length"){
                     console.log("I will now paint the Pass by circle again ....")
-                    this.areaQuery.setStyle({color: '#FFFFFF', fillColor: '#FFFFFF', fillOpacity: 0.1});
+                    this.areaQuery.setStyle({color: '#FFFFFF', fillColor: '#FFFFFF', fillOpacity: 0.01});
                     
                 },
                 updateLayer : function(layer, value){
@@ -1334,47 +1405,59 @@ block content
             lens.areaQuery.on("popupopen", function() {
                 // To remove marker on click of delete
                 $('.marker-delete-button:visible').click(function () {
-                    lens.intersections.forEach(function(item, index, array) {
-                        var layerofItem = attLenResults.getLayer(item.lID);
-                        layerofItem.eachLayer(function (layer) {
-                            if (lens.areaQuery.getBounds().intersects(layer.getBounds())){
-                                switch(lens.enc) {
-                                    case "color":
-                                        layer.setStyle({color: '#FF6347'});
-                                        console.log("Here comes the layer");
-                                        console.log(layer);
-                                        item.updateLayer(layer, layer._layers[0].features.properties);
-                                        item.intersections.forEach(function(itemInterLens, index, array) {
-                                            if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
-                                                itemInterLens.updateLayer(layer, layer.features.properties);
-                                            }
-                                        });
-                                        break;
-                                    case "brightness":
-                                        layer.setStyle({color: '#FF6347'});
-                                        item.updateLayer(layer, layer._layers[0].features.properties);
-                                        item.intersections.forEach(function(itemInterLens, index, array) {
-                                            if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
-                                                itemInterLens.updateLayer(layer, layer.features.properties);
-                                            }
-                                        });
-                                        break;
-                                    case "opacity":
-                                        console.log("Returning Opacity to 1");
-                                        layer.setStyle({opacity:1});
-                                        break;
-                                    case "width":
-                                        console.log("Returning Width to 1.5");
-                                        layer.setStyle({"weight": 1});
-                                        break;
-                                }
-                            }
-                        });
-
-                    });
-                    lensesLayer.removeLayer(lens.areaQuery);
+                    
                     attLensesArray.splice( attLensesArray.indexOf(lens),1);
                     attLenResults.removeLayer(lens.lID);
+                    attLensesArray.forEach(function (lensInGlobalArray,index,array){
+                        var indexofLens = lensInGlobalArray.intersections.indexOf(lens);
+                        if(indexofLens !=-1) {
+                            lensInGlobalArray.intersections.splice(indexofLens,1);
+                            var layerofItem = attLenResults.getLayer(lensInGlobalArray.lID);
+                            console.log("This is the layer associated with the lens needing update");
+                            console.log(layerofItem);
+                            layerofItem.eachLayer(function (layerHolder) {
+                                layerHolder.eachLayer(function (layer) {
+                                    console.log("For each layer of the item's lID");
+                                    console.log(layer);
+                                    if (lens.areaQuery.getBounds().intersects(layer.getBounds())){
+                                        console.log("This layer is inside the bounds");
+                                        switch(lens.enc) {
+                                            case "color":
+                                                layer.setStyle({color: '#FF6347'});
+                                                console.log("Here comes the layer");
+                                                console.log(layer);
+                                                lensInGlobalArray.updateLayer(layer, layer._layers[layer._leaflet_id - 1].feature.properties);
+                                                lensInGlobalArray.intersections.forEach(function(itemInterLens, index, array) {
+                                                    if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
+                                                        itemInterLens.updateLayer(layer, layer.feature.properties);
+                                                    }
+                                                });
+                                                break;
+                                            case "brightness":
+                                                layer.setStyle({color: '#FF6347'});
+                                                lensInGlobalArray.updateLayer(layer, layer._layers[layer._leaflet_id - 1].feature.properties);
+                                                lensInGlobalArray.intersections.forEach(function(itemInterLens, index, array) {
+                                                    if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
+                                                        itemInterLens.updateLayer(layer, layer.feature.properties);
+                                                    }
+                                                });
+                                                break;
+                                            case "opacity":
+                                                console.log("Returning Opacity to 1");
+                                                layer.setStyle({opacity:1});
+                                                break;
+                                            case "width":
+                                                console.log("Returning Width to 1.5");
+                                                layer.setStyle({"weight": 1.5});
+                                                break;
+                                        }
+                                    }
+                                });
+                            });
+
+                        }
+                    });
+                    lensesLayer.removeLayer(lens.areaQuery);
                     //deleteAttribute(lngLat, radiusQuery, _attribute, _encoding);
                 });
                 
