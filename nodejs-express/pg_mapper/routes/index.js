@@ -35,6 +35,25 @@ var drawTracksMap ="SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As 
  SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) , velo
  FROM multis*/
 
+ /*
+ WITH tryingToDivide AS (
+	SELECT tid as idThis, geom as geomThis, data_time as dataTime,
+	lag(tid) over (order by tid asc,data_time asc) as idPrev, 
+	lag(geom) over (order by tid asc, data_time asc) as geomPrev
+	FROM track_divided_by_time_30s)
+
+UPDATE track_divided_by_time_30s
+SET linegeom =
+        CASE
+        WHEN idThis = idPrev THEN
+        ST_SetSRID(ST_MakeLine(geomPrev,geomThis),4326)
+        ELSE 
+          NULL
+        END
+FROM tryingToDivide
+WHERE tid = idThis AND  data_time = dataTime
+ */
+
 
 var select_first = "SELECT taxi_id from (SELECT taxi_id,row_number() as rn,count(*) over () as total_countFROM tracks) t where rn = 1 or rn = total_count";
 
@@ -95,6 +114,8 @@ router.get('/data', function (req, res) {
 var timeB4draw = Math.floor( new Date().getTime()/1000);
 router.get('/map', function(req, res) {
 
+  activeQuery = "";
+
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
   console.log("Fetching on database");
@@ -105,11 +126,6 @@ router.get('/map', function(req, res) {
 
   var timefetch = Math.floor( new Date().getTime()/1000);
   var timeafterGet = timefetch-timeB4draw;
-
-  //SET QUERY STRING TO RESET FOR EACH CLIENT
-
-  activeQuery = " WHERE ";
-
 
   // Pass the result to the map page
   query.on("end", function (result) {
@@ -140,6 +156,39 @@ router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
   var query = client.query(new Query(query_args_ContructorQUERIES(req.params.tab, req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
+  query.on("row", function (row, result) {
+      result.addRow(row);
+  });
+
+  var timefetch = Math.floor( new Date().getTime()/1000);
+  var timeafterGet = timefetch-timeB4draw;
+  console.log("Updating map");
+  // Pass the result to the map page
+  query.on("end", function (result) {
+      //var data = require('../public/data/geoJSON.json')
+      var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
+      res.send(dataNew);
+      
+      console.log("DATA PASSED TO BE DRAWN");
+      var timeAdraw = Math.floor( new Date().getTime()/1000);
+      console.log(timeAdraw-timefetch);
+  });
+
+});
+
+router.get('/attQuery/:tab/:long/:lat/:radius', function(req, res) {
+  console.log(req.params.long);
+  console.log(req.params.lat);
+
+
+  //Radius in meters to degrees
+  var radiusDegrees = req.params.radius/ 111120;
+
+  //var minDegrees = req.params.minValue/ 111120;
+
+  var client = new Client(conString); // Setup our Postgres Client
+  client.connect(); // connect to the client
+  var query = client.query(new Query(query_args_ContructorATTQUERIES(req.params.tab, req.params.long, req.params.lat, radiusDegrees))); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
   });
@@ -303,6 +352,17 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
   else{
     console.log("The string is empty");
     return "";}
+  
+}
+function query_args_ContructorATTQUERIES (tab,long, lat, radius){
+
+  var withsPart ="WITH trackDivided as ( SELECT tid as tid, vel as velPerPoint, linegeom FROM track_divided_by_time_30s WHERE ST_DWithin(linegeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")), trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + ") SELECT trackDivided.linegeom, trackDivided.velPerPoint, trajectoryLine.length, trajectoryLine.veloc_avg, trajectoryLine.duration, trajectoryLine.data_time_End  FROM trajectoryLine , trackDivided WHERE trackDivided.tid = trajectoryLine.track_id";
+  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
+  var secondPart = " LIMIT 5000000) 	As f) As fc";
+ 
+  console.log("Im on an attribute Lens");
+  console.log(withsPart);
+  return firstPart + secondPart;
   
 }
 

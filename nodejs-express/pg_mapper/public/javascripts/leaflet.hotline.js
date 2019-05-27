@@ -45,6 +45,11 @@
 		this._canvas = canvas = typeof canvas === 'string'
 			? document.getElementById(canvas)
 			: canvas;
+		/*var canvasParent = document.getElementsByClassName("leaflet-pane leaflet-overlay-pane");
+		this.canvas = canvasParent[0].childNodes[0];*/
+			       
+		
+
 
 		this._ctx = canvas.getContext('2d');
 		this._width = canvas.width;
@@ -267,6 +272,7 @@
 
 
 	var Renderer = L.Canvas.extend({
+	
 		_initContainer: function () {
 			L.Canvas.prototype._initContainer.call(this);
 			this._hotline = new Hotline(this._container);
@@ -276,6 +282,7 @@
 			L.Canvas.prototype._update.call(this);
 			this._hotline.width(this._container.width);
 			this._hotline.height(this._container.height);
+
 		},
 
 		_updatePoly: function (layer) {
@@ -312,7 +319,10 @@
 				this._hotline.palette(layer.options.palette);
 			}
 		}
+		
 	});
+	
+	
 
 	var renderer = function (options) {
 		return L.Browser.canvas ? new Renderer(options) : null;
@@ -358,6 +368,8 @@
 			}
 		}
 	};
+
+
 
 
 	L.Hotline = L.Polyline.extend({
@@ -444,7 +456,8 @@
 		},
 
 		_clickTolerance: function () {
-			return this.options.weight / 2 + this.options.outlineWidth + (L.Browser.touch ? 10 : 0);
+			//return this.options.weight / 2 + this.options.outlineWidth + (L.Browser.touch ? 10 : 0);
+			return 0;
 		}
 	});
 

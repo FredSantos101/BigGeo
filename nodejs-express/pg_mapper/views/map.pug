@@ -8,8 +8,13 @@ block content
         
         
         
-        var map = L.map('map',{preferCanvas: true, center: [39.96964,116.33251], zoom: 10});
-        
+        var map = L.map('map',{preferCanvas: true,renderer: L.canvas({}), center: [39.96964,116.33251], zoom: 10});
+        map.createPane('lensPane');
+        map.createPane('velPane');
+        map.createPane('attLensPane');
+        map.getPane('lensPane').style.zIndex = 480;
+        map.getPane('attLensPane').style.zIndex = 410;
+        map.getPane('velPane').style.zIndex = 400;
         var popup = L.popup();
         var popup2 = L.popup();
 
@@ -29,9 +34,9 @@ block content
         var markerGroup2 = L.featureGroup().addTo(map);
         var markerGroup3 = L.featureGroup().addTo(map);
         
-        var attLenResults = L.featureGroup().addTo(map);
+        var attLenResults = L.featureGroup({pane: 'attLensPane'}).addTo(map);
 
-        var lensesLayer = L.geoJSON().addTo(map);
+        var lensesLayer = L.featureGroup({pane: 'lensPane'}).addTo(map);
 
         var lensPreCreationLayer = L.layerGroup().addTo(map);
         
@@ -48,6 +53,7 @@ block content
         var encodingFuncVar = "color";
 
         var attLensesArray = [];
+
 
         //black and white, when it is a greyish color its hard to see
         /*L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
@@ -144,7 +150,10 @@ block content
         map.addControl(new customControlQ());
         map.addControl(new customControlA());
             
-
+        var container = document.getElementsByClassName("leaflet-zoom-animated");
+        container[0].onclick = function(e){
+                L.DomEvent.stopPropagation(e);
+        }
                 
 
         
@@ -336,6 +345,268 @@ block content
             
             
         }
+        
+        function createAttributeQuery(lngLat, radiusQuery, aTypeLens, encoding){
+            var attLayer = L.featureGroup().addTo(attLenResults);
+            
+                // Create URL
+            var urlString3 = "attQuery/trajectory_lines/"  + lngLat.lng + "/" + lngLat.lat + "/" + radiusQuery;
+            var urlString2 = "attQuery/trajectory_lines1/" + lngLat.lng + "/" + lngLat.lat + "/" + radiusQuery;
+            var urlString1 = "attQuery/trajectory_lines2/" + lngLat.lng + "/" + lngLat.lat + "/" + radiusQuery;
+            var urlString  = "attQuery/trajectory_lines3/" + lngLat.lng + "/" + lngLat.lat + "/" + radiusQuery;
+            
+            var lensesVar = createALens(lngLat, radiusQuery, aTypeLens, encoding);
+            lensesVar.lID = attLayer._leaflet_id;
+            var newData = $.ajax({
+                url: urlString,
+                type: 'GET',
+                dataType:'json',
+                success: console.log("Data successfully loaded!"),
+                error: function (xhr) {
+                    alert(xhr.statusText)
+                }
+                
+            }) 
+            $.when(newData).done(function() {
+                
+                if(newData.responseJSON.features != null){
+                    console.log(newData.responseJSON.features);
+                    newData.responseJSON.features.forEach(function(item, index, array) {
+                        var tracksToDraw = L.geoJson(item,firstStyle);
+                        switch(aTypeLens) {
+                            case "length":
+                                lengthAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "duration":
+                                // code block
+                                durationAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "vel":
+                                velocityAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                            case "time":
+                                timeAtt(tracksToDraw, item.properties, encoding);
+                                break;
+                        } 
+                        lensesVar.intersections.forEach(function(lensInt, index, array) {
+                            console.log(lensInt, index);
+                            if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
+                                lensInt.updateLayer(tracksToDraw,item.properties)
+                            }
+                        });
+                        tracksToDraw.addTo(attLayer);
+                    });
+                    
+                    lensesVar.colorSuccess();
+                }
+            }); 
+            /*var newData1 = $.ajax({
+                url: urlString1,
+                type: 'GET',
+                dataType:'json',
+                success: console.log("Data successfully loaded!"),
+                error: function (xhr) {
+                    alert(xhr.statusText)
+                }
+                
+            }) 
+            $.when(newData1).done(function() {
+                if(newData1.responseJSON.features != null){
+                    var tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
+                    tracksToDraw.addTo(markerGroup1);
+                    lastMarkerGroupID1 = tracksToDraw._leaflet_id;
+                    lensesVar.colorSuccess();
+                }
+                lensesLayer.bringToFront();
+            });
+            var newData2 = $.ajax({
+                url: urlString2,
+                type: 'GET',
+                dataType:'json',
+                success: console.log("Data successfully loaded!"),
+                error: function (xhr) {
+                    alert(xhr.statusText)
+                }
+                
+            }) 
+            $.when(newData2).done(function() {
+                if(newData2.responseJSON.features != null){
+                    var tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
+                    tracksToDraw.addTo(markerGroup2);
+                    lastMarkerGroupID2 = tracksToDraw._leaflet_id;
+                    lensesVar.colorSuccess();
+                }
+                lensesLayer.bringToFront();
+            });
+            var newData3 = $.ajax({
+                url: urlString3,
+                type: 'GET',
+                dataType:'json',
+                success: console.log("Data successfully loaded!"),
+                error: function (xhr) {
+                    alert(xhr.statusText)
+                }
+                
+            }) 
+            $.when(newData3).done(function() {
+                if(newData3.responseJSON.features != null){
+                    var tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
+                    tracksToDraw.addTo(markerGroup3);
+                    lastMarkerGroupID3 = tracksToDraw._leaflet_id;
+                    lensesVar.colorSuccess();
+                }
+                lensesLayer.bringToFront();
+            });*/
+            
+            
+        }
+
+        /*function attributeLensCreation(lngLat,radius,attribute,encoding){
+            var metresPerPixel = 40075016.686 * Math.abs(Math.cos(lngLat.lat * 180/Math.PI)) / Math.pow(2, map.getZoom()+8);
+            var pixelsInRadius = radius / metresPerPixel;
+            var aLens = createALens(lngLat, radius, attribute, encoding);
+            var layerToPaintVEL = L.featureGroup().addTo(attLenResults);
+
+            if(defaultLayerFlag){
+                defaultLayer.eachLayer(function (layer) {
+                    var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                    //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                    if ( yourDistance <= pixelsInRadius){
+                        switch(attribute) {
+                            case "length":
+                                lengthAtt(layer, encoding);
+                                break;
+                            case "duration":
+                                // code block
+                                durationAtt(layer, encoding);
+                                break;
+                            case "vel":
+                                velocityAtt(layerToPaintVEL,layer,encoding);
+                                break;
+                            case "time":
+                                timeAtt(layer, encoding);
+                                break;
+                        }   
+                        
+                    //}
+                    }
+                
+                });
+            }
+            else{
+                 if(lastMarkerGroupID !=null ){
+                    markerGroup.getLayer(lastMarkerGroupID).eachLayer(function (layer) {
+                        var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                        //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                        if ( yourDistance <= pixelsInRadius){
+                            switch(attribute) {
+                                case "length":
+                                    lengthAtt(layer, encoding);
+                                    break;
+                                case "duration":
+                                    // code block
+                                    durationAtt(layer, encoding);
+                                    break;
+                                case "vel":
+                                    velocityAtt(layerToPaintVEL,layer,encoding);
+                                    break;
+                                case "time":
+                                    timeAtt(layer, encoding);
+                                    break;
+                            }   
+                            
+                        //}
+                        }
+                        
+                    });
+                }
+                if(lastMarkerGroupID1 !=null && map.hasLayer(markerGroup1)){
+                    markerGroup1.getLayer(lastMarkerGroupID1).eachLayer(function (layer) {
+                        var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                        //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                        if ( yourDistance <= pixelsInRadius){
+                            switch(attribute) {
+                                case "length":
+                                    lengthAtt(layer, encoding);
+                                    break;
+                                case "duration":
+                                    // code block
+                                    durationAtt(layer, encoding);
+                                    break;
+                                case "vel":
+                                    velocityAtt(layerToPaintVEL,layer,encoding);
+                                    break;
+                                case "time":
+                                    timeAtt(layer, encoding);
+                                    break;
+                            }   
+                            
+                        //}
+                        }
+                    
+                    });          
+                }
+                if(lastMarkerGroupID2 !=null && map.hasLayer(markerGroup2)){
+                    markerGroup2.getLayer(lastMarkerGroupID2).eachLayer(function (layer) {
+                        var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                        //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                        if ( yourDistance <= pixelsInRadius){
+                            switch(attribute) {
+                                case "length":
+                                    lengthAtt(layer, encoding);
+                                    break;
+                                case "duration":
+                                    // code block
+                                    durationAtt(layer, encoding);
+                                    break;
+                                case "vel":
+                                    velocityAtt(layerToPaintVEL,layer,encoding);
+                                    break;
+                                case "time":
+                                    timeAtt(layer, encoding);
+                                    break;
+                            }   
+                            
+                        //}
+                        }
+                        
+                    });   
+                }
+                if(lastMarkerGroupID3 !=null && map.hasLayer(markerGroup3)){
+                    markerGroup3.getLayer(lastMarkerGroupID3).eachLayer(function (layer) {
+                        var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                        //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                        if ( yourDistance <= pixelsInRadius){
+                            switch(attribute) {
+                                case "length":
+                                    lengthAtt(layer, encoding);
+                                    break;
+                                case "duration":
+                                    // code block
+                                    durationAtt(layer, encoding);
+                                    break;
+                                case "vel":
+                                    velocityAtt(layerToPaintVEL,layer,encoding);
+                                    break;
+                                case "time":
+                                    timeAtt(layer, encoding);
+                                    break;
+                            }   
+                            
+                        //}
+                        }
+                        
+                    });
+                }
+            
+            }
+            aLens.colorSuccess();
+            if(attribute == "vel" && encoding == "color"){
+                aLens.lID = layerToPaintVEL._leaflet_id;
+            }
+            console.log("lensesLayer now");
+            lensesLayer.bringToFront();
+        }*/
 
         /////
         /////
@@ -448,8 +719,8 @@ block content
             console.log("Delete att");
             var metresPerPixel = 40075016.686 * Math.abs(Math.cos(lngLat.lat * 180/Math.PI)) / Math.pow(2, map.getZoom()+8);
             var pixelsInRadius = radius / metresPerPixel;
-            if(lastMarkerGroupID3 !=null){
-                    markerGroup3.getLayer(lastMarkerGroupID3).eachLayer(function (layer) {
+            if(defaultLayerFlag){
+                    defaultLayer.eachLayer(function (layer) {
                         console.log("Each layer");
                         var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
                         //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
@@ -457,10 +728,15 @@ block content
                             switch(_encoding) {
                                 case "color":
                                     layer.setStyle({color: '#FF6347'});
-                                    attLensesArray.forEach(function(item, index, array) {
-                                        console.log(item, index);
-                                        item.updateLayer(layer)
-                                    });
+                                    layer.setStyle({opacity:1.0});
+                                        attLensesArray.forEach(function(item, index, array) {
+                                            console.log(item, index);
+                                            if(item.att == "vel"){ //if same type dont perform? detetar layers em conjunto, guardar valor em array d layers por lente e dps apagar.
+                                                var layerToPaint = L.featureGroup().addTo(attLenResults);
+                                                item.updateLayer(layer, layerToPaint);
+                                            }
+                                            else item.updateLayer(layer, null)
+                                        });
                                     break;
                                 case "brightness":
                                     layer.setStyle({color: '#FF6347'});
@@ -481,95 +757,150 @@ block content
                         }               
                     });
             }
-            if(lastMarkerGroupID2 !=null){
-                    markerGroup2.getLayer(lastMarkerGroupID2).eachLayer(function (layer) {
+            else{
+                if(lastMarkerGroupID3 !=null && map.hasLayer(markerGroup3)){
+                    markerGroup3.getLayer(lastMarkerGroupID3).eachLayer(function (layer) {
+                        console.log("Each layer");
                         var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
                         //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
                         if ( yourDistance <= pixelsInRadius){
                             switch(_encoding) {
                                 case "color":
                                     layer.setStyle({color: '#FF6347'});
-                                    attLensesArray.forEach(function(item, index, array) {
-                                        console.log(item, index);
-                                        item.updateLayer(layer)
-                                    });
-                                    break;
-                                case "brightness":
-                                    layer.setStyle({color: '#FF6347'});
-                                    attLensesArray.forEach(function(item, index, array) {
-                                        console.log(item, index);
-                                        item.updateLayer(layer)
-                                    });
-                                    break;
-                                case "opacity":
-                                    layer.setStyle({opacity:1});
-                                    break;
-                                case "width":
-                                    layer.setStyle({"weight": 1.5});
-                                    break;
-                            }
-                        }               
-                    });
-            }
-            if(lastMarkerGroupID1 !=null){
-                    markerGroup1.getLayer(lastMarkerGroupID1).eachLayer(function (layer) {
-                        var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
-                        //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
-                        if ( yourDistance <= pixelsInRadius){
-                            switch(_encoding) {
-                                case "color":
-                                    layer.setStyle({color: '#FF6347'});
-                                    attLensesArray.forEach(function(item, index, array) {
-                                        console.log(item, index);
-                                        item.updateLayer(layer)
-                                    });
-                                    break;
-                                case "brightness":
-                                    layer.setStyle({color: '#FF6347'});
-                                    attLensesArray.forEach(function(item, index, array) {
-                                        console.log(item, index);
-                                        item.updateLayer(layer)
-                                    });
-                                    break;
-                                case "opacity":
-                                    layer.setStyle({opacity:1});
-                                    break;
-                                case "width":
-                                    layer.setStyle({"weight": 1.5});
-                                    break;
-                            }
-                        }               
-                    });
-            }
-            if(lastMarkerGroupID !=null){
-                    markerGroup.getLayer(lastMarkerGroupID).eachLayer(function (layer) {
-                        var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
-                        //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
-                        if ( yourDistance <= pixelsInRadius){
-                            switch(_encoding) {
-                                case "color":
-                                    layer.setStyle({color: '#FF6347'});
-                                    attLensesArray.forEach(function(item, index, array) {
-                                        console.log(item, index);
-                                        item.updateLayer(layer)
-                                    });
-                                    break;
-                                case "brightness":
-                                    layer.setStyle({color: '#FF6347'});
-                                    attLensesArray.forEach(function(item, index, array) {
-                                        console.log(item, index);
-                                        item.updateLayer(layer)
-                                    });
-                                    break;
-                                case "opacity":
                                     layer.setStyle({opacity:1.0});
+                                        attLensesArray.forEach(function(item, index, array) {
+                                            console.log(item, index);
+                                            if(item.att == "vel"){
+                                                var layerToPaint = L.featureGroup().addTo(attLenResults);
+                                                item.updateLayer(layer, layerToPaint);
+                                            }
+                                            else item.updateLayer(layer, null)
+                                        });
+                                    break;
+                                case "brightness":
+                                    layer.setStyle({color: '#FF6347'});
+                                    attLensesArray.forEach(function(item, index, array) {
+                                        console.log(item, index);
+                                        item.updateLayer(layer)
+                                    });
+                                    break;
+                                case "opacity":
+                                    console.log("Returning Opacity to 1");
+                                    layer.setStyle({opacity:1});
                                     break;
                                 case "width":
+                                    console.log("Returning Width to 1.5");
                                     layer.setStyle({"weight": 1.5});
                                     break;
                             }
                         }               
                     });
+                }
+                if(lastMarkerGroupID2 !=null && map.hasLayer(markerGroup2)){
+                        markerGroup2.getLayer(lastMarkerGroupID2).eachLayer(function (layer) {
+                            var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                            //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                            if ( yourDistance <= pixelsInRadius){
+                                switch(_encoding) {
+                                    case "color":
+                                        layer.setStyle({color: '#FF6347'});
+                                        layer.setStyle({opacity:1.0});
+                                        attLensesArray.forEach(function(item, index, array) {
+                                            console.log(item, index);
+                                            if(item.att == "vel"){
+                                                var layerToPaint = L.featureGroup().addTo(attLenResults);
+                                                item.updateLayer(layer, layerToPaint);
+                                            }
+                                            else item.updateLayer(layer, null)
+                                        });
+                                        break;
+                                    case "brightness":
+                                        layer.setStyle({color: '#FF6347'});
+                                        attLensesArray.forEach(function(item, index, array) {
+                                            console.log(item, index);
+                                            item.updateLayer(layer)
+                                        });
+                                        break;
+                                    case "opacity":
+                                        layer.setStyle({opacity:1});
+                                        break;
+                                    case "width":
+                                        layer.setStyle({"weight": 1.5});
+                                        break;
+                                }
+                            }               
+                        });
+                }
+                if(lastMarkerGroupID1 !=null && map.hasLayer(markerGroup1)){
+                        markerGroup1.getLayer(lastMarkerGroupID1).eachLayer(function (layer) {
+                            var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                            //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                            if ( yourDistance <= pixelsInRadius){
+                                switch(_encoding) {
+                                    case "color":
+                                        layer.setStyle({color: '#FF6347'});
+                                        layer.setStyle({opacity:1.0});
+                                        attLensesArray.forEach(function(item, index, array) {
+                                            console.log(item, index);
+                                            if(item.att == "vel"){
+                                                var layerToPaint = L.featureGroup().addTo(attLenResults);
+                                                item.updateLayer(layer, layerToPaint);
+                                            }
+                                            else item.updateLayer(layer, null)
+                                        });
+                                        break;
+                                    case "brightness":
+                                        layer.setStyle({color: '#FF6347'});
+                                        attLensesArray.forEach(function(item, index, array) {
+                                            console.log(item, index);
+                                            item.updateLayer(layer)
+                                        });
+                                        break;
+                                    case "opacity":
+                                        layer.setStyle({opacity:1});
+                                        break;
+                                    case "width":
+                                        layer.setStyle({"weight": 1.5});
+                                        break;
+                                }
+                            }               
+                        });
+                }
+                if(lastMarkerGroupID !=null && map.hasLayer(markerGroup)){
+                        markerGroup.getLayer(lastMarkerGroupID).eachLayer(function (layer) {
+                            var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                            //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                            if ( yourDistance <= pixelsInRadius){
+                                switch(_encoding) {
+                                    case "color":
+                                        layer.setStyle({color: '#FF6347'});
+                                        layer.setStyle({opacity:1.0});
+                                        attLensesArray.forEach(function(item, index, array) {
+                                            console.log(item, index);
+                                            if(item.att == "vel"){
+                                                var layerToPaint = L.featureGroup().addTo(attLenResults);
+                                                item.updateLayer(layer, layerToPaint);
+                                            }
+                                            else item.updateLayer(layer, null)
+                                        });
+                                        break;
+                                    case "brightness":
+                                        layer.setStyle({color: '#FF6347'});
+                                        attLensesArray.forEach(function(item, index, array) {
+                                            console.log(item, index);
+                                            item.updateLayer(layer)
+                                        });
+                                        break;
+                                    case "opacity":
+                                        layer.setStyle({opacity:1.0});
+                                        break;
+                                    case "width":
+                                        layer.setStyle({"weight": 1.5});
+                                        break;
+                                }
+                            }               
+                        });
+                } 
             } 
         }
 
@@ -824,7 +1155,7 @@ block content
                         .openOn(map);
                 }
                 else {
-                    attributeLensCreation(location, $('#radiusBox').val(),attributeFuncVar,encodingFuncVar);
+                    createAttributeQuery(location, $('#radiusBox').val(),attributeFuncVar,encodingFuncVar);
                 }
             });
             $('.dropbtnOpt-length').click(function () {
@@ -954,214 +1285,101 @@ block content
                     fillOpacity: 0.6,
                     radius: radiusQuery
                 }).addTo(lensesLayer),
+                lID : null,
+                att : _attribute,
+                enc : _encoding,
+                intersections: [],
                 colorSuccess : function() {
-                    if(_attribute == "length"){
-                        console.log("I will now paint the Pass by circle again ....")
-                        lens.areaQuery.setStyle({color: '#FFFFFF', fillColor: '#FFFFFF', fillOpacity: 0.1});
-                    }
-                    if(_attribute == "time"){
-                        console.log("I will now paint the Pass by circle again ....")
-                        lens.areaQuery.setStyle({color: '#FFFFFF', fillColor: '#FFFFFF', fillOpacity: 0.1});
-                    }
-                    if(_attribute == "duration"){
-                        console.log("I will now paint the Pass by circle again ....")
-                        lens.areaQuery.setStyle({color: '#FFFFFF', fillColor: '#FFFFFF', fillOpacity: 0.1});
-                    }
-                    if(_attribute == "vel"){
-                        console.log("I will now paint the Pass by circle again ....")
-                        lens.areaQuery.setStyle({color: '#FFFFFF', fillColor: '#FFFFFF', fillOpacity: 0.1});
-                    }
+                    //if(_attribute == "length"){
+                    console.log("I will now paint the Pass by circle again ....")
+                    this.areaQuery.setStyle({color: '#FFFFFF', fillColor: '#FFFFFF', fillOpacity: 0.1});
                     
                 },
-                updateLayer : function(layer){
-                    var metresPerPixel = 40075016.686 * Math.abs(Math.cos(lngLat.lat * 180/Math.PI)) / Math.pow(2, map.getZoom()+8);
-                    var pixelsInRadius = radiusQuery / metresPerPixel;
-                    var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
+                updateLayer : function(layer, value){
                     //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
-                    if ( yourDistance <= pixelsInRadius){
+                    if ( this.areaQuery.getBounds().intersects(layer.getBounds())){
                         switch(_attribute) {
                             case "length":
-                                lengthAtt(layer, _encoding);
+                                lengthAtt(layer, value,_encoding);
                                 break;
                             case "duration":
-                                // code block
-                                durationAtt(layer, _encoding);
+                                durationAtt(layer,value, _encoding);
                                 break;
                             case "vel":
-                                velocityAtt(aLens,layer,encoding);
+                                velocityAtt(layer,value,_encoding);
                                 break;
                             case "time":
-                                timeAtt(layer, _encoding);
+                                timeAtt(layer,value, _encoding);
                                 break;
                         }   
                         
                     //}
                     }
+                    else console.log("Layer not within the circle")
                 }
             };
+
+            attLensesArray.forEach(function(item, index, array) {
+                console.log(item, index);
+                if(item.areaQuery.getBounds().intersects(lens.areaQuery.getBounds())){
+                    lens.intersections.push(item);
+                }
+            });
             
             attLensesArray.push(lens);
+
+            console.log(attLensesArray);
             
             lens.areaQuery.bindPopup("This lens is taking the attribute " + _attribute + " and encoding it as the " + _encoding + ".\n" + "<input type='button' value='Delete this lens' class='marker-delete-button'/>")
             lens.areaQuery.on("popupopen", function() {
-            var tempMarker = lens;
+                // To remove marker on click of delete
+                $('.marker-delete-button:visible').click(function () {
+                    lens.intersections.forEach(function(item, index, array) {
+                        var layerofItem = attLenResults.getLayer(item.lID);
+                        layerofItem.eachLayer(function (layer) {
+                            if (lens.areaQuery.getBounds().intersects(layer.getBounds())){
+                                switch(lens.enc) {
+                                    case "color":
+                                        layer.setStyle({color: '#FF6347'});
+                                        console.log("Here comes the layer");
+                                        console.log(layer);
+                                        item.updateLayer(layer, layer._layers[0].features.properties);
+                                        item.intersections.forEach(function(itemInterLens, index, array) {
+                                            if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
+                                                itemInterLens.updateLayer(layer, layer.features.properties);
+                                            }
+                                        });
+                                        break;
+                                    case "brightness":
+                                        layer.setStyle({color: '#FF6347'});
+                                        item.updateLayer(layer, layer._layers[0].features.properties);
+                                        item.intersections.forEach(function(itemInterLens, index, array) {
+                                            if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
+                                                itemInterLens.updateLayer(layer, layer.features.properties);
+                                            }
+                                        });
+                                        break;
+                                    case "opacity":
+                                        console.log("Returning Opacity to 1");
+                                        layer.setStyle({opacity:1});
+                                        break;
+                                    case "width":
+                                        console.log("Returning Width to 1.5");
+                                        layer.setStyle({"weight": 1});
+                                        break;
+                                }
+                            }
+                        });
 
-            //var tempMarkerGeoJSON = this.toGeoJSON();
-
-            //var lID = tempMarker._leaflet_id; // Getting Leaflet ID of this marker
-
-            // To remove marker on click of delete
-            $('.marker-delete-button:visible').click(function () {
-                lensesLayer.removeLayer(tempMarker.areaQuery);
-                attLensesArray.splice( attLensesArray.indexOf(lens),1);
-                deleteAttribute(lngLat, radiusQuery, _attribute, _encoding);
-                
+                    });
+                    lensesLayer.removeLayer(lens.areaQuery);
+                    attLensesArray.splice( attLensesArray.indexOf(lens),1);
+                    attLenResults.removeLayer(lens.lID);
+                    //deleteAttribute(lngLat, radiusQuery, _attribute, _encoding);
                 });
                 
-            }) ; 
+            }); 
             return lens
-        }
-
-
-        function attributeLensCreation(lngLat,radius,attribute,encoding){
-            var metresPerPixel = 40075016.686 * Math.abs(Math.cos(lngLat.lat * 180/Math.PI)) / Math.pow(2, map.getZoom()+8);
-            var pixelsInRadius = radius / metresPerPixel;
-            var aLens = createALens(lngLat, radius, attribute, encoding);
-            if(defaultLayerFlag){
-                defaultLayer.eachLayer(function (layer) {
-                    var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
-                    //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
-                    if ( yourDistance <= pixelsInRadius){
-                        switch(attribute) {
-                            case "length":
-                                lengthAtt(layer, encoding);
-                                break;
-                            case "duration":
-                                // code block
-                                durationAtt(layer, encoding);
-                                break;
-                            case "vel":
-                                velocityAtt(aLens,layer,encoding);
-                                break;
-                            case "time":
-                                timeAtt(layer, encoding);
-                                break;
-                        }   
-                        
-                    //}
-                    }
-                
-                });
-            }
-            else{
-                 if(lastMarkerGroupID !=null){
-                    markerGroup.getLayer(lastMarkerGroupID).eachLayer(function (layer) {
-                        var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
-                        //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
-                        if ( yourDistance <= pixelsInRadius){
-                            switch(attribute) {
-                                case "length":
-                                    lengthAtt(layer, encoding);
-                                    break;
-                                case "duration":
-                                    // code block
-                                    durationAtt(layer, encoding);
-                                    break;
-                                case "vel":
-                                    velocityAtt(aLens,layer,encoding);
-                                    break;
-                                case "time":
-                                    timeAtt(layer, encoding);
-                                    break;
-                            }   
-                            
-                        //}
-                        }
-                        
-                    });
-                }
-                if(lastMarkerGroupID1 !=null){
-                    markerGroup1.getLayer(lastMarkerGroupID1).eachLayer(function (layer) {
-                        var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
-                        //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
-                        if ( yourDistance <= pixelsInRadius){
-                            switch(attribute) {
-                                case "length":
-                                    lengthAtt(layer, encoding);
-                                    break;
-                                case "duration":
-                                    // code block
-                                    durationAtt(layer, encoding);
-                                    break;
-                                case "vel":
-                                    velocityAtt(aLens,layer,encoding);
-                                    break;
-                                case "time":
-                                    timeAtt(layer, encoding);
-                                    break;
-                            }   
-                            
-                        //}
-                        }
-                    
-                    });          
-                }
-                if(lastMarkerGroupID2 !=null){
-                    markerGroup2.getLayer(lastMarkerGroupID2).eachLayer(function (layer) {
-                        var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
-                        //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
-                        if ( yourDistance <= pixelsInRadius){
-                            switch(attribute) {
-                                case "length":
-                                    lengthAtt(layer, encoding);
-                                    break;
-                                case "duration":
-                                    // code block
-                                    durationAtt(layer, encoding);
-                                    break;
-                                case "vel":
-                                    velocityAtt(aLens,layer,encoding);
-                                    break;
-                                case "time":
-                                    timeAtt(layer, encoding);
-                                    break;
-                            }   
-                            
-                        //}
-                        }
-                        
-                    });   
-                }
-                if(lastMarkerGroupID3 !=null){
-                    markerGroup3.getLayer(lastMarkerGroupID3).eachLayer(function (layer) {
-                        var yourDistance = L.GeometryUtil.closest(map, layer, lngLat).distance;
-                        //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
-                        if ( yourDistance <= pixelsInRadius){
-                            switch(attribute) {
-                                case "length":
-                                    lengthAtt(layer, encoding);
-                                    break;
-                                case "duration":
-                                    // code block
-                                    durationAtt(layer, encoding);
-                                    break;
-                                case "vel":
-                                    velocityAtt(aLens,layer,encoding);
-                                    break;
-                                case "time":
-                                    timeAtt(layer, encoding);
-                                    break;
-                            }   
-                            
-                        //}
-                        }
-                        
-                    });
-                }
-            
-            }
-            aLens.colorSuccess();
-            
         }
 
         /////
@@ -1172,12 +1390,12 @@ block content
         /////  Functions per attribute
         /////
 
-        function velocityAtt(master, layer, encoding){
+        function velocityAtt(layer, properties, encoding){
              // code block
-            var velAtt = layer.feature.properties.f4;
+            var velAtt = properties.f5;
             switch(encoding){
                 case "color":
-                    
+                    /*layer.setStyle({opacity:0});
                     var pointsArray = layer.feature.geometry.coordinates;
                     
                     var velArray =  layer.feature.properties.f5;
@@ -1185,21 +1403,61 @@ block content
                     var finalArray = [];
                     
                     for(var i = 0;i < velArray.length;i++ ){
-                        finalArray.push(pointsArray[i].push(velArray[i]));
+                        finalArray.push([pointsArray[i][1],pointsArray[i][0],velArray[i]]);    
                     }
+                    console.log(pointsArray);
                     var hotlineLayer = L.hotline(finalArray, {
                         min: 0,
-                        max: 75,
+                        max: 60,
                         palette: {
                             0.0: '#ff0000',
                             0.3: '#ffff00',
                             1.0: '#008800'
                         },
-                        weight: 5,
-                        outlineColor: '#000000',
-                        outlineWidth: 1
-                    }).addTo(map);
+                        weight: 1,
+                        outlineColor: '#FFFFFF',
+                        outlineWidth: 0
+                    });
+                    
+                    delete finalArray;
+                    delete pointsArray;
+                    delete velArray;
+                    
 
+                    console.log(hotlineLayer);
+                    hotlineLayer.addTo(layerToPaint);
+                    */
+
+                    if(velAtt <= 1)          {
+                            layer.setStyle({color :'#29FF9A'});
+                    }
+                    else if(velAtt <= 2)     {
+                            layer.setStyle({color :'#40E49B'});
+                    }
+                    else if(velAtt <= 5)    {
+                            layer.setStyle({color :'#58CA9C'});
+                    }
+                    else if(velAtt <= 10)    {
+                            layer.setStyle({color :'#70B09D'});
+                    }
+                    else if(velAtt <= 15)    {
+                            layer.setStyle({color :'#88969E'});
+                    }
+                    else if(velAtt <= 20)    {
+                            layer.setStyle({color :'#9F7C9F'});
+                    }
+                    else if(velAtt <=  30)   {
+                            layer.setStyle({color :'#B762A0'});
+                    }
+                    else if(velAtt <=  50)   {
+                            layer.setStyle({color :'#CF48A1'});
+                    }
+                    else if(velAtt <=  80)   {
+                            layer.setStyle({color :'#E72EA2'});
+                    }
+                    else    layer.setStyle({color :'#FF14A3'});
+                    break;
+                    
                     break;
                 case "brightness":
                     if(velAtt <= 1)          {
@@ -1249,9 +1507,9 @@ block content
             }
         }
 
-        function lengthAtt(layer, encoding){
+        function lengthAtt(layer,properties, encoding){
              // code block
-            var len = layer.feature.properties.f1;
+            var len = properties.f1;
             switch(encoding){
                 case "color":
                     if(len <= 250)          layer.setStyle({color :'#29FF9A'}) 
@@ -1331,9 +1589,9 @@ block content
             }
         }
         
-        function durationAtt(layer, encoding){
+        function durationAtt(layer, properties, encoding){
              // code block
-            var dur = layer.feature.properties.f2;
+            var dur = properties.f2;
             switch(encoding){
                 case "color":
                     if(dur <= "00:01:00")           layer.setStyle({color :'#FFF8DC'}) 
@@ -1385,11 +1643,11 @@ block content
             }
         }
 
-         function timeAtt(layer, encoding){
+         function timeAtt(layer, properties, encoding){
             // 2008-02-02 13:30:44
             // 2008-02-08 17:39:18
             // code block
-            var tim = layer.feature.properties.f3;
+            var tim = properties.f3;
             switch(encoding){
                 case "color":
                     if(tim <= "2008-02-03 13:30:44")            layer.setStyle({color :'#FFF8DC'}) 
