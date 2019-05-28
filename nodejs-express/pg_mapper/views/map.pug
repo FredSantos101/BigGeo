@@ -343,10 +343,12 @@ block content
                 lensesLayer.bringToFront();
             });
             
-            
+            attLensesArray.forEach(function(item, index, array) {
+                item.updateALL();
+            });
         }
         
-        function createAttributeQuery(lngLat, radiusQuery, aTypeLens, encoding){
+        /*function createAttributeQuery(lngLat, radiusQuery, aTypeLens, encoding){
             var attLayer = L.featureGroup().addTo(attLenResults);
             var _attLayer = L.featureGroup().addTo(attLayer);
             var _attLayer1 = L.featureGroup().addTo(attLayer);
@@ -532,7 +534,9 @@ block content
             });
             lensesVar.colorSuccess();
             
-        }
+        }*/
+
+
 
         /*function attributeLensCreation(lngLat,radius,attribute,encoding){
             var metresPerPixel = 40075016.686 * Math.abs(Math.cos(lngLat.lat * 180/Math.PI)) / Math.pow(2, map.getZoom()+8);
@@ -788,7 +792,7 @@ block content
             
         }
 
-        function deleteAttribute(lngLat, radius, _attribute, _encoding){
+        /*function deleteAttribute(lngLat, radius, _attribute, _encoding){
             console.log("Delete att");
             var metresPerPixel = 40075016.686 * Math.abs(Math.cos(lngLat.lat * 180/Math.PI)) / Math.pow(2, map.getZoom()+8);
             var pixelsInRadius = radius / metresPerPixel;
@@ -975,7 +979,7 @@ block content
                         });
                 } 
             } 
-        }
+        }*/
 
         /////
         /////
@@ -1228,7 +1232,7 @@ block content
                         .openOn(map);
                 }
                 else {
-                    createAttributeQuery(location, $('#radiusBox').val(),attributeFuncVar,encodingFuncVar);
+                    createALens(location, $('#radiusBox').val(),attributeFuncVar,encodingFuncVar).createLayers();
                 }
             });
             $('.dropbtnOpt-length').click(function () {
@@ -1342,6 +1346,9 @@ block content
                     lastMarkerGroupID3 = null;
                 }
                 deleteQuery(lng, lat, radiusQuery, _type, minVal, maxVal);
+                attLensesArray.forEach(function(item, index, array) {
+                    item.updateALL();
+                });
                 });
                 
             }) ; 
@@ -1356,6 +1363,8 @@ block content
                     fillOpacity: 0.6,
                     radius: radiusQuery
                 }).addTo(lensesLayer),
+                lngLat : lngLat,
+                radiusQuery : radiusQuery,
                 lID : null,
                 att : _attribute,
                 enc : _encoding,
@@ -1387,6 +1396,197 @@ block content
                     //}
                     }
                     else console.log("Layer not within the circle")
+                },
+
+                createLayers : function(){
+                    var attLayer = L.featureGroup().addTo(attLenResults);
+                    var _attLayer = L.featureGroup().addTo(attLayer);
+                    var _attLayer1 = L.featureGroup().addTo(attLayer);
+                    var _attLayer2 = L.featureGroup().addTo(attLayer);
+                    var _attLayer3 = L.featureGroup().addTo(attLayer);
+                    
+                        // Create URL
+                    var urlString3 = "attQuery/trajectory_lines/"  + this.lngLat.lng + "/" + this.lngLat.lat + "/" + this.radiusQuery;
+                    var urlString2 = "attQuery/trajectory_lines1/" + this.lngLat.lng + "/" + this.lngLat.lat + "/" + this.radiusQuery;
+                    var urlString1 = "attQuery/trajectory_lines2/" + this.lngLat.lng + "/" + this.lngLat.lat + "/" + this.radiusQuery;
+                    var urlString  = "attQuery/trajectory_lines3/" + this.lngLat.lng + "/" + this.lngLat.lat + "/" + this.radiusQuery;
+                    
+                    this.lID = attLayer._leaflet_id;
+                    var newData = $.ajax({
+                        url: urlString,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData).done(function() {
+                        
+                        if(newData.responseJSON.features != null){
+                            console.log(newData.responseJSON.features);
+                            newData.responseJSON.features.forEach(function(item, index, array) {
+                                var tracksToDraw = L.geoJson(item,firstStyle);
+                                switch(lens.att) {
+                                    case "length":
+                                        lengthAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "duration":
+                                        // code block
+                                        durationAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "vel":
+                                        velocityAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "time":
+                                        timeAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                } 
+                                lens.intersections.forEach(function(lensInt, index, array) {
+                                    if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
+                                        console.log("This layer intersects the other lenses");
+                                        console.log(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds()));
+                                        console.log(lensInt);
+                                        console.log(tracksToDraw);
+                                        lensInt.updateLayer(tracksToDraw,item.properties)
+                                    }
+                                });
+                                tracksToDraw.addTo(_attLayer);
+                            });
+                            
+                        }
+                    }); 
+                    var newData1 = $.ajax({
+                        url: urlString1,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData1).done(function() {
+                        if(newData1.responseJSON.features != null){
+                            console.log(newData1.responseJSON.features);
+                            newData1.responseJSON.features.forEach(function(item, index, array) {
+                                var tracksToDraw = L.geoJson(item,firstStyle);
+                                switch(lens.att) {
+                                    case "length":
+                                        lengthAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "duration":
+                                        // code block
+                                        durationAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "vel":
+                                        velocityAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "time":
+                                        timeAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                } 
+                                lens.intersections.forEach(function(lensInt, index, array) {
+                                    console.log(lensInt, index);
+                                    if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
+                                        lensInt.updateLayer(tracksToDraw,item.properties)
+                                    }
+                                });
+                                tracksToDraw.addTo(_attLayer1);
+                            });
+                            
+                        }
+                    });
+                    var newData2 = $.ajax({
+                        url: urlString2,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData2).done(function() {
+                        if(newData2.responseJSON.features != null){
+                            console.log(newData2.responseJSON.features);
+                            newData2.responseJSON.features.forEach(function(item, index, array) {
+                                var tracksToDraw = L.geoJson(item,firstStyle);
+                                switch(lens.att) {
+                                    case "length":
+                                        lengthAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "duration":
+                                        // code block
+                                        durationAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "vel":
+                                        velocityAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "time":
+                                        timeAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                } 
+                                lens.intersections.forEach(function(lensInt, index, array) {
+                                    console.log(lensInt, index);
+                                    if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
+                                        lensInt.updateLayer(tracksToDraw,item.properties)
+                                    }
+                                });
+                                tracksToDraw.addTo(_attLayer2);
+                            });
+                            
+                        }
+                    });
+                    var newData3 = $.ajax({
+                        url: urlString3,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData3).done(function() {
+                        if(newData3.responseJSON.features != null){
+                            console.log(newData3.responseJSON.features);
+                            newData3.responseJSON.features.forEach(function(item, index, array) {
+                                var tracksToDraw = L.geoJson(item,firstStyle);
+                                switch(lens.att) {
+                                    case "length":
+                                        lengthAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "duration":
+                                        // code block
+                                        durationAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "vel":
+                                        velocityAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                    case "time":
+                                        timeAtt(tracksToDraw, item.properties, lens.enc);
+                                        break;
+                                } 
+                                lens.intersections.forEach(function(lensInt, index, array) {
+                                    console.log(lensInt, index);
+                                    if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
+                                        lensInt.updateLayer(tracksToDraw,item.properties)
+                                    }
+                                });
+                                tracksToDraw.addTo(_attLayer3);
+                            });
+                            
+                            
+                        }
+                    });
+                    this.colorSuccess();
+                    
+                },
+                updateALL : function (){
+                    attLenResults.removeLayer(lens.lID);
+                    this.createLayers();
                 }
             };
 
@@ -1429,7 +1629,7 @@ block content
                                                 lensInGlobalArray.updateLayer(layer, layer._layers[layer._leaflet_id - 1].feature.properties);
                                                 lensInGlobalArray.intersections.forEach(function(itemInterLens, index, array) {
                                                     if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
-                                                        itemInterLens.updateLayer(layer, layer.feature.properties);
+                                                        itemInterLens.updateLayer(layer, layer._layers[layer._leaflet_id - 1].feature.properties);
                                                     }
                                                 });
                                                 break;
@@ -1438,7 +1638,7 @@ block content
                                                 lensInGlobalArray.updateLayer(layer, layer._layers[layer._leaflet_id - 1].feature.properties);
                                                 lensInGlobalArray.intersections.forEach(function(itemInterLens, index, array) {
                                                     if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
-                                                        itemInterLens.updateLayer(layer, layer.feature.properties);
+                                                        itemInterLens.updateLayer(layer, layer._layers[layer._leaflet_id - 1].feature.properties);
                                                     }
                                                 });
                                                 break;
@@ -1458,6 +1658,8 @@ block content
                         }
                     });
                     lensesLayer.removeLayer(lens.areaQuery);
+
+                    //Previous method
                     //deleteAttribute(lngLat, radiusQuery, _attribute, _encoding);
                 });
                 
