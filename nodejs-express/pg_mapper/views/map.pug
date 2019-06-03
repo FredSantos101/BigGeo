@@ -10,9 +10,13 @@ block content
         
         var map = L.map('map',{preferCanvas: true,renderer: L.canvas({}), center: [39.96964,116.33251], zoom: 10});
         map.createPane('lensPane');
+        map.createPane('outtterLensPane');
+        map.createPane('outtterLensDeletePane');
         map.createPane('velPane');
         map.createPane('attLensPane');
-        map.getPane('lensPane').style.zIndex = 480;
+        map.getPane('lensPane').style.zIndex = 600;
+        map.getPane('outtterLensPane').style.zIndex = 650;
+        map.getPane('outtterLensDeletePane').style.zIndex = 700;
         map.getPane('attLensPane').style.zIndex = 410;
         map.getPane('velPane').style.zIndex = 400;
         var popup = L.popup();
@@ -36,7 +40,9 @@ block content
         
         var attLenResults = L.featureGroup({pane: 'attLensPane'}).addTo(map);
 
+        var outterLensesLayer = L.featureGroup({pane: 'outtterLensPane'}).addTo(map);
         var lensesLayer = L.featureGroup({pane: 'lensPane'}).addTo(map);
+        
 
         var lensPreCreationLayer = L.layerGroup().addTo(map);
         
@@ -1361,8 +1367,10 @@ block content
                     color: 'DarkRed',
                     fillColor: 'red',
                     fillOpacity: 0.6,
-                    radius: radiusQuery
+                    radius: radiusQuery,
+                    pane: 'lensPane'
                 }).addTo(lensesLayer),
+                outsideCircle : null,
                 lngLat : lngLat,
                 radiusQuery : radiusQuery,
                 lID : null,
@@ -1387,6 +1395,15 @@ block content
                 },
                 getlID : function (){
                     return this.lID;
+                },
+                setOutsideCircle: function(circle){
+                    this.outsideCircle = circle;
+                },
+                setRadius : function (value){
+                    this.radiusQuery = value;
+                },
+                getRadius : function (){
+                    return this.radiusQuery;
                 },
                 colorSuccess : function() {
                     //if(_attribute == "length"){
@@ -1430,7 +1447,7 @@ block content
                     var urlString1 = "attQuery/trajectory_lines2/" + this.lngLat.lng + "/" + this.lngLat.lat + "/" + this.radiusQuery;
                     var urlString  = "attQuery/trajectory_lines3/" + this.lngLat.lng + "/" + this.lngLat.lat + "/" + this.radiusQuery;
                     
-                    this.lID = attLayer._leaflet_id;
+                    this.setlID(attLayer._leaflet_id);
                     var newData = $.ajax({
                         url: urlString,
                         type: 'GET',
@@ -1607,25 +1624,25 @@ block content
                     
                 },
                 updateALL : function (){
-                    attLenResults.removeLayer(this.lID);
+                    attLenResults.removeLayer(this.getlID());
                     this.createLayers();
                 },
                 deleteAndUpdateOthers: function(){
-                    attLenResults.removeLayer(this.lID);
+                    attLenResults.removeLayer(this.getlID());
                     attLensesArray.splice( attLensesArray.indexOf(this),1);
-                    
+                    var thisVar = this;
                     attLensesArray.forEach(function (lensInGlobalArray,index,array){
-                        if(lensInGlobalArray.intersections.indexOf(lens) !=-1) {
+                        if(lensInGlobalArray.intersections.indexOf(thisVar) !=-1) {
                             console.log(lensInGlobalArray.intersections);
                             console.log("I will now delete the lens from this ones intersection list")
-                            lensInGlobalArray.intersections.splice(lensInGlobalArray.intersections.indexOf(lens),1);
+                            lensInGlobalArray.intersections.splice(lensInGlobalArray.intersections.indexOf(thisVar),1);
                             console.log(lensInGlobalArray.intersections);
-                            var layerofItem = attLenResults.getLayer(lensInGlobalArray.lID);
+                            var layerofItem = attLenResults.getLayer(lensInGlobalArray.getlID());
                             layerofItem.eachLayer(function (layerHolder) {
                                 layerHolder.eachLayer(function (layer) {
-                                    if (lens.getBound().intersects(layer.getBounds())){
+                                    if (thisVar.getBound().intersects(layer.getBounds())){
                                         console.log("This layer is inside the bounds");
-                                        switch(lens.enc) {
+                                        switch(thisVar.enc) {
                                             case "color":
                                                 layer.setStyle({color: '#FF6347'});
                                                 lensInGlobalArray.updateLayer(layer, layer._layers[layer._leaflet_id - 1].feature.properties);
@@ -1667,6 +1684,14 @@ block content
 
             lens.setBounds(lens.areaQuery.getBounds());
 
+            var northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
+            var southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
+            var numOfPixl = northVar.distanceTo(southVar);
+            var myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [95,95], html: "<input type='button' value='X' class='myDeleteButton' style='z-index: 1000; margin: -9%;'/>"});
+            console.log(myOutsideCircle.options);
+            var outsideCircVar = L.marker(lens.areaQuery.getBounds().getCenter(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
+            lens.setOutsideCircle(outsideCircVar);
+
             attLensesArray.forEach(function(item, index, array) {
                 console.log(item, index);
                 if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
@@ -1677,40 +1702,54 @@ block content
             attLensesArray.push(lens);
 
             console.log(attLensesArray);
-
-            lens.areaQuery.on({
+            var moved = false;
+            lens.outsideCircle.on({
                 mousedown: function () {
-                    map.dragging.disable();
+                    
                     map.on('mousemove', function (e) {
+                        map.dragging.disable();
+                        moved = true;
                         lens.areaQuery.setLatLng(e.latlng);
+                        lens.outsideCircle.setLatLng(e.latlng);
                         lens.lngLat = e.latlng;
                     });
                 },
                 mouseup: function(){
                     map.removeEventListener('mousemove');
-                    map.dragging.enable();
-                    lens.deleteAndUpdateOthers();
+                    if(moved){ 
+                        moved = false;   
+                        map.dragging.enable();
+                        lens.deleteAndUpdateOthers();
 
-                    attLensesArray.forEach(function(item, index, array) {
-                        console.log(item, index);
-                        if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
-                            lens.intersections.push(item);
-                        }
-                    });
-                    attLensesArray.push(lens);
-                    lens.createLayers();
-                    lens.setBounds(lens.areaQuery.getBounds());
+                        attLensesArray.forEach(function(item, index, array) {
+                            console.log(item, index);
+                            if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
+                                lens.intersections.push(item);
+                            }
+                        });
+                        attLensesArray.push(lens);
+                        lens.createLayers();
+                        lens.setBounds(lens.areaQuery.getBounds());
+                    }
+                },
+                mouseout:function(){
+                    outterLensesLayer.removeLayer(lens.outsideCircle);
                 }
+            });
+            lens.areaQuery.on({
+                click: function(e){
+                    L.DomEvent.stopPropagation(e);
+                    outterLensesLayer.addLayer(lens.outsideCircle);
+                    $('.myDeleteButton').click(function (e) {
+                        console.log("YEEE BOYYYY");
+                        L.DomEvent.stopPropagation(e); 
+                        outterLensesLayer.removeLayer(lens.outsideCircle);
+                        lensesLayer.removeLayer(lens.areaQuery);
+                        lens.deleteAndUpdateOthers();
+                    });
+                },
             }); 
-            lens.areaQuery.bindPopup("This lens is taking the attribute " + _attribute + " and encoding it as the " + _encoding + ".\n" + "<input type='button' value='Delete this lens' class='marker-delete-button'/>")
-            lens.areaQuery.on("popupopen", function() {
-                // To remove marker on click of delete
-                $('.marker-delete-button:visible').click(function () {
-                    lens.deleteAndUpdateOthers();
-                    lensesLayer.removeLayer(lens.areaQuery);
-                });
-                
-            }); 
+            
             return lens
         }
 
