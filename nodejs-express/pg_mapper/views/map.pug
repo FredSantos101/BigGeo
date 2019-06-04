@@ -1413,19 +1413,20 @@ block content
                 },
                 updateLayer : function(layer, value){
                     //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                    //TODO
                     if ( this.areaQuery.getBounds().intersects(layer.getBounds())){
-                        switch(_attribute) {
+                        switch(this.att) {
                             case "length":
-                                lengthAtt(layer, value,_encoding);
+                                lengthAtt(layer, value,this.enc);
                                 break;
                             case "duration":
-                                durationAtt(layer,value, _encoding);
+                                durationAtt(layer,value, this.enc);
                                 break;
                             case "vel":
-                                velocityAtt(layer,value,_encoding);
+                                velocityAtt(layer,value,this.enc);
                                 break;
                             case "time":
-                                timeAtt(layer,value, _encoding);
+                                timeAtt(layer,value, this.enc);
                                 break;
                         }   
                         
@@ -1627,8 +1628,41 @@ block content
                     attLenResults.removeLayer(this.getlID());
                     this.createLayers();
                 },
+                updateLENS : function(){
+                    
+                    this.updateOthers();
+                    var thisVar = this;
+                    attLensesArray.forEach(function(item, index, array) {
+                        if(thisVar.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
+                            thisVar.intersections.push(item);
+                        }
+                    });
+                    attLensesArray.push(lens);
+                    console.log(attLensesArray);
+                    attLenResults.getLayer(this.getlID()).getLayers().forEach(function(oneOfFourATTLayers,index,array){
+                        oneOfFourATTLayers.getLayers().forEach(function(oneOfSmallLayers,index,array){
+                            oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1].setStyle(firstStyle);
+                            thisVar.updateLayer(oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1],oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1].feature.properties);
+                            console.log(oneOfSmallLayers);
+                            thisVar.intersections.forEach(function(lensInt, index, array) {
+                                    console.log(lensInt.areaQuery);
+                                    if(lensInt.areaQuery.getBounds().intersects(oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1].getBounds())){
+
+                                        console.log("This layer intersects the other lenses");
+                                        
+                                        lensInt.updateLayer(oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1],oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1].feature.properties);
+                                    }
+                                });
+                        });
+                    });
+                    attLenResults.getLayer(this.getlID()).bringToFront();
+
+                },
                 deleteAndUpdateOthers: function(){
                     attLenResults.removeLayer(this.getlID());
+                    this.updateOthers();
+                },
+                updateOthers: function(){
                     attLensesArray.splice( attLensesArray.indexOf(this),1);
                     var thisVar = this;
                     attLensesArray.forEach(function (lensInGlobalArray,index,array){
@@ -1644,30 +1678,30 @@ block content
                                         console.log("This layer is inside the bounds");
                                         switch(thisVar.enc) {
                                             case "color":
-                                                layer.setStyle({color: '#FF6347'});
-                                                lensInGlobalArray.updateLayer(layer, layer._layers[layer._leaflet_id - 1].feature.properties);
+                                                layer._layers[layer._leaflet_id - 1].setStyle({color: '#FF6347'});
+                                                lensInGlobalArray.updateLayer(layer._layers[layer._leaflet_id - 1], layer._layers[layer._leaflet_id - 1].feature.properties);
                                                 lensInGlobalArray.intersections.forEach(function(itemInterLens, index, array) {
-                                                    if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
-                                                        itemInterLens.updateLayer(layer, layer._layers[layer._leaflet_id - 1].feature.properties);
+                                                    if (itemInterLens.areaQuery.getBounds().intersects(layer._layers[layer._leaflet_id - 1].getBounds())){
+                                                        itemInterLens.updateLayer(layer._layers[layer._leaflet_id - 1], layer._layers[layer._leaflet_id - 1].feature.properties);
                                                     }
                                                 });
                                                 break;
                                             case "brightness":
-                                                layer.setStyle({color: '#FF6347'});
-                                                lensInGlobalArray.updateLayer(layer, layer._layers[layer._leaflet_id - 1].feature.properties);
+                                                layer._layers[layer._leaflet_id - 1].setStyle({color: '#FF6347'});
+                                                lensInGlobalArray.updateLayer(layer._layers[layer._leaflet_id - 1], layer._layers[layer._leaflet_id - 1].feature.properties);
                                                 lensInGlobalArray.intersections.forEach(function(itemInterLens, index, array) {
-                                                    if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
-                                                        itemInterLens.updateLayer(layer, layer._layers[layer._leaflet_id - 1].feature.properties);
+                                                    if (itemInterLens.getBound().intersects(layer._layers[layer._leaflet_id - 1].getBounds())){
+                                                        itemInterLens.updateLayer(layer._layers[layer._leaflet_id - 1], layer._layers[layer._leaflet_id - 1].feature.properties);
                                                     }
                                                 });
                                                 break;
                                             case "opacity":
                                                 console.log("Returning Opacity to 1");
-                                                layer.setStyle({opacity:1});
+                                                layer._layers[layer._leaflet_id - 1].setStyle({opacity:1});
                                                 break;
                                             case "width":
                                                 console.log("Returning Width to 1.5");
-                                                layer.setStyle({"weight": 1.5});
+                                                layer._layers[layer._leaflet_id - 1].setStyle({"weight": 1.5});
                                                 break;
                                         }
                                     }
@@ -1677,8 +1711,6 @@ block content
                         }
                     });
 
-                    //Previous method
-                    //deleteAttribute(lngLat, radiusQuery, _attribute, _encoding);
                 }
             };
 
@@ -1687,9 +1719,25 @@ block content
             var northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
             var southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
             var numOfPixl = northVar.distanceTo(southVar);
-            var myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [95,95], html: "<input type='button' value='X' class='myDeleteButton' style='z-index: 1000; margin: -9%;'/>"});
+            var myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [100,100],iconAnchor:[90,90], html: 
+                "<input type='button' value='X' class='myDeleteButton' style='z-index: 1000; margin-left: -12.5%; margin: -23%;'/>"+
+                "<div class='dropdown' style='margin-left: 2.5%; margin-top: 87.5%;'><button class='dropbtn'><img src='images/attribute.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>" + 
+                "<button class='dropbtnOpt-length'>Length</button>"+
+                "<button class='dropbtnOpt-velocity'>Velocity</button>"+
+                "<button class='dropbtnOpt-time'>Time</button>"+
+                "<button class='dropbtnOpt-duration'>Duration</button>"+
+                "</div></div>" +
+                "<div class='dropdown'style='margin-left: 102.5%; margin-top: 75%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>" + 
+                "<button class='dropbtnOpt-color'>Color</button>"+
+                "<button class='dropbtnOpt-width'>Width</button>"+
+                "<button class='dropbtnOpt-brightness'>Brightness</button>"+
+                "<button class='dropbtnOpt-opacity'>Opacity</button>"+
+                "</div></div>" +
+                "<input type='button' value='X' class='testUpdate' style='z-index: 1000; margin-left: -12.5%; margin: -23%;'/>"
+                //"<div class='dropdown'style='margin-left: 102.5%; margin-top: 75%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>"
+            });
             console.log(myOutsideCircle.options);
-            var outsideCircVar = L.marker(lens.areaQuery.getBounds().getCenter(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
+            var outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
             lens.setOutsideCircle(outsideCircVar);
 
             attLensesArray.forEach(function(item, index, array) {
@@ -1704,6 +1752,9 @@ block content
             console.log(attLensesArray);
             var moved = false;
             lens.outsideCircle.on({
+                click : function(e){
+                    L.DomEvent.stopPropagation(e);
+                },
                 mousedown: function () {
                     
                     map.on('mousemove', function (e) {
@@ -1741,11 +1792,47 @@ block content
                     L.DomEvent.stopPropagation(e);
                     outterLensesLayer.addLayer(lens.outsideCircle);
                     $('.myDeleteButton').click(function (e) {
-                        console.log("YEEE BOYYYY");
                         L.DomEvent.stopPropagation(e); 
                         outterLensesLayer.removeLayer(lens.outsideCircle);
                         lensesLayer.removeLayer(lens.areaQuery);
                         lens.deleteAndUpdateOthers();
+                    });
+                    $('.testUpdate').click(function (e) {
+                        L.DomEvent.stopPropagation(e); 
+                        lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-length').click(function () {
+                            lens.att = "length";
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-velocity').click(function () {
+                            lens.att = "vel"
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-time').click(function () {
+                            lens.att = "time"
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-duration').click(function () {
+                            lens.att = "duration"
+                            lens.updateLENS();
+                    });
+
+                    $('.dropbtnOpt-color').click(function () {
+                            lens.enc = "color"
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-width').click(function () {
+                            lens.enc = "width"
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-brightness').click(function () {
+                            lens.enc = "brightness"
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-opacity').click(function () {
+                            lens.enc = "opacity"
+                            lens.updateLENS();
                     });
                 },
             }); 
