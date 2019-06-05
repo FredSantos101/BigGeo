@@ -1201,7 +1201,8 @@ block content
         }
         function attributeLensMenu(e){
             lensPreCreationLayer.clearLayers();
-            var previewCircle = L.circle(e.latlng, {
+            createALens(e.latlng, 5000,'time','color').createLayers();
+            /*var previewCircle = L.circle(e.latlng, {
                     color: 'red',
                     fillColor: '#f03',
                     fillOpacity: 0.5,
@@ -1273,7 +1274,7 @@ block content
                 var myVar = $(this).val();
                 previewCircle.setRadius( myVar);
 
-            });
+            });*/
         }
 
         /////
@@ -1400,6 +1401,7 @@ block content
                     this.outsideCircle = circle;
                 },
                 setRadius : function (value){
+                    this.areaQuery.setRadius(value);
                     this.radiusQuery = value;
                 },
                 getRadius : function (){
@@ -1720,20 +1722,21 @@ block content
             var southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
             var numOfPixl = northVar.distanceTo(southVar);
             var myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [100,100],iconAnchor:[90,90], html: 
-                "<input type='button' value='X' class='myDeleteButton' style='z-index: 1000; margin-left: -12.5%; margin: -23%;'/>"+
-                "<div class='dropdown' style='margin-left: 2.5%; margin-top: 87.5%;'><button class='dropbtn'><img src='images/attribute.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>" + 
+                "<input type='button' value='X' class='myDeleteButton' style='z-index: 1000;     position: fixed;margin: -16%;'/>"+
+                "<div class='dropdown' style='        margin-left: -9.5%; margin-top: 87.5%;'><button class='dropbtn'><img src='images/attribute.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>" + 
                 "<button class='dropbtnOpt-length'>Length</button>"+
                 "<button class='dropbtnOpt-velocity'>Velocity</button>"+
                 "<button class='dropbtnOpt-time'>Time</button>"+
                 "<button class='dropbtnOpt-duration'>Duration</button>"+
                 "</div></div>" +
-                "<div class='dropdown'style='margin-left: 102.5%; margin-top: 75%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>" + 
+                "<div class='dropdown'style='margin-left: 81.5%;margin-top: 83%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>" + 
                 "<button class='dropbtnOpt-color'>Color</button>"+
                 "<button class='dropbtnOpt-width'>Width</button>"+
                 "<button class='dropbtnOpt-brightness'>Brightness</button>"+
                 "<button class='dropbtnOpt-opacity'>Opacity</button>"+
                 "</div></div>" +
-                "<input type='button' value='X' class='testUpdate' style='z-index: 1000; margin-left: -12.5%; margin: -23%;'/>"
+                "<button class='myRadiusButton' style='z-index: 1019; position:fixed;     margin-left: 78.5%; margin-top: -19%;'><img src='images/radius.png' style='z-index: 999;width: 25px;height: 25px;    margin: inherit;margin-left: -3px;margin-top: -4px;'></button>"+
+                "<div id='rotationSliderContainer' style='display:none;'><div id='rotationSlider'style='display:none;'></div> <div id='rotationSliderDegrees'style='display:none;'></div></div>"
                 //"<div class='dropdown'style='margin-left: 102.5%; margin-top: 75%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>"
             });
             console.log(myOutsideCircle.options);
@@ -1748,10 +1751,13 @@ block content
             });
             
             attLensesArray.push(lens);
-
             console.log(attLensesArray);
+            
             var moved = false;
             lens.outsideCircle.on({
+                dbclick:function(e){
+                    L.DomEvent.stopPropagation(e);
+                },
                 click : function(e){
                     L.DomEvent.stopPropagation(e);
                 },
@@ -1788,6 +1794,9 @@ block content
                 }
             });
             lens.areaQuery.on({
+                dbclick:function(e){
+                    L.DomEvent.stopPropagation(e);
+                },
                 click: function(e){
                     L.DomEvent.stopPropagation(e);
                     outterLensesLayer.addLayer(lens.outsideCircle);
@@ -1797,10 +1806,110 @@ block content
                         lensesLayer.removeLayer(lens.areaQuery);
                         lens.deleteAndUpdateOthers();
                     });
-                    $('.testUpdate').click(function (e) {
+                    $('.myRadiusButton').click(function (e) {
                         L.DomEvent.stopPropagation(e); 
-                        lens.updateLENS();
-                    });
+                        if(document.getElementById("rotationSliderContainer").style.display=='none'){
+                            $(function(){
+                                var $container = $('#rotationSliderContainer');
+                                var $slider = $('#rotationSlider');
+                                var $degrees = $('#rotationSliderDegrees');
+                                
+                                    document.getElementById("rotationSliderContainer").style.display="block";
+                                    document.getElementById("rotationSlider").style.display="block";
+                                    document.getElementById("rotationSliderDegrees").style.display="block";
+
+                                    
+                                    var sliderWidth = $slider.width();
+                                    var sliderHeight = $slider.height();
+                                    var radius = $container.width()/2;
+                                    var deg = 0; 
+
+                                    deg = lens.getRadius()*360/10000;  
+                                    
+                                    X = Math.round(radius* Math.sin(deg*Math.PI/180));
+                                    Y = Math.round(radius*  -Math.cos(deg*Math.PI/180));
+                                    $slider.css({ left: X+radius-sliderWidth/2, top: Y+radius-sliderHeight/2 });
+                                    
+                                    var mdown = false;
+                                    $container
+                                    //.mousedown(function (e) {e.originalEvent.preventDefault();});
+                                    .mousedown(function (e) {L.DomEvent.stopPropagation(e);mdown = true; e.originalEvent.preventDefault();map.dragging.disable(); })
+                                    .mouseup(function (e) { 
+                                        L.DomEvent.stopPropagation(e);
+                                        mdown = false;
+                                        map.dragging.enable();
+                                        if (moved){
+                                        moved = false; 
+                                        lens.deleteAndUpdateOthers();
+                                        attLensesArray.forEach(function(item, index, array) {
+                                            console.log(item, index);
+                                            if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
+                                                lens.intersections.push(item);
+                                            }
+                                        });
+                                        attLensesArray.push(lens);
+                                        lens.createLayers();
+                                        lens.setBounds(lens.areaQuery.getBounds());}
+                                    })
+                                    .mousemove(function (e) {
+
+                                        if(mdown)
+                                        {
+                                            moved = true;      
+                                            e.originalEvent.preventDefault();
+                                            L.DomEvent.stopPropagation(e);
+                                            // firefox compatibility
+                                            if(typeof e.offsetX === "undefined" || typeof e.offsetY === "undefined") {
+                                            var targetOffset = $(e.target).offset();
+                                            e.offsetX = e.pageX - targetOffset.left;
+                                            e.offsetY = e.pageY - targetOffset.top;
+                                            }
+                                            
+                                            if($(e.target).is('#rotationSliderContainer'))
+                                                var mPos = {x: e.offsetX, y: e.offsetY};
+                                            else
+                                                var mPos = {x: e.target.offsetLeft + e.offsetX, y: e.target.offsetTop + e.offsetY};
+                                                
+                                            var atan = Math.atan2(mPos.x-radius, mPos.y-radius);
+                                            deg = -atan/(Math.PI/180) + 180; // final (0-360 positive) degrees from mouse position 
+                                            
+                                            
+                                            // for attraction to multiple of 90 degrees
+                                            var distance = Math.abs( deg - ( Math.round(deg / 90) * 90 ) );
+                                            
+                                            if( distance <= 5 )
+                                                deg = Math.round(deg / 90) * 90;
+                                                
+                                            if(deg == 360)
+                                                deg = 0;
+                                            
+                                            X = Math.round(radius* Math.sin(deg*Math.PI/180));
+                                            Y = Math.round(radius*  -Math.cos(deg*Math.PI/180));
+
+                                            $slider.css({ left: X+radius-sliderWidth/2, top: Y+radius-sliderHeight/2 });              
+                                            
+                                            var roundDeg = Math.round(deg);
+                                            
+                                            var percentage = deg/360;
+
+                                            var radiusMet = Math.round(10000 * percentage);
+                                            lens.setRadius(radiusMet); 
+                                            $degrees.html(radiusMet + 'Meters');
+                                            //$('#imageRotateDegrees').val(radiusMet);
+                                        }
+                                     });      
+                                    });            
+                                
+                                
+                            }
+                            else{
+                                document.getElementById("rotationSliderContainer").style.display="none";
+                                document.getElementById("rotationSlider").style.display="none";
+                                document.getElementById("rotationSliderDegrees").style.display="none";
+                            }
+
+                        }); 
+                    
                     $('.dropbtnOpt-length').click(function () {
                             lens.att = "length";
                             lens.updateLENS();
@@ -1833,8 +1942,9 @@ block content
                     $('.dropbtnOpt-opacity').click(function () {
                             lens.enc = "opacity"
                             lens.updateLENS();
-                    });
-                },
+                    });   
+ 
+                }
             }); 
             
             return lens
@@ -2197,6 +2307,8 @@ block content
 
             return rgb;
         }
+
+        
 
         
 

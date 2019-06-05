@@ -71,6 +71,8 @@ canvas:nth-of-type(2) {
 
 /* DROP DOWN MENU*/
 /* Dropdown Button */
+
+
 .dropbtn {
   background-color:#ff8400;
 	-moz-border-radius:25px;
@@ -78,7 +80,7 @@ canvas:nth-of-type(2) {
 	border-radius:50%;
 	display:inline-block;
 	cursor:pointer;
-	color:#3a8a9e;
+	color:hsl(41, 88%, 41%);
 	font-family:Arial;
   padding:7px 7px;
   width: 33px;
@@ -96,7 +98,7 @@ canvas:nth-of-type(2) {
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #f1f1f1;
+  background-color: #cc993a;
   min-width: 2cm;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
@@ -164,9 +166,10 @@ canvas:nth-of-type(2) {
 }
 
 /* Change color of dropdown links on hover */
-.dropdown-content .dropbtnOpt-length:hover {background-color: #ddd;}
-.dropdown-content .dropbtnOpt-time:hover {background-color: #ddd;}
-.dropdown-content .dropbtnOpt-duration:hover {background-color: #ddd;}
+.dropdown-content .dropbtnOpt-length:hover {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-time:hover {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-velocity:hover {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-duration:hover {background-color: hsl(41, 95%, 48%);}
 
 
 /* Show the dropdown menu on hover */
@@ -220,5 +223,57 @@ canvas:nth-of-type(2) {
 	position:relative;
 	top:1px;
 }
+.myRadiusButton {
+  background-color:#ff8400;
+	-moz-border-radius:25px;
+	-webkit-border-radius:25px;
+	border-radius:50%;
+	display:inline-block;
+	cursor:pointer;
+	color:hsl(41, 88%, 41%);
+	font-family:Arial;
+  padding:7px 7px;
+  width: 33px;
+  height:33px;
+	text-decoration:none;
+}
+.myRadiusButton:hover {
+	background-color:hsl(0, 100%, 50%);
+}
 
 
+/***********************/
+
+#rotationSliderContainer { 
+  position: relative;
+  width: 250px;
+  height: 250px;
+  left: -80px;
+  top: -80px;
+  border: 5px solid hsla(180, 66%, 64%, 0.938);
+  border-radius: 50%;
+  cursor: default;
+  z-index: 800;
+}
+#rotationSlider { 
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  background: #A64B00;
+  border-radius: 10px;
+  cursor: pointer;
+  z-index: 800;
+}
+#rotationSliderDegrees {
+  position: absolute;
+  top: 110px;
+  width: 100%;
+  font-size: 20px;
+  color: #FFF;
+  text-align: center;
+  -moz-user-select: none; 
+  -khtml-user-select: none; 
+  -webkit-user-select: none; 
+  -o-user-select: none;
+  z-index: 2;
+}
