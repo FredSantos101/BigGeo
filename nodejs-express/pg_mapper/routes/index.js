@@ -138,7 +138,7 @@ router.get('/map', function(req, res) {
           title: "BigGeo", // Give a title to our page
           jsonData: data // Pass data to the View
       });
-      var timeAdraw = Math.floor( new Date().getTime()/1000);
+      client.end();
   });
 
 });
@@ -172,6 +172,7 @@ router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(
       console.log("DATA PASSED TO BE DRAWN");
       var timeAdraw = Math.floor( new Date().getTime()/1000);
       console.log(timeAdraw-timefetch);
+      client.end();
   });
 
 });
@@ -205,6 +206,7 @@ router.get('/attQuery/:tab/:long/:lat/:radius', function(req, res) {
       console.log("DATA PASSED TO BE DRAWN");
       var timeAdraw = Math.floor( new Date().getTime()/1000);
       console.log(timeAdraw-timefetch);
+      client.end();
   });
 
 });
@@ -236,6 +238,45 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
       console.log("DATA PASSED TO BE DRAWN");
       var timeAdraw = Math.floor( new Date().getTime()/1000);
       console.log(timeAdraw-timefetch);
+      client.end();
+  });
+
+});
+
+router.get('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:longNEW/:latNEW/:radiusNEW/:typeNEW/:minValueNEW/:maxValueNEW', function(req, res) {
+  console.log(req.params.long);
+  console.log(req.params.lat);
+
+
+  //Radius in meters to degrees
+  var radiusDegrees = req.params.radius/ 111120;
+  var radiusDegreesNEW = req.params.radiusNEW/ 111120;
+
+  var client = new Client(conString); // Setup our Postgres Client
+  client.connect(); // connect to the client
+
+  //DELETE OLD QUERY OF THE LENS
+  var deleteOldPos = query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue);
+  var newQuery = query_args_ContructorQUERIES(req.params.tab,req.params.longNEW, req.params.latNEW, radiusDegreesNEW, req.params.typeNEW, req.params.minValueNEW, req.params.maxValueNEW);
+  
+  var query = client.query(new Query(newQuery)); // Run our Query
+  query.on("row", function (row, result) {
+      result.addRow(row);
+  });
+
+  var timefetch = Math.floor( new Date().getTime()/1000);
+  var timeafterGet = timefetch-timeB4draw;
+  console.log("Updating map");
+  // Pass the result to the map page
+  query.on("end", function (result) {
+      //var data = require('../public/data/geoJSON.json')
+      var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
+      res.send(dataNew);
+      
+      console.log("DATA PASSED TO BE DRAWN");
+      var timeAdraw = Math.floor( new Date().getTime()/1000);
+      console.log(timeAdraw-timefetch);
+      client.end();
   });
 
 });

@@ -238,7 +238,7 @@ block content
 
        
 
-        function createQuery(lng, lat, radiusQuery, typeLens, minVal, maxVal){
+        /*function createQuery(lng, lat, radiusQuery, typeLens, minVal, maxVal){
             lensPreCreationLayer.clearLayers();
             console.log("Im removing the map now and adding new ones afterwards")
             if(defaultLayerFlag){
@@ -352,7 +352,7 @@ block content
             attLensesArray.forEach(function(item, index, array) {
                 item.updateALL();
             });
-        }
+        }*/
         
         /*function createAttributeQuery(lngLat, radiusQuery, aTypeLens, encoding){
             var attLayer = L.featureGroup().addTo(attLenResults);
@@ -699,7 +699,7 @@ block content
         /////
         /////
 
-        function deleteQuery(lng, lat, radius, type, minVal, maxVal){
+        /*function deleteQuery(lng, lat, radius, type, minVal, maxVal){
             var urlString3 = "queryRemoval/trajectory_lines/"  + lng + "/" + lat + "/" + radius + "/" + type + "/" + minVal + "/" + maxVal;
             var urlString2 = "queryRemoval/trajectory_lines1/" + lng + "/" + lat + "/" + radius + "/" + type + "/" + minVal + "/" + maxVal;
             var urlString1 = "queryRemoval/trajectory_lines2/" + lng + "/" + lat + "/" + radius + "/" + type + "/" + minVal + "/" + maxVal;
@@ -796,7 +796,7 @@ block content
                 lensesLayer.bringToFront();
             });
             
-        }
+        }*/
 
         /*function deleteAttribute(lngLat, radius, _attribute, _encoding){
             console.log("Delete att");
@@ -1037,7 +1037,7 @@ block content
                         .openOn(map);
                 }
                 else {
-                    createQuery(location.lng, location.lat, $('#radiusBox').val(),"Default",0,0);
+                    createLens(location.lng, location.lat, 5000,"Default",0,0).createLayers();
                 }
             });
             $('.marker-create-Start-button').click(function () {
@@ -1293,6 +1293,96 @@ block content
                     fillOpacity: 0.6,
                     radius: radiusQuery
                 }).addTo(lensesLayer),
+                outsideCircle : null,
+                lngLat : [lat,lng],
+                radiusQuery : radiusQuery,
+                type : _type,
+                minV : minVal,
+                maxV : maxVal,
+                lngLatOLD : [lat,lng],
+                radiusQueryOLD : radiusQuery,
+                typeOLD : _type,
+                minVOLD : minVal,
+                maxVOLD : maxVal,
+                lID : null,
+                bounds : null,
+                getMinV: function (){
+                    return this.minV;
+                },
+                getMaxV: function (){
+                    return this.maxV;
+                },
+                getType: function (){
+                    return this.type;
+                },
+                setMinV: function (value){
+                    this.minV = value;
+                },
+                setMaxV: function (value){
+                    this.maxV = value;
+                },
+                setType: function (value){
+                    this.type = value;
+                },
+                setLngLat : function (value){
+                    this.lngLat = value;
+                },
+                getMinVOLD: function (){
+                    return this.minVOLD;
+                },
+                getMaxVOLD: function (){
+                    return this.maxVOLD;
+                },
+                getTypeOLD: function (){
+                    return this.typeOLD;
+                },
+                setMinVOLD: function (value){
+                    this.minVOLD = value;
+                },
+                setMaxVOLD: function (value){
+                    this.maxVOLD = value;
+                },
+                setTypeOLD: function (value){
+                    this.typeOLD = value;
+                },
+                setLngLatOLD : function (value){
+                    this.lngLatOLD = value;
+                },
+                setBounds : function (value){
+                    this.bounds = value;
+                },
+                setlID : function (value){
+                    this.lID = value;
+                },
+                getLngLat : function (){
+                    return this.lngLat;
+                },
+                getLngLatOLD : function (){
+                    return this.lngLatOLD;
+                },
+                getBound : function (){
+                    return this.bounds;
+                },
+                getlID : function (){
+                    return this.lID;
+                },
+                setOutsideCircle: function(circle){
+                    this.outsideCircle = circle;
+                },
+                setRadius : function (value){
+                    this.areaQuery.setRadius(value);
+                    this.radiusQuery = value;
+                },
+                getRadius : function (){
+                    return this.radiusQuery;
+                },
+                setRadiusOLD : function (value){
+                    this.areaQuery.setRadius(value);
+                    this.radiusQuery = value;
+                },
+                getRadiusOLD : function (){
+                    return this.radiusQuery;
+                },
                 colorSuccess : function() {
                     if(_type == "Default"){
                         console.log("I will now paint the Pass by circle again ....")
@@ -1322,43 +1412,617 @@ block content
                         console.log("I will now paint the End circle again ....")
                         lens.areaQuery.setStyle({color: 'DarkTurquoise ', fillColor: 'DarkTurquoise ', fillOpacity: 0.2});
                     }
+                },
+                createLayers: function(){
+                    //lensPreCreationLayer.clearLayers();
+                    console.log("Im removing the map now and adding new ones afterwards")
+                    if(defaultLayerFlag){
+                        defaultLayerFlag = false;
+                        map.removeLayer(defaultLayer);
+                    }
+
+                    if(lastMarkerGroupID !=null){
+                        markerGroup.removeLayer(lastMarkerGroupID);
+                        lastMarkerGroupID = null;
+                    }
+                    if(lastMarkerGroupID1 !=null){
+                        markerGroup1.removeLayer(lastMarkerGroupID1);
+                        lastMarkerGroupID1 = null;
+                    }
+                    if(lastMarkerGroupID2 !=null){
+                        markerGroup2.removeLayer(lastMarkerGroupID2);
+                        lastMarkerGroupID2 = null;
+                    }
+                    if(lastMarkerGroupID3 !=null){
+                        markerGroup3.removeLayer(lastMarkerGroupID3);
+                        lastMarkerGroupID3 = null;
+                    }
+
+                        // Create URL
+                    var urlString3 = "query/trajectory_lines/"  + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    var urlString2 = "query/trajectory_lines1/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    var urlString1 = "query/trajectory_lines2/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    var urlString  = "query/trajectory_lines3/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    
+
+                    var thisVar = this;
+
+                    var newData = $.ajax({
+                        url: urlString,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData).done(function() {
+                        if(newData.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup);
+                            lastMarkerGroupID = tracksToDraw._leaflet_id;
+                            thisVar.colorSuccess();
+                        }
+                        lensesLayer.bringToFront();
+                    }); 
+                    var newData1 = $.ajax({
+                        url: urlString1,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData1).done(function() {
+                        if(newData1.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup1);
+                            lastMarkerGroupID1 = tracksToDraw._leaflet_id;
+                            thisVar.colorSuccess();
+                        }
+                        lensesLayer.bringToFront();
+                    });
+                    var newData2 = $.ajax({
+                        url: urlString2,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData2).done(function() {
+                        if(newData2.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup2);
+                            lastMarkerGroupID2 = tracksToDraw._leaflet_id;
+                            thisVar.colorSuccess();
+                        }
+                        lensesLayer.bringToFront();
+                    });
+                    var newData3 = $.ajax({
+                        url: urlString3,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData3).done(function() {
+                        if(newData3.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup3);
+                            lastMarkerGroupID3 = tracksToDraw._leaflet_id;
+                            thisVar.colorSuccess();
+                        }
+                        lensesLayer.bringToFront();
+                    });
+                    
+                    attLensesArray.forEach(function(item, index, array) {
+                        //item.updateALL();
+                    });
+                },
+                deleteLayers: function(){
+                    lensesLayer.removeLayer(lens.areaQuery);
+                    if(lastMarkerGroupID !=null){
+                        console.log("YEEEEEEEEE BOOOOOOOYYYYYYY");
+                        markerGroup.removeLayer(lastMarkerGroupID);
+                        lastMarkerGroupID = null;
+                    }
+                    if(lastMarkerGroupID1 !=null){
+                        console.log("YEEEEEEEEE 1 BOOOOOOOYYYYYYY");
+                        markerGroup1.removeLayer(lastMarkerGroupID1);
+                        lastMarkerGroupID1 = null;
+                    }
+                    if(lastMarkerGroupID2 !=null){
+                        console.log("YEEEEEEEEE 2 BOOOOOOOYYYYYYY");
+                        markerGroup2.removeLayer(lastMarkerGroupID2);
+                        lastMarkerGroupID2 = null;
+                    }
+                    if(lastMarkerGroupID3 !=null){
+                        console.log("YEEEEEEEEE 3 BOOOOOOOYYYYYYY");
+                        markerGroup3.removeLayer(lastMarkerGroupID3);
+                        lastMarkerGroupID3 = null;
+                    }
+                    var urlString3 = "queryRemoval/trajectory_lines/"  + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
+                    var urlString2 = "queryRemoval/trajectory_lines1/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
+                    var urlString1 = "queryRemoval/trajectory_lines2/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
+                    var urlString  = "queryRemoval/trajectory_lines3/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
+  
+                    var newData = $.ajax({
+                        url: urlString,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("1 successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    })
+                    $.when(newData).done(function() {
+                        
+                        console.log("Im removing the map now and adding new ones afterwards")
+                        
+                        if(newData.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup);
+                            var idTracks = tracksToDraw._leaflet_id;
+                            lastMarkerGroupID = tracksToDraw._leaflet_id;
+                            
+                        }
+                        lensesLayer.bringToFront();
+                        
+                    });
+                    var newData1 = $.ajax({
+                        url: urlString1,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("2 successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    })
+                    $.when(newData1).done(function() {
+                        
+                        console.log("Im removing the map now and adding new ones afterwards")
+                        
+                        if(newData1.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup1);
+                            lastMarkerGroupID1 = tracksToDraw._leaflet_id;
+                            
+                        }
+                        lensesLayer.bringToFront();
+                    });
+                    var newData2 = $.ajax({
+                        url: urlString2,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("3 successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    })
+                    $.when(newData2).done(function() {
+                        
+                        console.log("Im removing the map now and adding new ones afterwards")
+                        
+                        if(newData2.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup2);
+                            lastMarkerGroupID2 = tracksToDraw._leaflet_id;
+                            
+                        }
+                        lensesLayer.bringToFront();
+                    });
+                    var newData3 = $.ajax({
+                        url: urlString3,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("4 successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    })
+                    $.when(newData3).done(function() {
+                        
+                        console.log("Im removing the map now and adding new ones afterwards")
+                        
+                        if(newData3.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup3);
+                            lastMarkerGroupID3 = tracksToDraw._leaflet_id;
+                            
+                        }
+                        lensesLayer.bringToFront();
+                    });
+                    
+                },
+                updateLENS: function(){
+                    if(lastMarkerGroupID !=null){
+                        console.log("YEEEEEEEEE BOOOOOOOYYYYYYY");
+                        markerGroup.removeLayer(lastMarkerGroupID);
+                        lastMarkerGroupID = null;
+                    }
+                    if(lastMarkerGroupID1 !=null){
+                        console.log("YEEEEEEEEE 1 BOOOOOOOYYYYYYY");
+                        markerGroup1.removeLayer(lastMarkerGroupID1);
+                        lastMarkerGroupID1 = null;
+                    }
+                    if(lastMarkerGroupID2 !=null){
+                        console.log("YEEEEEEEEE 2 BOOOOOOOYYYYYYY");
+                        markerGroup2.removeLayer(lastMarkerGroupID2);
+                        lastMarkerGroupID2 = null;
+                    }
+                    if(lastMarkerGroupID3 !=null){
+                        console.log("YEEEEEEEEE 3 BOOOOOOOYYYYYYY");
+                        markerGroup3.removeLayer(lastMarkerGroupID3);
+                        lastMarkerGroupID3 = null;
+                    }
+                    var urlString3 = "queryMoved/trajectory_lines/"  + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
+                    this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    var urlString2 = "queryMoved/trajectory_lines1/" + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
+                    this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    var urlString1 = "queryMoved/trajectory_lines2/" + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
+                    this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    var urlString  = "queryMoved/trajectory_lines3/" + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
+                    this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    
+                    var newData = $.ajax({
+                        url: urlString,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("1 successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    })
+                    $.when(newData).done(function() {
+                        
+                        console.log("Im removing the map now and adding new ones afterwards")
+                        
+                        if(newData.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup);
+                            var idTracks = tracksToDraw._leaflet_id;
+                            lastMarkerGroupID = tracksToDraw._leaflet_id;
+                            
+                        }
+                        lensesLayer.bringToFront();
+                        
+                    });
+                    var newData1 = $.ajax({
+                        url: urlString1,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("2 successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    })
+                    $.when(newData1).done(function() {
+                        
+                        console.log("Im removing the map now and adding new ones afterwards")
+                        
+                        if(newData1.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup1);
+                            lastMarkerGroupID1 = tracksToDraw._leaflet_id;
+                            
+                        }
+                        lensesLayer.bringToFront();
+                    });
+                    var newData2 = $.ajax({
+                        url: urlString2,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("3 successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    })
+                    $.when(newData2).done(function() {
+                        
+                        console.log("Im removing the map now and adding new ones afterwards")
+                        
+                        if(newData2.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup2);
+                            lastMarkerGroupID2 = tracksToDraw._leaflet_id;
+                            
+                        }
+                        lensesLayer.bringToFront();
+                    });
+                    var newData3 = $.ajax({
+                        url: urlString3,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("4 successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    })
+                    $.when(newData3).done(function() {
+                        
+                        console.log("Im removing the map now and adding new ones afterwards")
+                        
+                        if(newData3.responseJSON.features != null){
+                            var tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
+                            tracksToDraw.addTo(markerGroup3);
+                            lastMarkerGroupID3 = tracksToDraw._leaflet_id;
+                            
+                        }
+                        lensesLayer.bringToFront();
+                    });
+
                 }
             };
             
-            
-            lens.areaQuery.bindPopup("<input type='button' value='Delete this lens' class='marker-delete-button'/>")
+            lens.setBounds(lens.areaQuery.getBounds());
+
+            /*CALCULATE THE DISTANCE FROM ONE POINT TO ANOTHER IN PIXELS
+            var northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
+            var southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
+            var numOfPixl = northVar.distanceTo(southVar);*/
+            var myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [100,100],iconAnchor:[90,90], html: 
+                "<input type='button' value='X' class='myDeleteButton' style='z-index: 1000;     position: fixed;margin: -16%;'/>"+
+                "<div class='dropdown' style='        margin-left: -9.5%; margin-top: 87.5%;'><button class='dropbtn'><img src='images/attribute.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>" + 
+                "<button class='dropbtnOpt-length'>Length</button>"+
+                "<button class='dropbtnOpt-velocity'>Velocity</button>"+
+                "<button class='dropbtnOpt-time'>Time</button>"+
+                "<button class='dropbtnOpt-duration'>Duration</button>"+
+                "</div></div>" +
+                "<div class='dropdown'style='margin-left: 81.5%;margin-top: 83%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>" + 
+                "<button class='dropbtnOpt-color'>Color</button>"+
+                "<button class='dropbtnOpt-width'>Width</button>"+
+                "<button class='dropbtnOpt-brightness'>Brightness</button>"+
+                "<button class='dropbtnOpt-opacity'>Opacity</button>"+
+                "</div></div>" +
+                "<button class='myRadiusButton' style='z-index: 1019; position:fixed;     margin-left: 78.5%; margin-top: -19%;'><img src='images/radius.png' style='z-index: 999;width: 25px;height: 25px;    margin: inherit;margin-left: -3px;margin-top: -4px;'></button>"+
+                "<div id='rotationSliderContainer' style='display:none;'><div id='rotationSlider'style='display:none;'></div> <div id='rotationSliderDegrees'style='display:none;'></div></div>"
+                //"<div class='dropdown'style='margin-left: 102.5%; margin-top: 75%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>"
+            });
+            console.log(myOutsideCircle.options);
+            var outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
+            lens.setOutsideCircle(outsideCircVar);
+
+                        
+            var moved = false;
+            lens.outsideCircle.on({
+                dbclick:function(e){
+                    L.DomEvent.stopPropagation(e);
+                },
+                click : function(e){
+                    L.DomEvent.stopPropagation(e);
+                },
+                mousedown: function () {
+                    
+                    map.on('mousemove', function (e) {
+                        map.dragging.disable();
+                        moved = true;
+                        lens.areaQuery.setLatLng(e.latlng);
+                        lens.outsideCircle.setLatLng(e.latlng);
+                    });
+                },
+                mouseup: function(e){
+                    map.removeEventListener('mousemove');
+                    if(moved){ 
+                        moved = false;   
+                        map.dragging.enable();
+                    
+                        lens.setLngLat([e.latlng.lat,e.latlng.lng]);
+                        lens.updateLENS();
+                        lens.setLngLatOLD([e.latlng.lat,e.latlng.lng]);
+                        lens.setBounds(lens.areaQuery.getBounds());
+                        attLensesArray.forEach(function(item, index, array) {
+                            item.updateALL();
+                        });
+                    }
+                },
+                mouseout:function(){
+                    outterLensesLayer.removeLayer(lens.outsideCircle);
+                }
+            });
+            lens.areaQuery.on({
+                dbclick:function(e){
+                    L.DomEvent.stopPropagation(e);
+                },
+                click: function(e){
+                    L.DomEvent.stopPropagation(e);
+                    outterLensesLayer.addLayer(lens.outsideCircle);
+                    $('.myDeleteButton').click(function (e) {
+                    
+                        lens.deleteLayers();
+                        attLensesArray.forEach(function(item, index, array) {
+                            item.updateALL();
+                        });
+                    });
+                    $('.myRadiusButton').click(function (e) {
+                        L.DomEvent.stopPropagation(e); 
+                        if(document.getElementById("rotationSliderContainer").style.display=='none'){
+                            $(function(){
+                                var $container = $('#rotationSliderContainer');
+                                var $slider = $('#rotationSlider');
+                                var $degrees = $('#rotationSliderDegrees');
+                                
+                                document.getElementById("rotationSliderContainer").style.display="block";
+                                document.getElementById("rotationSlider").style.display="block";
+                                document.getElementById("rotationSliderDegrees").style.display="block";
+
+                                
+                                var sliderWidth = $slider.width();
+                                var sliderHeight = $slider.height();
+                                var radius = $container.width()/2;
+                                var deg = 0; 
+
+                                deg = lens.getRadius()*360/10000;  
+                                
+                                X = Math.round(radius* Math.sin(deg*Math.PI/180));
+                                Y = Math.round(radius*  -Math.cos(deg*Math.PI/180));
+                                $slider.css({ left: X+radius-sliderWidth/2, top: Y+radius-sliderHeight/2 });
+                                
+                                var mdown = false;
+                                $container
+                                //.mousedown(function (e) {e.originalEvent.preventDefault();});
+                                .mousedown(function (e) {L.DomEvent.stopPropagation(e);mdown = true; e.originalEvent.preventDefault();map.dragging.disable(); })
+                                .mouseup(function (e) { 
+                                    L.DomEvent.stopPropagation(e);
+                                    mdown = false;
+                                    map.dragging.enable();
+                                    if (moved){
+                                    moved = false; 
+                                    lens.deleteAndUpdateOthers();
+                                    attLensesArray.forEach(function(item, index, array) {
+                                        console.log(item, index);
+                                        if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
+                                            lens.intersections.push(item);
+                                        }
+                                    });
+                                    attLensesArray.push(lens);
+                                    lens.createLayers();
+                                    lens.setBounds(lens.areaQuery.getBounds());}
+                                })
+                                .mousemove(function (e) {
+
+                                    if(mdown)
+                                    {
+                                        moved = true;      
+                                        e.originalEvent.preventDefault();
+                                        L.DomEvent.stopPropagation(e);
+                                        // firefox compatibility
+                                        if(typeof e.offsetX === "undefined" || typeof e.offsetY === "undefined") {
+                                        var targetOffset = $(e.target).offset();
+                                        e.offsetX = e.pageX - targetOffset.left;
+                                        e.offsetY = e.pageY - targetOffset.top;
+                                        }
+                                        
+                                        if($(e.target).is('#rotationSliderContainer'))
+                                            var mPos = {x: e.offsetX, y: e.offsetY};
+                                        else
+                                            var mPos = {x: e.target.offsetLeft + e.offsetX, y: e.target.offsetTop + e.offsetY};
+                                            
+                                        var atan = Math.atan2(mPos.x-radius, mPos.y-radius);
+                                        deg = -atan/(Math.PI/180) + 180; // final (0-360 positive) degrees from mouse position 
+                                        
+                                        
+                                        // for attraction to multiple of 90 degrees
+                                        var distance = Math.abs( deg - ( Math.round(deg / 90) * 90 ) );
+                                        
+                                        if( distance <= 5 )
+                                            deg = Math.round(deg / 90) * 90;
+                                            
+                                        if(deg == 360)
+                                            deg = 0;
+                                        
+                                        X = Math.round(radius* Math.sin(deg*Math.PI/180));
+                                        Y = Math.round(radius*  -Math.cos(deg*Math.PI/180));
+
+                                        $slider.css({ left: X+radius-sliderWidth/2, top: Y+radius-sliderHeight/2 });              
+                                        
+                                        var roundDeg = Math.round(deg);
+                                        
+                                        var percentage = deg/360;
+
+                                        var radiusMet = Math.round(10000 * percentage);
+                                        lens.setRadius(radiusMet); 
+                                        $degrees.html(radiusMet + 'Meters');
+                                        //$('#imageRotateDegrees').val(radiusMet);
+                                    }
+                                });      
+                            });            
+                                
+                                
+                            }
+                            else{
+                                document.getElementById("rotationSliderContainer").style.display="none";
+                                document.getElementById("rotationSlider").style.display="none";
+                                document.getElementById("rotationSliderDegrees").style.display="none";
+                            }
+
+                    }); 
+                    
+                    $('.dropbtnOpt-length').click(function () {
+                            lens.att = "length";
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-velocity').click(function () {
+                            lens.att = "vel"
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-time').click(function () {
+                            lens.att = "time"
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-duration').click(function () {
+                            lens.att = "duration"
+                            lens.updateLENS();
+                    });
+
+                    $('.dropbtnOpt-color').click(function () {
+                            lens.enc = "color"
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-width').click(function () {
+                            lens.enc = "width"
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-brightness').click(function () {
+                            lens.enc = "brightness"
+                            lens.updateLENS();
+                    });
+                    $('.dropbtnOpt-opacity').click(function () {
+                            lens.enc = "opacity"
+                            lens.updateLENS();
+                    });   
+ 
+                }
+            }); 
+            /*lens.areaQuery.bindPopup("<input type='button' value='Delete this lens' class='marker-delete-button'/>")
             lens.areaQuery.on("popupopen", function() {
-            //var tempMarkerGeoJSON = this.toGeoJSON();
+                //var tempMarkerGeoJSON = this.toGeoJSON();
 
-            //var lID = tempMarker._leaflet_id; // Getting Leaflet ID of this marker
+                //var lID = tempMarker._leaflet_id; // Getting Leaflet ID of this marker
 
-            // To remove marker on click of delete
-            $('.marker-delete-button:visible').click(function () {
-                lensesLayer.removeLayer(lens.areaQuery);
-                
-                if(lastMarkerGroupID !=null){
-                    markerGroup.removeLayer(lastMarkerGroupID);
-                    lastMarkerGroupID = null;
-                }
-                if(lastMarkerGroupID1 !=null){
-                    markerGroup1.removeLayer(lastMarkerGroupID1);
-                    lastMarkerGroupID1 = null;
-                }
-                if(lastMarkerGroupID2 !=null){
-                    markerGroup2.removeLayer(lastMarkerGroupID2);
-                    lastMarkerGroupID2 = null;
-                }
-                if(lastMarkerGroupID3 !=null){
-                    markerGroup3.removeLayer(lastMarkerGroupID3);
-                    lastMarkerGroupID3 = null;
-                }
-                deleteQuery(lng, lat, radiusQuery, _type, minVal, maxVal);
-                attLensesArray.forEach(function(item, index, array) {
-                    item.updateALL();
+                // To remove marker on click of delete
+                $('.marker-delete-button:visible').click(function () {
+                    lensesLayer.removeLayer(lens.areaQuery);
+                    
+                    if(lastMarkerGroupID !=null){
+                        markerGroup.removeLayer(lastMarkerGroupID);
+                        lastMarkerGroupID = null;
+                    }
+                    if(lastMarkerGroupID1 !=null){
+                        markerGroup1.removeLayer(lastMarkerGroupID1);
+                        lastMarkerGroupID1 = null;
+                    }
+                    if(lastMarkerGroupID2 !=null){
+                        markerGroup2.removeLayer(lastMarkerGroupID2);
+                        lastMarkerGroupID2 = null;
+                    }
+                    if(lastMarkerGroupID3 !=null){
+                        markerGroup3.removeLayer(lastMarkerGroupID3);
+                        lastMarkerGroupID3 = null;
+                    }
+                    deleteQuery(lng, lat, radiusQuery, _type, minVal, maxVal);
+                    attLensesArray.forEach(function(item, index, array) {
+                        item.updateALL();
+                    });
                 });
-                });
-                
-            }) ; 
+                    
+            }) ; */
             return lens
         }
 
@@ -1718,9 +2382,10 @@ block content
 
             lens.setBounds(lens.areaQuery.getBounds());
 
+            /*CALCULATE THE DISTANCE FROM ONE POINT TO ANOTHER IN PIXELS
             var northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
             var southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
-            var numOfPixl = northVar.distanceTo(southVar);
+            var numOfPixl = northVar.distanceTo(southVar);*/
             var myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [100,100],iconAnchor:[90,90], html: 
                 "<input type='button' value='X' class='myDeleteButton' style='z-index: 1000;     position: fixed;margin: -16%;'/>"+
                 "<div class='dropdown' style='        margin-left: -9.5%; margin-top: 87.5%;'><button class='dropbtn'><img src='images/attribute.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>" + 
@@ -1908,7 +2573,7 @@ block content
                                 document.getElementById("rotationSliderDegrees").style.display="none";
                             }
 
-                        }); 
+                    }); 
                     
                     $('.dropbtnOpt-length').click(function () {
                             lens.att = "length";
