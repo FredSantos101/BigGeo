@@ -18,9 +18,9 @@ a {
   cursor: pointer;
 }
 
-canvas:nth-of-type(2) {
+/*canvas:nth-of-type(2) {
   pointer-events:none;
-}
+}*/
 
 /* The actual popup (appears on top) */
 .popup .popuptext {
@@ -105,6 +105,30 @@ canvas:nth-of-type(2) {
 }
 
 /* Links inside the dropdown */
+.dropdown-content .dropbtnOpt-default{
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  width: 2cm;
+  user-select: selected;
+}
+.dropdown-content .dropbtnOpt-start{
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  width: 2cm;
+  user-select: selected;
+}
+.dropdown-content .dropbtnOpt-end{
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  width: 2cm;
+  user-select: selected;
+}
 .dropdown-content .dropbtnOpt-length{
   color: black;
   padding: 12px 16px;
@@ -170,10 +194,22 @@ canvas:nth-of-type(2) {
 .dropdown-content .dropbtnOpt-time:hover {background-color: hsl(41, 95%, 48%);}
 .dropdown-content .dropbtnOpt-velocity:hover {background-color: hsl(41, 95%, 48%);}
 .dropdown-content .dropbtnOpt-duration:hover {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-default:hover {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-start:hover {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-end:hover {background-color: hsl(41, 95%, 48%);}
+
+.dropdown-content .dropbtnOpt-length:active {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-time:active {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-velocity:active {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-duration:active {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-default:active {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-start:active {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-end:active {background-color: hsl(41, 95%, 48%);}
 
 
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {display: block;}
+
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {background-color: #d45500;}
@@ -240,6 +276,23 @@ canvas:nth-of-type(2) {
 .myRadiusButton:hover {
 	background-color:hsl(0, 100%, 50%);
 }
+.myIntervalsButton {
+  background-color:#ff8400;
+	-moz-border-radius:25px;
+	-webkit-border-radius:25px;
+	border-radius:50%;
+	display:inline-block;
+	cursor:pointer;
+	color:hsl(41, 88%, 41%);
+	font-family:Arial;
+  padding:7px 7px;
+  width: 33px;
+  height:33px;
+	text-decoration:none;
+}
+.myIntervalsButton:hover {
+	background-color:hsl(0, 100%, 50%);
+}
 
 
 /***********************/
@@ -276,4 +329,26 @@ canvas:nth-of-type(2) {
   -webkit-user-select: none; 
   -o-user-select: none;
   z-index: 2;
+}
+
+.rslider {
+  display: inline-block;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+.rs-control .rs-range-color {
+  background-color: #3da6f100;
+}
+.rs-control .rs-path-color {
+  background-color: #ffffff00;
+}
+.rs-control .rs-handle:after {
+  background-color: #e2921c;
+}
+.rs-control .rs-bg-color {
+  background-color: #593d3d00;
+}
+
+.rs-tooltip{
+  color: #FFF;
 }

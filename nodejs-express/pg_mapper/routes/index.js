@@ -149,7 +149,7 @@ router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(
 
 
   //Radius in meters to degrees
-  var radiusDegrees = req.params.radius/ 111120;
+  var radiusDegrees = (req.params.radius/ 111120).toFixed(8);
 
   //var minDegrees = req.params.minValue/ 111120;
 
@@ -183,7 +183,7 @@ router.get('/attQuery/:tab/:long/:lat/:radius', function(req, res) {
 
 
   //Radius in meters to degrees
-  var radiusDegrees = req.params.radius/ 111100;
+  var radiusDegrees = (req.params.radius/ 111120).toFixed(8);
 
   //var minDegrees = req.params.minValue/ 111120;
 
@@ -217,7 +217,7 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
 
 
   //Radius in meters to degrees
-  var radiusDegrees = req.params.radius/ 111120;
+  var radiusDegrees = (req.params.radius/ 111120).toFixed(8);
 
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
@@ -249,14 +249,16 @@ router.get('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:longN
 
 
   //Radius in meters to degrees
-  var radiusDegrees = req.params.radius/ 111120;
-  var radiusDegreesNEW = req.params.radiusNEW/ 111120;
+  var radiusDegrees = (req.params.radius/ 111120).toFixed(8);
+  console.log(radiusDegrees);
+  var radiusDegreesNEW = (req.params.radiusNEW/ 111120).toFixed(8);
 
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
 
   //DELETE OLD QUERY OF THE LENS
   var deleteOldPos = query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue);
+  console.log(deleteOldPos);
   var newQuery = query_args_ContructorQUERIES(req.params.tab,req.params.longNEW, req.params.latNEW, radiusDegreesNEW, req.params.typeNEW, req.params.minValueNEW, req.params.maxValueNEW);
   
   var query = client.query(new Query(newQuery)); // Run our Query
