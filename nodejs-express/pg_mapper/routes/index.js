@@ -257,10 +257,11 @@ router.get('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:longN
   client.connect(); // connect to the client
 
   //DELETE OLD QUERY OF THE LENS
+  console.log(activeQuery);
   var deleteOldPos = query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue);
-  console.log(deleteOldPos);
+  console.log(activeQuery);
   var newQuery = query_args_ContructorQUERIES(req.params.tab,req.params.longNEW, req.params.latNEW, radiusDegreesNEW, req.params.typeNEW, req.params.minValueNEW, req.params.maxValueNEW);
-  
+  console.log(activeQuery);
   var query = client.query(new Query(newQuery)); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);

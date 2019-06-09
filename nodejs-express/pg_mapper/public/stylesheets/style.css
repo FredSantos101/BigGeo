@@ -348,7 +348,9 @@ a {
 .rs-control .rs-bg-color {
   background-color: #593d3d00;
 }
-
 .rs-tooltip{
   color: #FFF;
+}
+.rs-border  {
+    border-color: #00B7FF;
 }

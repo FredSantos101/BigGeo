@@ -1301,6 +1301,7 @@ block content
                     this.outsideCircle = circle;
                 },
                 setRadius : function (value){
+                    console.log("YEEE BOYY");
                     this.areaQuery.setRadius(value);
                     this.radiusQuery = value;
                 },
@@ -1582,6 +1583,8 @@ block content
                     
                 },
                 updateLENS: function(){
+                    this.areaQuery.setStyle({color: 'DarkRed',fillColor: 'red',fillOpacity: 0.6});
+                    var thisVar= this;
                     if(lastMarkerGroupID !=null){
                         markerGroup.removeLayer(lastMarkerGroupID);
                         lastMarkerGroupID = null;
@@ -1626,8 +1629,9 @@ block content
                             tracksToDraw.addTo(markerGroup);
                             var idTracks = tracksToDraw._leaflet_id;
                             lastMarkerGroupID = tracksToDraw._leaflet_id;
-                            
+                            thisVar.colorSuccess();
                         }
+                        
                         lensesLayer.bringToFront();
                         
                     });
@@ -1649,7 +1653,7 @@ block content
                             var tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup1);
                             lastMarkerGroupID1 = tracksToDraw._leaflet_id;
-                            
+                            thisVar.colorSuccess();
                         }
                         lensesLayer.bringToFront();
                     });
@@ -1671,7 +1675,7 @@ block content
                             var tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup2);
                             lastMarkerGroupID2 = tracksToDraw._leaflet_id;
-                            
+                            thisVar.colorSuccess();
                         }
                         lensesLayer.bringToFront();
                     });
@@ -1693,7 +1697,7 @@ block content
                             var tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup3);
                             lastMarkerGroupID3 = tracksToDraw._leaflet_id;
-                            
+                            thisVar.colorSuccess();
                         }
                         lensesLayer.bringToFront();
                     });
@@ -1724,10 +1728,13 @@ block content
                 "<button class='dropbtnOpt-length'>Length</button>"+
                 "<button class='dropbtnOpt-velocity'>Average velocity</button>"+
                 "</div></div>" +
-                "<button class='myIntervalsButton' style='z-index: 1021; position:fixed;     margin-left: 81.5%;margin-top: 83%;'><img src='images/intervals.png' style='z-index: 999;width: 25px;height: 25px;    margin: inherit;margin-left: -3px;margin-top: -4px;'></button>"+
+                "<button class='myIntervalsButton' style='z-index: 1025; position:fixed;     margin-left: 81.5%;margin-top: 83%;'><img src='images/intervals.png' style='z-index: 999;width: 25px;height: 25px;    margin: inherit;margin-left: -3px;margin-top: -4px;'></button>"+
                 "<button class='myRadiusButton' style='z-index: 1019; position:fixed;     margin-left: 78.5%; margin-top: -19%;'><img src='images/radius.png' style='z-index: 999;width: 25px;height: 25px;    margin: inherit;margin-left: -3px;margin-top: -4px;'></button>"+
-                "<div id='rotationSliderContainer' style='display:none;'><div id='rotationSlider'style='display:none;'></div> <div id='rotationSliderDegrees'style='display:none;'></div></div>"+
-                "<div id='sliderIntervalVel' style='z-index:1020;left:-80px; top:-80px;display:none;'></div>"
+                "<div id='sliderRadius' style='z-index:1018;left:-80px; top:-80px;display:none;'></div>"+
+                "<div id='sliderIntervalVel' style='z-index:1020;left:-80px; top:-80px;display:none;'></div>"+
+                "<div id='sliderIntervalLength' style='z-index:1021;left:-80px; top:-80px;display:none;'></div>"+
+                "<div id='sliderIntervalDuration' style='z-index:1022;left:-80px; top:-80px;display:none;'></div>"+
+                "<div id='sliderIntervalTime' style='z-index:1023;left:-80px; top:-80px;display:none;'></div>"
                 /*"<input type='text' id='amountVel' readonly style=' border:0; color:#f6f31f1; font-weight:bold;'>" + 
                 "<div id='maxMinBoundsVel' style='width:50px;height:50px'></div>" + 
                 "<input type='text' id='amountLength' readonly style='width:50px; border:0; color:#669911; font-weight:bold;'>" + 
@@ -1862,32 +1869,180 @@ block content
                     });
 
                     $('.myIntervalsButton').click(function(e){
-                        console.log("YEEEEEE BOOOOOOOOYYYYYYYYYYYYYYY");
-                        if(document.getElementById("sliderIntervalVel").style.display=='block'){
-                            document.getElementById("sliderIntervalVel").style.display="none";
-                        }
-                        else document.getElementById("sliderIntervalVel").style.display="block";
+                        if(document.getElementById("sliderRadius").style.display=='none'){
+                            if(lens.getType() == "Vel_avg") {
+                                if(document.getElementById("sliderIntervalVel").style.display=='none'){
+                                    document.getElementById("sliderIntervalVel").style.display="block";
 
-                        var $sliderIntervalVel = $('#sliderIntervalVel');
-                        $sliderIntervalVel.mousedown( function (e){
-                            //TODO VELOCITY REMOVING BADLY??
-                            L.DomEvent.stopPropagation(e);
-                            map.dragging.disable();
-                            e.originalEvent.preventDefault();
-                        });
+                                    var $sliderIntervalVel = $('#sliderIntervalVel');
+                                    $sliderIntervalVel.mousedown( function (e){
+                                        //TODO VELOCITY REMOVING BADLY??
+                                        L.DomEvent.stopPropagation(e);
+                                        map.dragging.disable();
+                                        e.originalEvent.preventDefault();
+                                    });
+                                }
+                                else document.getElementById("sliderIntervalVel").style.display="none";
+                            }
+                            if(lens.getType() == "Length") {
+                                if(document.getElementById("sliderIntervalLength").style.display=='none'){
+                                    document.getElementById("sliderIntervalLength").style.display="block";
+
+                                    var $sliderIntervalLength = $('#sliderIntervalLength');
+                                    $sliderIntervalLength.mousedown( function (e){
+                                        //TODO VELOCITY REMOVING BADLY??
+                                        L.DomEvent.stopPropagation(e);
+                                        map.dragging.disable();
+                                        e.originalEvent.preventDefault();
+                                    });
+                                }
+                                else document.getElementById("sliderIntervalLength").style.display="none";
+                            }
+                            if(lens.getType() == "Time_Duration") {
+                                if(document.getElementById("sliderIntervalDuration").style.display=='none'){
+                                    document.getElementById("sliderIntervalDuration").style.display="block";
+
+                                    var $sliderIntervalDuration = $('#sliderIntervalDuration');
+                                    $sliderIntervalDuration.mousedown( function (e){
+                                        //TODO VELOCITY REMOVING BADLY??
+                                        L.DomEvent.stopPropagation(e);
+                                        map.dragging.disable();
+                                        e.originalEvent.preventDefault();
+                                    });
+                                }
+                                else document.getElementById("sliderIntervalDuration").style.display="none";
+                            }
+                            if(lens.getType() == "Time_Interval") {
+                                if(document.getElementById("sliderIntervalTime").style.display=='none'){
+                                    document.getElementById("sliderIntervalTime").style.display="block";
+
+                                    var $sliderIntervalTime = $('#sliderIntervalTime');
+                                    $sliderIntervalTime.mousedown( function (e){
+                                        //TODO VELOCITY REMOVING BADLY??
+                                        L.DomEvent.stopPropagation(e);
+                                        map.dragging.disable();
+                                        e.originalEvent.preventDefault();
+                                    });
+                                }
+                                else document.getElementById("sliderIntervalTime").style.display="none";
+                            }
+                        } 
+                        
                         $(function(){
                             $("#sliderIntervalVel").roundSlider({
                                 sliderType: "range",
                                 radius: "130px",
-                                value: "0,360",
+                                value: lens.getMinV() + "," + lens.getMaxV(),
                                 min: 0,
-                                max: 200,
-                                lineCap: "round",
+                                max: 250,
+                                //lineCap: "round",
                                 width: 5,
                                 editableTooltip: false,
                                 handleSize: "+10",
                                 handleShape: "dot",
-                                change: function (e) {
+                                drag: function (e) {
+                                    L.DomEvent.stopPropagation(e);
+                                    
+                                    var index = e.value.indexOf(",");  // Gets the first index where a , occours
+                                    var firstPart = e.value.substr(0, index); // Gets the first part
+                                    var secondPart = e.value.substr(index + 1);  // Gets the text part
+                                    lens.setMinV(firstPart);
+                                    lens.setMaxV(secondPart);
+                                    console.log(lens.getMinV());
+                                    console.log(lens.getMaxV());
+                                },
+                                start: function(e) {
+                                    
+                                },
+                                stop: function (e) {
+                                    L.DomEvent.stopPropagation(e);
+                                    map.dragging.enable();
+                                    lens.updateLENS();
+                                    lens.setMinVOLD(lens.getMinV());
+                                    lens.setMaxVOLD(lens.getMaxV());
+                                }
+                            });
+                            
+                            $("#sliderIntervalLength").roundSlider({
+                                sliderType: "range",
+                                radius: "130px",
+                                value: lens.getMinV() + "," + lens.getMaxV(),
+                                min: 1,
+                                max: 500000,
+                                //lineCap: "round",
+                                width: 5,
+                                editableTooltip: false,
+                                handleSize: "+10",
+                                handleShape: "dot",
+                                drag: function (e) {
+                                    L.DomEvent.stopPropagation(e);
+                                    
+                                    var index = e.value.indexOf(",");  // Gets the first index where a , occours
+                                    var firstPart = e.value.substr(0, index); // Gets the first part
+                                    var secondPart = e.value.substr(index + 1);  // Gets the text part
+                                    lens.setMinV(firstPart);
+                                    lens.setMaxV(secondPart);
+                                    console.log(lens.getMinV());
+                                    console.log(lens.getMaxV());
+                                },
+                                start: function(e) {
+                                    
+                                },
+                                stop: function (e) {
+                                    L.DomEvent.stopPropagation(e);
+                                    map.dragging.enable();
+                                    lens.updateLENS();
+                                    lens.setMinVOLD(lens.getMinV());
+                                    lens.setMaxVOLD(lens.getMaxV());
+                                }
+                            });
+                            
+                            $("#sliderIntervalDuration").roundSlider({
+                                sliderType: "range",
+                                radius: "130px",
+                                value: lens.getMinV() + "," + lens.getMaxV(),
+                                min: 0, // 2008-02-02 13:30:44
+                                max: 85839, // 2008-02-08 17:39:18
+                                //lineCap: "round",
+                                width: 5,
+                                editableTooltip: false,
+                                handleSize: "+10",
+                                handleShape: "dot",
+                                drag: function (e) {
+                                    L.DomEvent.stopPropagation(e);
+                                    
+                                    var index = e.value.indexOf(",");  // Gets the first index where a , occours
+                                    var firstPart = e.value.substr(0, index); // Gets the first part
+                                    var secondPart = e.value.substr(index + 1);  // Gets the text part
+                                    lens.setMinV(firstPart);
+                                    lens.setMaxV(secondPart);
+                                    console.log(lens.getMinV());
+                                    console.log(lens.getMaxV());
+                                },
+                                start: function(e) {
+                                    
+                                },
+                                stop: function (e) {
+                                    L.DomEvent.stopPropagation(e);
+                                    map.dragging.enable();
+                                    lens.updateLENS();
+                                    lens.setMinVOLD(lens.getMinV());
+                                    lens.setMaxVOLD(lens.getMaxV());
+                                }
+                            });
+                            
+                            $("#sliderIntervalTime").roundSlider({
+                                sliderType: "range",
+                                radius: "130px",
+                                value: lens.getMinV() + "," + lens.getMaxV(),
+                                min: 1201959044 , // 2008-02-02 13:30:44
+                                max: 1202492358 , // 2008-02-08 17:39:18
+                                //lineCap: "round",
+                                width: 5,
+                                editableTooltip: false,
+                                handleSize: "+10",
+                                handleShape: "dot",
+                                drag: function (e) {
                                     L.DomEvent.stopPropagation(e);
                                     
                                     var index = e.value.indexOf(",");  // Gets the first index where a , occours
@@ -1915,38 +2070,36 @@ block content
 
                     $('.myRadiusButton').click(function (e) {
                         L.DomEvent.stopPropagation(e); 
-                        if(document.getElementById("rotationSliderContainer").style.display=='none'){
+                        if(document.getElementById("sliderRadius").style.display=='none' && document.getElementById("sliderRadius").style.display=='none'){
+                            document.getElementById("sliderRadius").style.display="block";
+                            var $sliderRadius = $('#sliderRadius');
+                            $sliderRadius.mousedown( function (e){
+                                //TODO VELOCITY REMOVING BADLY??
+                                L.DomEvent.stopPropagation(e);
+                                map.dragging.disable();
+                                e.originalEvent.preventDefault();
+                            });
                             $(function(){
-                                var $container = $('#rotationSliderContainer');
-                                var $slider = $('#rotationSlider');
-                                var $degrees = $('#rotationSliderDegrees');
-                                
-                                document.getElementById("rotationSliderContainer").style.display="block";
-                                document.getElementById("rotationSlider").style.display="block";
-                                document.getElementById("rotationSliderDegrees").style.display="block";
-
-                                
-                                var sliderWidth = $slider.width();
-                                var sliderHeight = $slider.height();
-                                var radius = $container.width()/2;
-                                var deg = 0; 
-
-                                deg = lens.getRadius()*360/10000;  
-                                
-                                X = Math.round(radius* Math.sin(deg*Math.PI/180));
-                                Y = Math.round(radius*  -Math.cos(deg*Math.PI/180));
-                                $slider.css({ left: X+radius-sliderWidth/2, top: Y+radius-sliderHeight/2 });
-                                
-                                var mdown = false;
-                                $container
-                                //.mousedown(function (e) {e.originalEvent.preventDefault();});
-                                .mousedown(function (e) {L.DomEvent.stopPropagation(e);mdown = true; e.originalEvent.preventDefault();map.dragging.disable(); })
-                                .mouseup(function (e) { 
-                                    L.DomEvent.stopPropagation(e);
-                                    mdown = false;
-                                    map.dragging.enable();
-                                    if (movedRadius){
-                                        movedRadius = false; 
+                                $("#sliderRadius").roundSlider({
+                                    sliderType: "min-range",
+                                    radius: "130px",
+                                    value: lens.getRadius(),
+                                    min: 0,
+                                    max: 10000,
+                                    //lineCap: "round",
+                                    width: 5,
+                                    editableTooltip: false,
+                                    handleSize: "+10",
+                                    handleShape: "dot",
+                                    drag: function (e) {
+                                        L.DomEvent.stopPropagation(e);
+                                        lens.setRadius(e.value); 
+                                    },
+                                    start: function(e) {
+                                    },
+                                    stop: function (e) {
+                                        L.DomEvent.stopPropagation(e);
+                                        map.dragging.enable();
                                         lens.updateLENS();
                                         lens.setBounds(lens.areaQuery.getBounds());
                                         attLensesArray.forEach(function(item, index, array) {
@@ -1954,101 +2107,79 @@ block content
                                         });
                                         lens.setRadiusOLD(lens.getRadius());
                                     }
-                                })
-                                .mousemove(function (e) {
-
-                                    if(mdown)
-                                    {
-                                        movedRadius = true;      
-                                        e.originalEvent.preventDefault();
-                                        L.DomEvent.stopPropagation(e);
-                                        // firefox compatibility
-                                        if(typeof e.offsetX === "undefined" || typeof e.offsetY === "undefined") {
-                                        var targetOffset = $(e.target).offset();
-                                        e.offsetX = e.pageX - targetOffset.left;
-                                        e.offsetY = e.pageY - targetOffset.top;
-                                        }
-                                        
-                                        if($(e.target).is('#rotationSliderContainer'))
-                                            var mPos = {x: e.offsetX, y: e.offsetY};
-                                        else
-                                            var mPos = {x: e.target.offsetLeft + e.offsetX, y: e.target.offsetTop + e.offsetY};
-                                            
-                                        var atan = Math.atan2(mPos.x-radius, mPos.y-radius);
-                                        deg = -atan/(Math.PI/180) + 180; // final (0-360 positive) degrees from mouse position 
-                                        
-                                        
-                                        // for attraction to multiple of 90 degrees
-                                        var distance = Math.abs( deg - ( Math.round(deg / 90) * 90 ) );
-                                        
-                                        if( distance <= 5 )
-                                            deg = Math.round(deg / 90) * 90;
-                                            
-                                        if(deg == 360)
-                                            deg = 0;
-                                        
-                                        X = Math.round(radius* Math.sin(deg*Math.PI/180));
-                                        Y = Math.round(radius*  -Math.cos(deg*Math.PI/180));
-
-                                        $slider.css({ left: X+radius-sliderWidth/2, top: Y+radius-sliderHeight/2 });              
-                                        
-                                        var roundDeg = Math.round(deg);
-                                        
-                                        var percentage = deg/360;
-
-                                        var radiusMet = Math.round(10000 * percentage);
-                                        lens.setRadius(radiusMet); 
-                                        $degrees.html(radiusMet + 'Meters');
-                                        //$('#imageRotateDegrees').val(radiusMet);
-                                    }
-                                });      
-                            });            
-                                
-                                
-                            }
-                            else{
-                                document.getElementById("rotationSliderContainer").style.display="none";
-                                document.getElementById("rotationSlider").style.display="none";
-                                document.getElementById("rotationSliderDegrees").style.display="none";
-                            }
+                                });
+                            }); 
+                            
+                        }
+                        else{
+                            document.getElementById("sliderRadius").style.display="none";
+                        }
 
                     }); 
                     
                     $('.dropbtnOpt-default').click(function () {
                             lens.setType("Default");
+                            lens.setMinV(0);
+                            lens.setMaxV(0);
                             lens.updateLENS();
                             lens.setTypeOLD("Default");
+                            lens.setMinVOLD(0);
+                            lens.setMaxVOLD(0);
                     });
                     $('.dropbtnOpt-start').click(function () {
                             lens.setType("Start");
+                            lens.setMinV(0);
+                            lens.setMaxV(0);
                             lens.updateLENS();
                             lens.setTypeOLD("Start");
+                            lens.setMinVOLD(0);
+                            lens.setMaxVOLD(0);
                     });
                     $('.dropbtnOpt-end').click(function () {
                             lens.setType("End");
+                            lens.setMinV(0);
+                            lens.setMaxV(0);
                             lens.updateLENS();
                             lens.setTypeOLD("End");
+                            lens.setMinVOLD(0);
+                            lens.setMaxVOLD(0);
                     });
                     $('.dropbtnOpt-length').click(function () {
                             
                             lens.setType("Length");
+                            lens.setMinV(1);
+                            lens.setMaxV(500000);
                             lens.updateLENS();
                             lens.setTypeOLD("Length");
+                            lens.setMinVOLD(1);
+                            lens.setMaxVOLD(500000);
                     });
                     $('.dropbtnOpt-velocity').click(function () {
                             lens.setType("Vel_avg");
+                            lens.setMinV(0);
+                            lens.setMaxV(250);
                             lens.updateLENS();
                             lens.setTypeOLD("Vel_avg");
+                            lens.setMinVOLD(0);
+                            lens.setMaxVOLD(250);
                     });
                     $('.dropbtnOpt-time').click(function () {
                             lens.setType("Time_Interval");
+                            lens.setMinV(1201959044);
+                            lens.setMaxV(1202492358);
                             lens.updateLENS();
                             lens.setTypeOLD("Time_Interval");
+                            lens.setMinVOLD(1201959044);
+                            lens.setMaxVOLD(1202492358);
                     });
                     $('.dropbtnOpt-duration').click(function () {
                             lens.setType("Time_Duration");
+                            lens.setMinV(0);
+                            lens.setMaxV(85839);
                             lens.updateLENS();
                             lens.setTypeOLD("Time_Duration");
+                            lens.setMinVOLD(0);
+                            lens.setMaxVOLD(85839);
                     });  
  
                 }
