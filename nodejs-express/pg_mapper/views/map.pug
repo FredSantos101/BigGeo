@@ -16,10 +16,18 @@ block content
         map.createPane('outtterLensDeletePane');
         map.createPane('velPane');
         map.createPane('attLensPane');
+        map.createPane('queryLensPane');
+        map.createPane('queryLensPane1');
+        map.createPane('queryLensPane2');
+        map.createPane('queryLensPane3');
         map.getPane('lensPane').style.zIndex = 600;
         map.getPane('outtterLensPane').style.zIndex = 650;
         map.getPane('outtterLensDeletePane').style.zIndex = 700;
-        map.getPane('attLensPane').style.zIndex = 410;
+        map.getPane('attLensPane').style.zIndex = 450;
+        map.getPane('queryLensPane').style.zIndex = 400;
+        map.getPane('queryLensPane1').style.zIndex = 401;
+        map.getPane('queryLensPane2').style.zIndex = 402;
+        map.getPane('queryLensPane3').style.zIndex = 403;
         map.getPane('velPane').style.zIndex = 400;
         var popup = L.popup();
         var popup2 = L.popup();
@@ -35,10 +43,10 @@ block content
 
         //create array with all layers?
 
-        var markerGroup  = L.featureGroup().addTo(map);
-        var markerGroup1 = L.featureGroup().addTo(map);
-        var markerGroup2 = L.featureGroup().addTo(map);
-        var markerGroup3 = L.featureGroup().addTo(map);
+        var markerGroup  = L.featureGroup({pane: 'queryLensPane'}).addTo(map);
+        var markerGroup1 = L.featureGroup({pane: 'queryLensPane1'}).addTo(map);
+        var markerGroup2 = L.featureGroup({pane: 'queryLensPane2'}).addTo(map);
+        var markerGroup3 = L.featureGroup({pane: 'queryLensPane3'}).addTo(map);
         
         var attLenResults = L.featureGroup({pane: 'attLensPane'}).addTo(map);
 
@@ -171,6 +179,12 @@ block content
             "weight": 1.5
             
         };
+        var firstStyleATT = {
+            "color": '#FF6347',
+            "weight": 1.5,
+            "pane": "attLensPane"
+            
+        };
         /*var color2;
             var r = Math.min(Math.max(Math.floor(Math.random() * 255), 55), 200);
             var g = Math.min(Math.max(Math.floor(Math.random() * 255), 75), 255);
@@ -193,7 +207,7 @@ block content
         map.on('zoomend', function() {
             console.log(map.getZoom())
             if (map.getZoom() >= 19){
-                    map.addLayer(markerGroup3);
+                    markerGroup3.addTo(map);
             }
             else {
                 if (map.hasLayer(markerGroup3)) {
@@ -202,7 +216,7 @@ block content
                     console.log("MarkerGroup3 not active");
                 }
                 if (map.getZoom() >= 17){
-                    map.addLayer(markerGroup2);
+                    markerGroup2.addTo(map);
                 }
                 else {
                     if (map.hasLayer(markerGroup2)) {
@@ -211,7 +225,7 @@ block content
                         console.log("MarkerGroup2 not active");
                     }
                     if (map.getZoom() >= 15){
-                        map.addLayer(markerGroup1);
+                        markerGroup1.addTo(map);
                     }
                     else {
                         if (map.hasLayer(markerGroup1)) {
@@ -1222,7 +1236,8 @@ block content
                     color: 'DarkRed',
                     fillColor: 'red',
                     fillOpacity: 0.6,
-                    radius: radiusQuery
+                    radius: radiusQuery,
+                    pane: 'lensPane'
                 }).addTo(lensesLayer),
                 outsideCircle : null,
                 lngLat : [lat,lng],
@@ -1301,7 +1316,6 @@ block content
                     this.outsideCircle = circle;
                 },
                 setRadius : function (value){
-                    console.log("YEEE BOYY");
                     this.areaQuery.setRadius(value);
                     this.radiusQuery = value;
                 },
@@ -1462,22 +1476,18 @@ block content
                 deleteLayers: function(){
                     lensesLayer.removeLayer(lens.areaQuery);
                     if(lastMarkerGroupID !=null){
-                        console.log("YEEEEEEEEE BOOOOOOOYYYYYYY");
                         markerGroup.removeLayer(lastMarkerGroupID);
                         lastMarkerGroupID = null;
                     }
                     if(lastMarkerGroupID1 !=null){
-                        console.log("YEEEEEEEEE 1 BOOOOOOOYYYYYYY");
                         markerGroup1.removeLayer(lastMarkerGroupID1);
                         lastMarkerGroupID1 = null;
                     }
                     if(lastMarkerGroupID2 !=null){
-                        console.log("YEEEEEEEEE 2 BOOOOOOOYYYYYYY");
                         markerGroup2.removeLayer(lastMarkerGroupID2);
                         lastMarkerGroupID2 = null;
                     }
                     if(lastMarkerGroupID3 !=null){
-                        console.log("YEEEEEEEEE 3 BOOOOOOOYYYYYYY");
                         markerGroup3.removeLayer(lastMarkerGroupID3);
                         lastMarkerGroupID3 = null;
                     }
@@ -2238,6 +2248,18 @@ block content
                 enc : _encoding,
                 intersections: [],
                 bounds : null,
+                addIntersection: function (obj){
+                    this.intersections.push(obj);
+                },
+                removeIntersection: function (obj){
+                    for(var i = this.intersections.length - 1; i >= 0; i--) {
+                        if(this.intersections[i] === obj) {
+                            this.intersections.splice(i, 1);
+                            return true;
+                        }
+                    }
+                    return false;
+                },
                 setLngLat : function (value){
                     this.lngLat = value;
                 },
@@ -2297,11 +2319,11 @@ block content
                 },
 
                 createLayers : function(){
-                    var attLayer = L.featureGroup().addTo(attLenResults);
-                    var _attLayer = L.featureGroup().addTo(attLayer);
-                    var _attLayer1 = L.featureGroup().addTo(attLayer);
-                    var _attLayer2 = L.featureGroup().addTo(attLayer);
-                    var _attLayer3 = L.featureGroup().addTo(attLayer);
+                    var attLayer = L.featureGroup({pane: 'attLensPane'}).addTo(attLenResults);
+                    var _attLayer = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
+                    var _attLayer1 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
+                    var _attLayer2 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
+                    var _attLayer3 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
                     
                         // Create URL
                     var urlString3 = "attQuery/trajectory_lines/"  + this.lngLat.lng + "/" + this.lngLat.lat + "/" + this.radiusQuery;
@@ -2323,9 +2345,8 @@ block content
                     $.when(newData).done(function() {
                         
                         if(newData.responseJSON.features != null){
-                            console.log(newData.responseJSON.features);
                             newData.responseJSON.features.forEach(function(item, index, array) {
-                                var tracksToDraw = L.geoJson(item,firstStyle);
+                                var tracksToDraw = L.geoJson(item,firstStyleATT);
                                 switch(lens.att) {
                                     case "length":
                                         lengthAtt(tracksToDraw, item.properties, lens.enc);
@@ -2342,14 +2363,7 @@ block content
                                         break;
                                 } 
                                 lens.intersections.forEach(function(lensInt, index, array) {
-                                    console.log(lensInt.areaQuery);
-                                    console.log(tracksToDraw.getBounds());
                                     if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
-
-                                        console.log("This layer intersects the other lenses");
-                                        console.log(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds()));
-                                        console.log(lensInt);
-                                        console.log(tracksToDraw);
                                         lensInt.updateLayer(tracksToDraw,item.properties)
                                     }
                                 });
@@ -2370,9 +2384,8 @@ block content
                     }) 
                     $.when(newData1).done(function() {
                         if(newData1.responseJSON.features != null){
-                            console.log(newData1.responseJSON.features);
                             newData1.responseJSON.features.forEach(function(item, index, array) {
-                                var tracksToDraw = L.geoJson(item,firstStyle);
+                                var tracksToDraw = L.geoJson(item,firstStyleATT);
                                 switch(lens.att) {
                                     case "length":
                                         lengthAtt(tracksToDraw, item.properties, lens.enc);
@@ -2389,7 +2402,6 @@ block content
                                         break;
                                 } 
                                 lens.intersections.forEach(function(lensInt, index, array) {
-                                    console.log(lensInt, index);
                                     if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
                                         lensInt.updateLayer(tracksToDraw,item.properties)
                                     }
@@ -2411,9 +2423,8 @@ block content
                     }) 
                     $.when(newData2).done(function() {
                         if(newData2.responseJSON.features != null){
-                            console.log(newData2.responseJSON.features);
                             newData2.responseJSON.features.forEach(function(item, index, array) {
-                                var tracksToDraw = L.geoJson(item,firstStyle);
+                                var tracksToDraw = L.geoJson(item,firstStyleATT);
                                 switch(lens.att) {
                                     case "length":
                                         lengthAtt(tracksToDraw, item.properties, lens.enc);
@@ -2430,7 +2441,6 @@ block content
                                         break;
                                 } 
                                 lens.intersections.forEach(function(lensInt, index, array) {
-                                    console.log(lensInt, index);
                                     if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
                                         lensInt.updateLayer(tracksToDraw,item.properties)
                                     }
@@ -2452,9 +2462,8 @@ block content
                     }) 
                     $.when(newData3).done(function() {
                         if(newData3.responseJSON.features != null){
-                            console.log(newData3.responseJSON.features);
                             newData3.responseJSON.features.forEach(function(item, index, array) {
-                                var tracksToDraw = L.geoJson(item,firstStyle);
+                                var tracksToDraw = L.geoJson(item,firstStyleATT);
                                 switch(lens.att) {
                                     case "length":
                                         lengthAtt(tracksToDraw, item.properties, lens.enc);
@@ -2471,7 +2480,6 @@ block content
                                         break;
                                 } 
                                 lens.intersections.forEach(function(lensInt, index, array) {
-                                    console.log(lensInt, index);
                                     if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
                                         lensInt.updateLayer(tracksToDraw,item.properties)
                                     }
@@ -2491,82 +2499,94 @@ block content
                     this.createLayers();
                 },
                 updateLENS : function(){
-                    
-                    this.updateOthers();
+                    this.intersections.splice(0,this.intersections.length);
+                    //this.updateOthers();
                     var thisVar = this;
+                    
                     attLensesArray.forEach(function(item, index, array) {
                         if(thisVar.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
-                            thisVar.intersections.push(item);
+                            thisVar.addIntersection(item);
                         }
                     });
+                    console.log("BELLOW IS THE INTNERSECTIONS OF THE LENS THAT WAS UPDATED");
+                    console.log(this.intersections);
                     attLensesArray.push(lens);
+                    console.log("Bellow is the attLensesArray");
                     console.log(attLensesArray);
-                    attLenResults.getLayer(this.getlID()).getLayers().forEach(function(oneOfFourATTLayers,index,array){
-                        oneOfFourATTLayers.getLayers().forEach(function(oneOfSmallLayers,index,array){
-                            oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1].setStyle(firstStyle);
-                            thisVar.updateLayer(oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1],oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1].feature.properties);
-                            console.log(oneOfSmallLayers);
-                            thisVar.intersections.forEach(function(lensInt, index, array) {
+                    attLenResults.getLayer(this.getlID()).eachLayer(function(oneOfFourATTLayers){
+                        oneOfFourATTLayers.eachLayer(function(oneOfSmallLayerContainer){
+                            oneOfSmallLayerContainer.eachLayer(function(oneOfSmallLayers) {
+                                oneOfSmallLayers.setStyle(firstStyleATT);
+                                thisVar.updateLayer(oneOfSmallLayers,oneOfSmallLayers.feature.properties);
+                                thisVar.intersections.forEach(function(lensInt, index, array) {
                                     console.log(lensInt.areaQuery);
-                                    if(lensInt.areaQuery.getBounds().intersects(oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1].getBounds())){
+                                    if(lensInt.areaQuery.getBounds().intersects(oneOfSmallLayers.getBounds())){
 
                                         console.log("This layer intersects the other lenses");
                                         
-                                        lensInt.updateLayer(oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1],oneOfSmallLayers._layers[oneOfSmallLayers._leaflet_id - 1].feature.properties);
+                                        lensInt.updateLayer(oneOfSmallLayers,oneOfSmallLayers.feature.properties);
                                     }
                                 });
+                            });
                         });
                     });
                     attLenResults.getLayer(this.getlID()).bringToFront();
 
                 },
-                deleteAndUpdateOthers: function(){
+                delete: function(){
                     attLenResults.removeLayer(this.getlID());
-                    this.updateOthers();
                 },
                 updateOthers: function(){
-                    attLensesArray.splice( attLensesArray.indexOf(this),1);
+                    for(var i = attLensesArray.length - 1; i >= 0; i--) {
+                        if(attLensesArray[i] === this) {
+                            attLensesArray.splice(i, 1);
+                        }
+                    }
                     var thisVar = this;
+                    
                     attLensesArray.forEach(function (lensInGlobalArray,index,array){
-                        if(lensInGlobalArray.intersections.indexOf(thisVar) !=-1) {
-                            console.log(lensInGlobalArray.intersections);
-                            console.log("I will now delete the lens from this ones intersection list")
-                            lensInGlobalArray.intersections.splice(lensInGlobalArray.intersections.indexOf(thisVar),1);
-                            console.log(lensInGlobalArray.intersections);
+                        console.log("AAAAAAAIXO");
+                        console.log(lensInGlobalArray);
+                        if(lensInGlobalArray.removeIntersection(thisVar)) {
+                            console.log(lensInGlobalArray);
+                            console.log("CIMAAAAAAAA");
+                            
                             var layerofItem = attLenResults.getLayer(lensInGlobalArray.getlID());
                             layerofItem.eachLayer(function (layerHolder) {
-                                layerHolder.eachLayer(function (layer) {
-                                    if (thisVar.getBound().intersects(layer.getBounds())){
-                                        console.log("This layer is inside the bounds");
-                                        switch(thisVar.enc) {
-                                            case "color":
-                                                layer._layers[layer._leaflet_id - 1].setStyle({color: '#FF6347'});
-                                                lensInGlobalArray.updateLayer(layer._layers[layer._leaflet_id - 1], layer._layers[layer._leaflet_id - 1].feature.properties);
-                                                lensInGlobalArray.intersections.forEach(function(itemInterLens, index, array) {
-                                                    if (itemInterLens.areaQuery.getBounds().intersects(layer._layers[layer._leaflet_id - 1].getBounds())){
-                                                        itemInterLens.updateLayer(layer._layers[layer._leaflet_id - 1], layer._layers[layer._leaflet_id - 1].feature.properties);
-                                                    }
-                                                });
-                                                break;
-                                            case "brightness":
-                                                layer._layers[layer._leaflet_id - 1].setStyle({color: '#FF6347'});
-                                                lensInGlobalArray.updateLayer(layer._layers[layer._leaflet_id - 1], layer._layers[layer._leaflet_id - 1].feature.properties);
-                                                lensInGlobalArray.intersections.forEach(function(itemInterLens, index, array) {
-                                                    if (itemInterLens.getBound().intersects(layer._layers[layer._leaflet_id - 1].getBounds())){
-                                                        itemInterLens.updateLayer(layer._layers[layer._leaflet_id - 1], layer._layers[layer._leaflet_id - 1].feature.properties);
-                                                    }
-                                                });
-                                                break;
-                                            case "opacity":
-                                                console.log("Returning Opacity to 1");
-                                                layer._layers[layer._leaflet_id - 1].setStyle({opacity:1});
-                                                break;
-                                            case "width":
-                                                console.log("Returning Width to 1.5");
-                                                layer._layers[layer._leaflet_id - 1].setStyle({"weight": 1.5});
-                                                break;
+                                layerHolder.eachLayer(function (layerContainer) {
+                                    layerContainer.eachLayer(function (layer){
+                                            if (thisVar.getBound().intersects(layer.getBounds())){
+                                            console.log("This layer is inside the bounds");
+                                            switch(thisVar.enc) {
+                                                case "color":
+                                                    layer.setStyle({color: '#FF6347'});
+                                                    lensInGlobalArray.updateLayer(layer, layer.feature.properties);
+                                                    lensInGlobalArray.intersections.forEach(function(itemInterLens, index, array) {
+                                                        if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
+                                                            itemInterLens.updateLayer(layer, layer.feature.properties);
+                                                        }
+                                                    });
+                                                    break;
+                                                case "brightness":
+                                                    layer.setStyle({color: '#FF6347'});
+                                                    lensInGlobalArray.updateLayer(layer, layer.feature.properties);
+                                                    lensInGlobalArray.intersections.forEach(function(itemInterLens, index, array) {
+                                                        if (itemInterLens.areaQuery.getBounds().intersects(layer.getBounds())){
+                                                            itemInterLens.updateLayer(layer, layer.feature.properties);
+                                                        }
+                                                    });
+                                                    break;
+                                                case "opacity":
+                                                    console.log("Returning Opacity to 1");
+                                                    layer.setStyle({opacity:1});
+                                                    break;
+                                                case "width":
+                                                    console.log("Returning Width to 1.5");
+                                                    layer.setStyle({"weight": 1.5});
+                                                    break;
+                                            }
                                         }
-                                    }
+                                    });
                                 });
                             });
 
@@ -2600,14 +2620,12 @@ block content
                 "<div id='rotationSliderContainer' style='display:none;'><div id='rotationSlider'style='display:none;'></div> <div id='rotationSliderDegrees'style='display:none;'></div></div>"
                 //"<div class='dropdown'style='margin-left: 102.5%; margin-top: 75%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>"
             });
-            console.log(myOutsideCircle.options);
             var outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
             lens.setOutsideCircle(outsideCircVar);
 
             attLensesArray.forEach(function(item, index, array) {
-                console.log(item, index);
                 if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
-                    lens.intersections.push(item);
+                    lens.addIntersection(item);
                 }
             });
             
@@ -2623,7 +2641,7 @@ block content
                     L.DomEvent.stopPropagation(e);
                 },
                 mousedown: function () {
-                    
+                    lens.updateOthers();
                     map.on('mousemove', function (e) {
                         map.dragging.disable();
                         moved = true;
@@ -2637,12 +2655,11 @@ block content
                     if(moved){ 
                         moved = false;   
                         map.dragging.enable();
-                        lens.deleteAndUpdateOthers();
+                        lens.delete();
 
                         attLensesArray.forEach(function(item, index, array) {
-                            console.log(item, index);
                             if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
-                                lens.intersections.push(item);
+                                lens.addIntersection(item);
                             }
                         });
                         attLensesArray.push(lens);
@@ -2651,6 +2668,8 @@ block content
                     }
                 },
                 mouseout:function(){
+                    console.log("Bellow is the attLensesArray");
+                    console.log(attLensesArray);
                     outterLensesLayer.removeLayer(lens.outsideCircle);
                 }
             });
@@ -2665,7 +2684,8 @@ block content
                         L.DomEvent.stopPropagation(e); 
                         outterLensesLayer.removeLayer(lens.outsideCircle);
                         lensesLayer.removeLayer(lens.areaQuery);
-                        lens.deleteAndUpdateOthers();
+                        lens.delete();
+                        lens.updateOthers();
                     });
                     $('.myRadiusButton').click(function (e) {
                         L.DomEvent.stopPropagation(e); 
@@ -2694,23 +2714,28 @@ block content
                                     var mdown = false;
                                     $container
                                     //.mousedown(function (e) {e.originalEvent.preventDefault();});
-                                    .mousedown(function (e) {L.DomEvent.stopPropagation(e);mdown = true; e.originalEvent.preventDefault();map.dragging.disable(); })
+                                    .mousedown(function (e) {
+                                        L.DomEvent.stopPropagation(e);
+                                        mdown = true; e.originalEvent.preventDefault();
+                                        map.dragging.disable(); 
+                                        lens.delete();
+                                        lens.updateOthers();
+                                    })
                                     .mouseup(function (e) { 
                                         L.DomEvent.stopPropagation(e);
                                         mdown = false;
                                         map.dragging.enable();
                                         if (moved){
-                                        moved = false; 
-                                        lens.deleteAndUpdateOthers();
-                                        attLensesArray.forEach(function(item, index, array) {
-                                            console.log(item, index);
-                                            if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
-                                                lens.intersections.push(item);
-                                            }
-                                        });
-                                        attLensesArray.push(lens);
-                                        lens.createLayers();
-                                        lens.setBounds(lens.areaQuery.getBounds());}
+                                            moved = false;
+                                            attLensesArray.forEach(function(item, index, array) {
+                                                if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
+                                                    lens.intersections.push(item);
+                                                }
+                                            });
+                                            attLensesArray.push(lens);
+                                            lens.createLayers();
+                                            lens.setBounds(lens.areaQuery.getBounds());
+                                        }
                                     })
                                     .mousemove(function (e) {
 
@@ -2772,35 +2797,43 @@ block content
                     }); 
                     
                     $('.dropbtnOpt-length').click(function () {
+                            lens.updateOthers();
                             lens.att = "length";
                             lens.updateLENS();
                     });
                     $('.dropbtnOpt-velocity').click(function () {
+                            lens.updateOthers();
                             lens.att = "vel"
                             lens.updateLENS();
                     });
                     $('.dropbtnOpt-time').click(function () {
+                            lens.updateOthers();
                             lens.att = "time"
                             lens.updateLENS();
                     });
                     $('.dropbtnOpt-duration').click(function () {
+                            lens.updateOthers();
                             lens.att = "duration"
                             lens.updateLENS();
                     });
 
                     $('.dropbtnOpt-color').click(function () {
+                            lens.updateOthers();
                             lens.enc = "color"
                             lens.updateLENS();
                     });
                     $('.dropbtnOpt-width').click(function () {
+                            lens.updateOthers();
                             lens.enc = "width"
                             lens.updateLENS();
                     });
                     $('.dropbtnOpt-brightness').click(function () {
+                            lens.updateOthers();
                             lens.enc = "brightness"
                             lens.updateLENS();
                     });
                     $('.dropbtnOpt-opacity').click(function () {
+                            lens.updateOthers();
                             lens.enc = "opacity"
                             lens.updateLENS();
                     });   
