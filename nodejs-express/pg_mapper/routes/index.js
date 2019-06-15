@@ -211,6 +211,30 @@ router.get('/attQuery/:tab/:long/:lat/:radius', function(req, res) {
 
 });
 
+router.get('/attQueryNEW/:tab/:geom', function(req, res) {
+
+  //var minDegrees = req.params.minValue/ 111120;
+
+  var client = new Client(conString); // Setup our Postgres Client
+  client.connect(); // connect to the client
+  var query = client.query(new Query(query_args_ContructorATTQUERIESNEW(req.params.tab, req.params.geom))); // Run our Query
+  query.on("row", function (row, result) {
+      result.addRow(row);
+  });
+
+  console.log("Updating map");
+  // Pass the result to the map page
+  query.on("end", function (result) {
+      //var data = require('../public/data/geoJSON.json')
+      var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
+      res.send(dataNew);
+      
+      console.log("DATA PASSED TO BE DRAWN");
+      client.end();
+  });
+
+});
+
 router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(req, res) {
   console.log(req.params.long);
   console.log(req.params.lat);
@@ -401,6 +425,20 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
 function query_args_ContructorATTQUERIES (tab,long, lat, radius){
   //SELECT tid, array_agg(vel ORDER BY tid, data_time) as velPerPoint, ST_MakeLine(array_agg(linegeom ORDER BY tid,data_time)) AS linegeom
   var withsPart ="WITH trackDivided as ( SELECT tid, vel as velPerPoint, linegeom, data_time FROM track_divided_by_time_30s WHERE ST_DWithin(linegeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")), trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), multi as (SELECT trackDivided.tid, array_agg(trackDivided.velPerPoint ORDER BY trackDivided.tid, trackDivided.data_time) as velPerPoint, ST_MakeLine(array_agg(trackDivided.linegeom ORDER BY trackDivided.tid,trackDivided.data_time)) AS linegeom FROM trackDivided, trajectoryLine WHERE trackDivided.tid = trajectoryLine.track_id GROUP BY trackDivided.tid) SELECT multi.linegeom as linegeom, multi.velPerPoint as velPerPoint, trajectoryLine.length as length, trajectoryLine.veloc_avg as veloc_avg, trajectoryLine.duration, trajectoryLine.data_time_End  FROM trajectoryLine , multi WHERE multi.tid = trajectoryLine.track_id";
+  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
+  var secondPart = " LIMIT 5000000) 	As f) As fc";
+ 
+  console.log("Im on an attribute Lens");
+  console.log(withsPart);
+  return firstPart + secondPart;
+  
+}
+
+function query_args_ContructorATTQUERIESNEW (tab,geomGeoJson){
+  //SELECT tid, array_agg(vel ORDER BY tid, data_time) as velPerPoint, ST_MakeLine(array_agg(linegeom ORDER BY tid,data_time)) AS linegeom
+  
+
+  var withsPart ="WITH trackDivided as ( SELECT tid, vel as velPerPoint, linegeom, data_time FROM track_divided_by_time_30s WHERE ST_Intersects(linegeom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326))), trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), multi as (SELECT trackDivided.tid, array_agg(trackDivided.velPerPoint ORDER BY trackDivided.tid, trackDivided.data_time) as velPerPoint, ST_MakeLine(array_agg(trackDivided.linegeom ORDER BY trackDivided.tid,trackDivided.data_time)) AS linegeom FROM trackDivided, trajectoryLine WHERE trackDivided.tid = trajectoryLine.track_id GROUP BY trackDivided.tid) SELECT multi.linegeom as linegeom, multi.velPerPoint as velPerPoint, trajectoryLine.length as length, trajectoryLine.veloc_avg as veloc_avg, trajectoryLine.duration, trajectoryLine.data_time_End  FROM trajectoryLine , multi WHERE multi.tid = trajectoryLine.track_id";
   var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
   var secondPart = " LIMIT 5000000) 	As f) As fc";
  

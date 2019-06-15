@@ -1219,7 +1219,7 @@ block content
         }
         function attributeLensMenu(e){
             lensPreCreationLayer.clearLayers();
-            createALens(e.latlng, 5000,'time','color').createLayers();
+            createALens(e.latlng, 1000,'time','color').createAreas().createLayers();
         }
 
         /////
@@ -1469,9 +1469,9 @@ block content
                         lensesLayer.bringToFront();
                     });
                     
-                    attLensesArray.forEach(function(item, index, array) {
-                        if (item != null) item.updateALL();
-                    });
+                    for(i = attLensesArray.length-1; i >= 0; i--){
+                        attLensesArray[i].updateALL();
+                    };
                 },
                 deleteLayers: function(){
                     lensesLayer.removeLayer(lens.areaQuery);
@@ -1587,9 +1587,9 @@ block content
                         lensesLayer.bringToFront();
                     });
 
-                    attLensesArray.forEach(function(item, index, array) {
-                        if (item != null) item.updateALL();
-                    });
+                    for(i = attLensesArray.length-1; i >= 0; i--){
+                        attLensesArray[i].updateALL();
+                    };
                     
                 },
                 updateLENS: function(){
@@ -1712,9 +1712,9 @@ block content
                         lensesLayer.bringToFront();
                     });
 
-                    attLensesArray.forEach(function(item, index, array) {
-                        if (item != null) item.updateALL();
-                    });
+                    for(i = attLensesArray.length-1; i >= 0; i--){
+                        attLensesArray[i].updateALL();
+                    };
 
                 }
             };
@@ -1854,9 +1854,9 @@ block content
                         lens.updateLENS();
                         lens.setLngLatOLD([e.latlng.lat,e.latlng.lng]);
                         lens.setBounds(lens.areaQuery.getBounds());
-                        attLensesArray.forEach(function(item, index, array) {
-                            item.updateALL();
-                        });
+                        for(i = attLensesArray.length-1; i >= 0; i--){
+                            attLensesArray[i].updateALL();
+                        };
                     }
                 },
                 mouseout:function(){
@@ -1873,9 +1873,9 @@ block content
                     $('.myDeleteButton').click(function (e) {
                     
                         lens.deleteLayers();
-                        attLensesArray.forEach(function(item, index, array) {
-                            item.updateALL();
-                        });
+                        for(i = attLensesArray.length-1; i >= 0; i--){
+                            attLensesArray[i].updateALL();
+                        };
                     });
 
                     $('.myIntervalsButton').click(function(e){
@@ -2112,9 +2112,9 @@ block content
                                         map.dragging.enable();
                                         lens.updateLENS();
                                         lens.setBounds(lens.areaQuery.getBounds());
-                                        attLensesArray.forEach(function(item, index, array) {
-                                            item.updateALL();
-                                        });
+                                        for(i = attLensesArray.length-1; i >= 0; i--){
+                                            attLensesArray[i].updateALL();
+                                        };
                                         lens.setRadiusOLD(lens.getRadius());
                                     }
                                 });
@@ -2247,6 +2247,7 @@ block content
                 att : _attribute,
                 enc : _encoding,
                 intersections: [],
+                areas: [],
                 bounds : null,
                 addIntersection: function (obj){
                     this.intersections.push(obj);
@@ -2255,6 +2256,18 @@ block content
                     for(var i = this.intersections.length - 1; i >= 0; i--) {
                         if(this.intersections[i] === obj) {
                             this.intersections.splice(i, 1);
+                            return true;
+                        }
+                    }
+                    return false;
+                },
+                addArea: function (obj){
+                    this.areas.push(obj);
+                },
+                removeArea: function (obj){
+                    for(var i = this.areas.length - 1; i >= 0; i--) {
+                        if(this.areas[i] === obj) {
+                            this.areas.splice(i, 1);
                             return true;
                         }
                     }
@@ -2297,39 +2310,86 @@ block content
                 updateLayer : function(layer, value){
                     //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
                     //TODO
-                    if ( this.areaQuery.getBounds().intersects(layer.getBounds())){
-                        switch(this.att) {
-                            case "length":
-                                lengthAtt(layer, value,this.enc);
-                                break;
-                            case "duration":
-                                durationAtt(layer,value, this.enc);
-                                break;
-                            case "vel":
-                                velocityAtt(layer,value,this.enc);
-                                break;
-                            case "time":
-                                timeAtt(layer,value, this.enc);
-                                break;
-                        }   
-                        
-                    //}
-                    }
-                    else console.log("Layer not within the circle")
+                    switch(this.att) {
+                        case "length":
+                            lengthAtt(layer, value,this.enc);
+                            break;
+                        case "duration":
+                            durationAtt(layer,value, this.enc);
+                            break;
+                        case "vel":
+                            velocityAtt(layer,value,this.enc);
+                            break;
+                        case "time":
+                            timeAtt(layer,value, this.enc);
+                            break;
+                    }   
                 },
+                addToLensArrayAndIntersections : function(){
+                    for(i=0; i< attLensesArray.length;i++){
+                        if(this.areaQuery.getBounds().intersects(attLensesArray[i].areaQuery.getBounds())){
+                            this.addIntersection(attLensesArray[i]);
+                        }
+                    }
+                    attLensesArray.push(this);
+                },
+                createAreas : function( ){
+                    this.addToLensArrayAndIntersections();
 
+                    var radius = this.getRadius()/1000;
+                    var options = {steps: 64, units: 'kilometers'};
+                    var circle = turf.circle([this.getLngLat().lng, this.getLngLat().lat], radius, options);
+                    
+                    var firstArea = creaAttAreas(circle);
+                    firstArea.addLens(this);
+                    this.addArea(firstArea);
+                    for(i = this.intersections.length-1; i>=0; i--){
+                        for(j = this.intersections[i].areas.length - 1; j>=0; j--){
+
+                            var intersection = turf.intersect(this.areas[0].area.geometry,this.intersections[i].areas[j].area.geometry);
+                            if(intersection!= null){
+                                var difference = turf.difference(this.areas[0].area.geometry,this.intersections[i].areas[j].area.geometry);
+                                this.areas[0].setArea(difference);
+                                
+                                var lensArrOfArea = this.intersections[i].areas[j].getLensArray();
+                                var newArea = creaAttAreas(intersection);
+                                for(k = 0; k < lensArrOfArea.length;k++){
+                                    newArea.addLens(lensArrOfArea[k]);
+                                }
+                                newArea.addLens(this);
+                                this.addArea(newArea);
+                            }
+                        }
+                    }
+                    return this;
+                },
                 createLayers : function(){
-                    var attLayer = L.featureGroup({pane: 'attLensPane'}).addTo(attLenResults);
+
+                    this.areas.forEach(function(eachArea, index, array) {
+                        eachArea.createLayers();
+                    });
+                    this.colorSuccess();
+
+                    /*var attLayer = L.featureGroup({pane: 'attLensPane'}).addTo(attLenResults);
                     var _attLayer = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
                     var _attLayer1 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
                     var _attLayer2 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
                     var _attLayer3 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
                     
+                    var radius = this.getRadius()/1000;
+                    var options = {steps: 64, units: 'kilometers'};
+                    var circle = turf.circle([this.getLngLat().lng, this.getLngLat().lat], radius, options);
+                    circle = turf.toMercator(circle);
+                    circle = turf.toWgs84(circle);
+                    var strCircle = JSON.stringify(circle.geometry);
+                    
+                    console.log("yoooooooo");console.log(strCircle);
+
                         // Create URL
-                    var urlString3 = "attQuery/trajectory_lines/"  + this.lngLat.lng + "/" + this.lngLat.lat + "/" + this.radiusQuery;
-                    var urlString2 = "attQuery/trajectory_lines1/" + this.lngLat.lng + "/" + this.lngLat.lat + "/" + this.radiusQuery;
-                    var urlString1 = "attQuery/trajectory_lines2/" + this.lngLat.lng + "/" + this.lngLat.lat + "/" + this.radiusQuery;
-                    var urlString  = "attQuery/trajectory_lines3/" + this.lngLat.lng + "/" + this.lngLat.lat + "/" + this.radiusQuery;
+                    var urlString3 = "attQueryNEW/trajectory_lines/"  + strCircle;
+                    var urlString2 = "attQueryNEW/trajectory_lines1/" + strCircle;
+                    var urlString1 = "attQueryNEW/trajectory_lines2/" + strCircle;
+                    var urlString  = "attQueryNEW/trajectory_lines3/" + strCircle;
                     
                     this.setlID(attLayer._leaflet_id);
                     var newData = $.ajax({
@@ -2491,15 +2551,57 @@ block content
                         }
                     });
                     this.colorSuccess();
-                    
+                   */ 
                 },
                 updateALL : function (){
                     //TODO CHAMAR ARRAY DE TRAS PARA A FRENTE PARA NAO TER DE FAZER VERIFICACOES  
-                    attLenResults.removeLayer(this.getlID());
+                    this.delete();
+                    this.updateOthersV2(false);
+                    this.createAreas();
                     this.createLayers();
                 },
-                updateLENS : function(){
-                    this.intersections.splice(0,this.intersections.length);
+                updateLENS : function(attORenc , value){
+                    //Will check if any of the lenses if any of the intersections has an area wich recieves the styling from it
+                    var foundMyself = false;
+                    console.log(attLensesArray);
+                    for(var i = 0;i<attLensesArray.length ;i++) {
+                        console.log("I enntered the array");
+                        console.log(attLensesArray[i]);
+                        if(attLensesArray[i] === this) {
+                            console.log("Found the lens");
+                            foundMyself = true;
+                        }
+                        else if(foundMyself){
+                            for(var j = 0; j < attLensesArray[i].intersections.length; j++) {
+                                if(attLensesArray[i].intersections[j] === this){
+                                    console.log("YOOOOOO IM FUCKING HERE ONCE AGAIN BIATCH");
+                                    if(attORenc){
+                                        attLensesArray[i].intersections[j].att = value;
+                                    }
+                                    //False for encoding
+                                    else{
+                                        attLensesArray[i].intersections[j].enc = value;
+                                    }
+                                    attLensesArray[i].areas.forEach( function(item,index,array){
+                                        item.updateLayer();
+                                    });
+                                }
+                            }
+                        }
+
+                    }
+                    //True for attriute
+                    if(attORenc){
+                        this.att = value;
+                    }
+                    //False for encoding
+                    else{
+                        this.enc = value;
+                    }
+                    this.areas.forEach( function(item,index,array){
+                        item.updateLayer();
+                    });
+                    /*this.intersections.splice(0,this.intersections.length);
                     //this.updateOthers();
                     var thisVar = this;
                     
@@ -2531,12 +2633,57 @@ block content
                         });
                     });
                     attLenResults.getLayer(this.getlID()).bringToFront();
-
+                    */
                 },
                 delete: function(){
-                    attLenResults.removeLayer(this.getlID());
+                    for(var areaIndex = this.areas.length - 1;areaIndex>=0; areaIndex--){
+                        this.areas[areaIndex].delete();
+                        this.areas.pop();
+                    }
                 },
-                updateOthers: function(){
+                removeFromAttLen : function(){
+                    for(var i = attLensesArray.length - 1; i >= 0; i--) {
+                        console.log("im in updateOthers");
+                        if(attLensesArray[i] === this) {
+                            console.log("i will splice the attLensesArray");
+                            attLensesArray.splice(i, 1);
+                            console.log(attLensesArray);
+                            break;
+                        }
+                    }
+                },
+                updateOthersV2 : function( onlyRemoveInter ){
+                    //true if areas need to e updated
+                    this.removeFromAttLen();
+                    for(i = 0; i<attLensesArray.length; i++){
+                        console.log("AAAAAAAIXO");
+                        console.log(attLensesArray[i]);
+                        if(attLensesArray[i].removeIntersection(this)) {
+                            if(onlyRemoveInter){
+                                console.log(attLensesArray[i]);
+                                console.log("CIMAAAAAAAA");
+                                for(var areaIndex = 0;areaIndex < attLensesArray[i].areas.length; areaIndex++){
+                                    if(attLensesArray[i].areas[areaIndex].removeLens(this)){
+                                        if(attLensesArray[i].areas[areaIndex].getLensArray().length ==1){
+                                            //IF ERROR APPEArS WHERE SOME PARTS ARE somewhat forgotten it might mean that splice allows for a jump?
+                                            console.log("AGORA VOU MOSTRAR Os ARRAYs a JUNTAR");
+                                            console.log(attLensesArray[i].areas[0].area);
+                                            console.log(attLensesArray[i].areas[areaIndex].area);
+                                            var unionVar = turf.union(attLensesArray[i].areas[0].area, attLensesArray[i].areas[areaIndex].area);
+                                            attLensesArray[i].areas[0].setArea(unionVar);
+                                            attLensesArray[i].areas[areaIndex].delete();
+                                            attLensesArray[i].areas[0].delete();
+                                            attLensesArray[i].areas.splice(areaIndex, 1);
+                                            attLensesArray[i].areas[0].createLayers();
+                                        }
+                                        else attLensesArray[i].areas[areaIndex].updateLayer();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                /*updateOthers: function(){
                     for(var i = attLensesArray.length - 1; i >= 0; i--) {
                         if(attLensesArray[i] === this) {
                             attLensesArray.splice(i, 1);
@@ -2593,7 +2740,7 @@ block content
                         }
                     });
 
-                }
+                }*/
             };
 
             lens.setBounds(lens.areaQuery.getBounds());
@@ -2622,15 +2769,6 @@ block content
             });
             var outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
             lens.setOutsideCircle(outsideCircVar);
-
-            attLensesArray.forEach(function(item, index, array) {
-                if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
-                    lens.addIntersection(item);
-                }
-            });
-            
-            attLensesArray.push(lens);
-            console.log(attLensesArray);
             
             var moved = false;
             lens.outsideCircle.on({
@@ -2641,8 +2779,12 @@ block content
                     L.DomEvent.stopPropagation(e);
                 },
                 mousedown: function () {
-                    lens.updateOthers();
+                    
                     map.on('mousemove', function (e) {
+                        if(!(moved)){
+
+                            lens.updateOthersV2(true);
+                        }
                         map.dragging.disable();
                         moved = true;
                         lens.areaQuery.setLatLng(e.latlng);
@@ -2657,12 +2799,7 @@ block content
                         map.dragging.enable();
                         lens.delete();
 
-                        attLensesArray.forEach(function(item, index, array) {
-                            if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
-                                lens.addIntersection(item);
-                            }
-                        });
-                        attLensesArray.push(lens);
+                        lens.createAreas();
                         lens.createLayers();
                         lens.setBounds(lens.areaQuery.getBounds());
                     }
@@ -2685,7 +2822,7 @@ block content
                         outterLensesLayer.removeLayer(lens.outsideCircle);
                         lensesLayer.removeLayer(lens.areaQuery);
                         lens.delete();
-                        lens.updateOthers();
+                        lens.updateOthersV2(true);
                     });
                     $('.myRadiusButton').click(function (e) {
                         L.DomEvent.stopPropagation(e); 
@@ -2718,8 +2855,8 @@ block content
                                         L.DomEvent.stopPropagation(e);
                                         mdown = true; e.originalEvent.preventDefault();
                                         map.dragging.disable(); 
-                                        lens.delete();
-                                        lens.updateOthers();
+                                        
+                                        
                                     })
                                     .mouseup(function (e) { 
                                         L.DomEvent.stopPropagation(e);
@@ -2727,12 +2864,7 @@ block content
                                         map.dragging.enable();
                                         if (moved){
                                             moved = false;
-                                            attLensesArray.forEach(function(item, index, array) {
-                                                if(lens.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
-                                                    lens.intersections.push(item);
-                                                }
-                                            });
-                                            attLensesArray.push(lens);
+                                            lens.createAreas();
                                             lens.createLayers();
                                             lens.setBounds(lens.areaQuery.getBounds());
                                         }
@@ -2741,6 +2873,10 @@ block content
 
                                         if(mdown)
                                         {
+                                            if(!(moved)){
+                                                lens.updateOthersV2(true);
+                                                lens.delete();
+                                            }
                                             moved = true;      
                                             e.originalEvent.preventDefault();
                                             L.DomEvent.stopPropagation(e);
@@ -2797,51 +2933,210 @@ block content
                     }); 
                     
                     $('.dropbtnOpt-length').click(function () {
-                            lens.updateOthers();
-                            lens.att = "length";
-                            lens.updateLENS();
+                            //lens.updateOthers();
+                            lens.updateLENS(true,"length");
                     });
                     $('.dropbtnOpt-velocity').click(function () {
-                            lens.updateOthers();
-                            lens.att = "vel"
-                            lens.updateLENS();
+                            //lens.updateOthers();
+                            lens.updateLENS(true,"vel");
                     });
                     $('.dropbtnOpt-time').click(function () {
-                            lens.updateOthers();
-                            lens.att = "time"
-                            lens.updateLENS();
+                            //lens.updateOthers();
+                            //lens.att = "time"
+                            lens.updateLENS(true,"time");
                     });
                     $('.dropbtnOpt-duration').click(function () {
-                            lens.updateOthers();
-                            lens.att = "duration"
-                            lens.updateLENS();
+                            //lens.updateOthers();
+                            //lens.att = "duration"
+                            lens.updateLENS(true,"duration");
                     });
 
                     $('.dropbtnOpt-color').click(function () {
-                            lens.updateOthers();
-                            lens.enc = "color"
-                            lens.updateLENS();
+                            //lens.updateOthers();
+                            //lens.enc = "color"
+                            lens.updateLENS(false,"color");
                     });
                     $('.dropbtnOpt-width').click(function () {
-                            lens.updateOthers();
-                            lens.enc = "width"
-                            lens.updateLENS();
+                            //lens.updateOthers();
+                            //lens.enc = "width"
+                            lens.updateLENS(false,"width");
                     });
                     $('.dropbtnOpt-brightness').click(function () {
-                            lens.updateOthers();
-                            lens.enc = "brightness"
-                            lens.updateLENS();
+                            //lens.updateOthers();
+                            //lens.enc = "brightness"
+                            lens.updateLENS(false,"brightness");
                     });
                     $('.dropbtnOpt-opacity').click(function () {
-                            lens.updateOthers();
-                            lens.enc = "opacity"
-                            lens.updateLENS();
+                            //lens.updateOthers();
+                            //lens.enc = "opacity"
+                            lens.updateLENS(false,"opacity");
                     });   
  
                 }
             }); 
             
             return lens
+        }
+
+        function creaAttAreas(areaOfQuery){
+            var areaObj = {
+                area:areaOfQuery,
+                lensArray: [],
+                lID:null,
+                setArea: function(newValue){
+                    this.area = newValue;
+                },
+                addLens: function (obj){
+                    this.lensArray.push(obj);
+                },
+                removeLens: function (obj){
+                    for(var i = this.lensArray.length - 1; i >= 0; i--) {
+                        if(this.lensArray[i] === obj) {
+                            this.lensArray.splice(i, 1);
+                            return true;
+                        }
+                    }
+                    return false;
+                },
+                setlID : function(value){
+                    this.lID = value;
+                },
+                getlID : function(){
+                    return this.lID;
+                },
+                getLensArray : function(){
+                    return this.lensArray;
+                },
+                createLayers : function(){
+                    var attLayer = L.featureGroup({pane: 'attLensPane'}).addTo(attLenResults);
+                    var _attLayer = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
+                    var _attLayer1 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
+                    var _attLayer2 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
+                    var _attLayer3 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
+                    
+
+                        // Create URL
+                    var urlString3 = "attQueryNEW/trajectory_lines/"  + JSON.stringify(this.area.geometry);
+                    var urlString2 = "attQueryNEW/trajectory_lines1/" + JSON.stringify(this.area.geometry);
+                    var urlString1 = "attQueryNEW/trajectory_lines2/" + JSON.stringify(this.area.geometry);
+                    var urlString  = "attQueryNEW/trajectory_lines3/" + JSON.stringify(this.area.geometry);
+                    
+                    this.setlID(attLayer._leaflet_id);
+                    var thisVar = this;
+                    var newData = $.ajax({
+                        url: urlString,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData).done(function() {
+                        
+                        if(newData.responseJSON.features != null){
+                            newData.responseJSON.features.forEach(function(item, index, array) {
+                                var tracksToDraw = L.geoJson(item,firstStyleATT);
+                                thisVar.getLensArray().forEach(function(lens,index,array){
+                                    console.log(lens);
+                                    lens.updateLayer(tracksToDraw,item.properties);
+                                });
+                                tracksToDraw.addTo(_attLayer);
+                            });
+                            
+                        }
+                    }); 
+                    var newData1 = $.ajax({
+                        url: urlString1,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData1).done(function() {
+                        if(newData1.responseJSON.features != null){
+                            newData1.responseJSON.features.forEach(function(item, index, array) {
+                                var tracksToDraw = L.geoJson(item,firstStyleATT);
+                                thisVar.getLensArray().forEach(function(lens,index,array){
+                                    lens.updateLayer(tracksToDraw,item.properties);
+                                });
+                                tracksToDraw.addTo(_attLayer1);
+                            });
+                            
+                        }
+                    });
+                    var newData2 = $.ajax({
+                        url: urlString2,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData2).done(function() {
+                        if(newData2.responseJSON.features != null){
+                            newData2.responseJSON.features.forEach(function(item, index, array) {
+                                var tracksToDraw = L.geoJson(item,firstStyleATT);
+                                thisVar.getLensArray().forEach(function(lens,index,array){
+                                    lens.updateLayer(tracksToDraw,item.properties); 
+                                });
+                                tracksToDraw.addTo(_attLayer2);
+                            });
+                            
+                        }
+                    });
+                    var newData3 = $.ajax({
+                        url: urlString3,
+                        type: 'GET',
+                        dataType:'json',
+                        success: console.log("Data successfully loaded!"),
+                        error: function (xhr) {
+                            alert(xhr.statusText)
+                        }
+                        
+                    }) 
+                    $.when(newData3).done(function() {
+                        if(newData3.responseJSON.features != null){
+                            newData3.responseJSON.features.forEach(function(item, index, array) {
+                                var tracksToDraw = L.geoJson(item,firstStyleATT);
+                                thisVar.getLensArray().forEach(function(lens,index,array){
+                                    lens.updateLayer(tracksToDraw,item.properties); 
+                                });
+                                tracksToDraw.addTo(_attLayer3);
+                            });
+                            
+                            
+                        }
+                    });
+                    
+                },
+                updateLayer : function(){
+                    var thisVar = this;
+                    attLenResults.getLayer(this.getlID()).eachLayer(function(oneOfFourATTLayers){
+                        oneOfFourATTLayers.eachLayer(function(oneOfSmallLayerContainer){
+                            oneOfSmallLayerContainer.eachLayer(function(oneOfSmallLayers) {
+                                oneOfSmallLayers.setStyle(firstStyleATT);
+                                thisVar.getLensArray().forEach(function(lens,index,array){
+                                    lens.updateLayer(oneOfSmallLayers,oneOfSmallLayers.feature.properties);
+                                });
+                            });
+                        });
+                    });
+                },
+                delete : function(){
+                    attLenResults.removeLayer(this.getlID());
+                    this.setlID(null);
+                }
+
+
+            };
+            return areaObj;
         }
 
         /////
