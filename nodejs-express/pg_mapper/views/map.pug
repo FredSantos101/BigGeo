@@ -4,17 +4,21 @@ block content
     #map
     script.
 
+        
+
 
         //Array that will save all the layers
         var layerArray = [];
+    
         
-        
-        
+
+
         var map = L.map('map',{preferCanvas: true,renderer: L.canvas({}), center: [39.96964,116.33251], zoom: 10});
         map.createPane('lensPane');
         map.createPane('outtterLensPane');
         map.createPane('outtterLensDeletePane');
         map.createPane('velPane');
+        map.createPane('areaPane');
         map.createPane('attLensPane');
         map.createPane('queryLensPane');
         map.createPane('queryLensPane1');
@@ -29,6 +33,8 @@ block content
         map.getPane('queryLensPane2').style.zIndex = 402;
         map.getPane('queryLensPane3').style.zIndex = 403;
         map.getPane('velPane').style.zIndex = 400;
+
+        map.getPane('areaPane').style.zIndex = 900;
         var popup = L.popup();
         var popup2 = L.popup();
 
@@ -52,6 +58,7 @@ block content
 
         var outterLensesLayer = L.featureGroup({pane: 'outtterLensPane'}).addTo(map);
         var lensesLayer = L.featureGroup({pane: 'lensPane'}).addTo(map);
+        var areasLayer = L.featureGroup({pane: 'areaPane'}).addTo(map);
         
 
         var lensPreCreationLayer = L.layerGroup().addTo(map);
@@ -1218,7 +1225,7 @@ block content
             });*/
         }
         function attributeLensMenu(e){
-            lensPreCreationLayer.clearLayers();
+            //lensPreCreationLayer.clearLayers();
             createALens(e.latlng, 1000,'time','color').createAreas().createLayers();
         }
 
@@ -2333,34 +2340,22 @@ block content
                     }
                     attLensesArray.push(this);
                 },
-                createAreas : function( ){
+                createAreas : function(){
                     this.addToLensArrayAndIntersections();
-
                     var radius = this.getRadius()/1000;
-                    var options = {steps: 64, units: 'kilometers'};
+                    var options = {steps: 32,units: 'kilometers'};
                     var circle = turf.circle([this.getLngLat().lng, this.getLngLat().lat], radius, options);
                     
                     var firstArea = creaAttAreas(circle);
                     firstArea.addLens(this);
                     this.addArea(firstArea);
-                    for(i = this.intersections.length-1; i>=0; i--){
-                        for(j = this.intersections[i].areas.length - 1; j>=0; j--){
+                    var areaCounnt =1;
+                    var numberOfAreasVisited = 0;
+                    var conaca = 0;
 
-                            var intersection = turf.intersect(this.areas[0].area.geometry,this.intersections[i].areas[j].area.geometry);
-                            if(intersection!= null){
-                                var difference = turf.difference(this.areas[0].area.geometry,this.intersections[i].areas[j].area.geometry);
-                                this.areas[0].setArea(difference);
-                                
-                                var lensArrOfArea = this.intersections[i].areas[j].getLensArray();
-                                var newArea = creaAttAreas(intersection);
-                                for(k = 0; k < lensArrOfArea.length;k++){
-                                    newArea.addLens(lensArrOfArea[k]);
-                                }
-                                newArea.addLens(this);
-                                this.addArea(newArea);
-                            }
-                        }
-                    }
+                    recursiveArea(this, this.intersections.length - 1, 0);
+
+                   
                     return this;
                 },
                 createLayers : function(){
@@ -2669,7 +2664,9 @@ block content
                                             console.log("AGORA VOU MOSTRAR Os ARRAYs a JUNTAR");
                                             console.log(attLensesArray[i].areas[0].area);
                                             console.log(attLensesArray[i].areas[areaIndex].area);
+                                            console.log("Before union");
                                             var unionVar = turf.union(attLensesArray[i].areas[0].area, attLensesArray[i].areas[areaIndex].area);
+                                            console.log("After union");
                                             attLensesArray[i].areas[0].setArea(unionVar);
                                             attLensesArray[i].areas[areaIndex].delete();
                                             attLensesArray[i].areas[0].delete();
@@ -2984,6 +2981,8 @@ block content
                 lensArray: [],
                 lID:null,
                 setArea: function(newValue){
+
+                    //this.area = turf.clone(newValue);
                     this.area = newValue;
                 },
                 addLens: function (obj){
@@ -3456,9 +3455,138 @@ block content
             }
         }
         /////
-        /////
+        ///// Area calculation
         /////
 
+        function recursiveArea(thisVar, indexI, j){ 
+            console.log([indexI, j]);
+            console.log("Look alive");
+            if(indexI >= 0){
+
+                console.log(thisVar.intersections[indexI].areas);
+                //for(let indexI = this.intersections.length - 1; indexI >= 0; indexI--){
+                //for(let j = 0; j < this.intersections[indexI].areas.length ; j++){
+                //var kinks1 = turf.unkinkPolygon(this.areas[0].area);
+                //var kinks2 = turf.unkinkPolygon(this.intersections[i].areas[j].area);
+                /*var noSelfInter1;
+                if(kinks1.features.length > 0) {
+                    
+                    noSelfInter1 = turf.buffer(this.areas[0].area.geometry, 0, 'meters');
+                    console.log("Polygon with no self itnersection 11");
+                    console.log(kinks1);
+                    console.log(noSelfInter1);
+                } 
+                else {
+                        console.log("Kinks1 with no features");
+
+                    console.log(kinks1);
+                    // if there are no self-intersection, intersect by unbuffered features
+                    noSelfInter1 = this.areas[0].area.geometry; 
+                }
+                var kinks2 = turf.kinks(this.intersections[i].areas[j].area);
+                var noSelfInter2;
+                if(kinks2.features.length > 0) {
+                    noSelfInter2 = turf.buffer(this.intersections[i].areas[j].area.geometry, 0, 'meters');
+                    console.log("Polygon with no self itnersection   2222222");
+
+                    console.log(kinks2);
+                    console.log(noSelfInter2);
+                } 
+                else {
+                    console.log("Kinks2 with no features");
+
+                    console.log(kinks2);
+                    // if there are no self-intersection, intersect by unbuffered features
+                    noSelfInter2 = this.intersections[i].areas[j].area.geometry; 
+                }*/
+                //console.log(kinks1.features);
+                
+                //for(var yo = 0; yo<kinks1.features.length;yo++){
+                    //for(var yo2 = 0; yo2<kinks2.features.length;yo2++){
+                
+                console.log("Before intersection and difference");
+                //var optionsTruncate = {coordinates: 2};
+                var urlIntersectDifference = "interdif/"  + JSON.stringify(thisVar.areas[0].area) + "/" +  JSON.stringify(thisVar.intersections[indexI].areas[j].area);
+                console.log(thisVar.areas[0].area);
+                //var thisVar = this;
+                //var thisAreasZero = this.areas[0];
+                //var oneOfAreasFromIntersection = this.intersections[indexI].areas[j];
+                var interDifPromise = intersectionServer(urlIntersectDifference);
+                interDifPromise.then(function(responseInter) {
+                    console.log("After intersection and difference");
+                    //var urlDifference = "difference/"  + JSON.stringify(thisVar.areas[0].area) + "/" +  JSON.stringify(thisVar.intersections[indexI].areas[j].area);
+                    
+                    if(responseInter[0] != null){
+                        
+                        //var differencePromise =  differenceServer(urlDifference);
+                        //differencePromise.then(function(responseDiff) {
+                        //var difference = turf.difference(turf.truncate(this.areas[0].area, optionsTruncate),turf.truncate(this.intersections[i].areas[j].area, optionsTruncate));
+                        console.log("Intersection not null");
+                        //var difference1 = turf.cleanCoords(difference)
+                        //var intersection1 = turf.cleanCoords(intersection)
+                        //console.log(thisAreasZero);
+                        //console.log(responseDiff);
+                        //thisAreasZero.setArea(responseDiff);
+                        thisVar.areas[0].setArea(responseInter[1]);
+
+                        var lensArrOfArea = thisVar.intersections[indexI].areas[j].getLensArray();
+                        var newArea = creaAttAreas(responseInter[0]);
+                        for(k = 0; k < lensArrOfArea.length;k++){
+                            newArea.addLens(lensArrOfArea[k]);
+                        }
+                        newArea.addLens(thisVar);
+                        thisVar.addArea(newArea);
+                        var color2;
+                        var r = Math.min(Math.max(Math.floor(Math.random() * 255), 55), 200);
+                        var g = Math.min(Math.max(Math.floor(Math.random() * 255), 75), 255);
+                        var b = Math.min(Math.max(Math.floor(Math.random() * 255), 100), 225);
+                        
+                        color2= "rgb("+r+" ,"+g+","+ b+")"; 
+                        var randomColor = Math.floor(Math.random()*16777215).toString(16);
+                        var cona = L.geoJson(responseInter[0], {
+                            color: '#ff3636',
+                            fillColor: color2,
+                            fillOpacity:1,
+                            pane: 'areaPane'
+                        });
+                        cona.addTo(areasLayer);
+                        //})
+                        
+                        j++;
+                        if(j==thisVar.intersections[indexI].areas.length){
+                            return recursiveArea(thisVar,indexI - 1, 0);
+                        }
+                        else{
+                            return recursiveArea(thisVar,indexI, j);
+                        }
+                    }
+                    else{
+                        console.log(responseInter);
+                        console.log("FODASS CARALHO PQ E Q EStA MERDA NAP DA?????");
+                        
+                        j++;
+                        if(j==thisVar.intersections[indexI].areas.length){
+                            return recursiveArea(thisVar,indexI - 1, 0);
+                        }
+                        else{
+                            return recursiveArea(thisVar,indexI, j);
+                        }
+                    }
+                }).catch(function(jqXHR) {
+                    if (jqXHR instanceof ReferenceError) {
+                        console.log('wow!');
+                    }
+                });
+            } 
+            else{
+                return thisVar;
+            }     
+        }
+                
+
+        /////
+        /////
+        /////
 
         /////
         ///// support
@@ -3495,6 +3623,46 @@ block content
             }
 
             return rgb;
+        }
+
+        function intersectionServer(urlIntersect){
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: urlIntersect,
+                    type: 'GET',
+                    dataType:'json',
+                    success: function(data){
+                        resolve(data)
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert('An error occurred... Look at the console (F12 or Ctrl+Shift+I, Console tab) for more information!');
+
+                        $('#result').html('<p>status code: '+jqXHR.status+'</p><p>errorThrown: ' + errorThrown + '</p><p>jqXHR.responseText:</p><div>'+jqXHR.responseText + '</div>');
+                        console.log('jqXHR:');
+                        console.log(jqXHR);
+                        console.log('textStatus:');
+                        console.log(textStatus);
+                        console.log('errorThrown:');
+                        console.log(errorThrown);
+                    }
+                }) 
+            });
+        }
+
+        function differenceServer(urlDifference){
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: urlDifference,
+                    type: 'GET',
+                    dataType:'json',
+                    success: function(data){
+                        resolve(data)
+                    },
+                    error: function (req, status, err) {
+                        reject(err);
+                    } 
+                }) 
+            });
         }
 
         

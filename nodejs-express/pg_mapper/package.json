@@ -7,6 +7,15 @@
     "fix-memory-limit": "cross-env NODE_OPTIONS=--max_old_space_size=8192"
   },
   "dependencies": {
+    "@turf/circle": "^6.0.1",
+    "@turf/clean-coords": "^6.0.1",
+    "@turf/clone": "^6.0.2",
+    "@turf/difference": "^6.0.2",
+    "@turf/helpers": "^6.1.4",
+    "@turf/intersect": "^6.1.3",
+    "@turf/truncate": "^6.0.1",
+    "@turf/turf": "^5.1.6",
+    "@turf/union": "^6.0.3",
     "browserfy": "^1.0.0",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
@@ -25,7 +34,7 @@
     "pug": "^2.0.3",
     "randomcolor": "^0.5.4",
     "round-slider": "^1.3.3",
-    "turf": "^3.0.14",
+    "turf": "^7.0.0-alpha.1",
     "uniq": "^1.0.1"
   },
   "devDependencies": {

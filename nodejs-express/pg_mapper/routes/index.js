@@ -1,5 +1,13 @@
 var express = require('express');
 var router = express.Router();
+var union = require('@turf/union');
+var difference = require('@turf/difference');
+var intersect = require("@turf/intersect")
+var clone = require('@turf/clone');
+var truncate = require('@turf/truncate');
+var polygon = require("@turf/helpers")
+var cleancoords = require("@turf/clean-coords");
+var turf = require("turf");
 
 /* PostgreSQL and PostGIS module and connection setup */
 const { Client, Query } = require('pg')
@@ -438,7 +446,7 @@ function query_args_ContructorATTQUERIESNEW (tab,geomGeoJson){
   //SELECT tid, array_agg(vel ORDER BY tid, data_time) as velPerPoint, ST_MakeLine(array_agg(linegeom ORDER BY tid,data_time)) AS linegeom
   
 
-  var withsPart ="WITH trackDivided as ( SELECT tid, vel as velPerPoint, linegeom, data_time FROM track_divided_by_time_30s WHERE ST_Intersects(linegeom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326))), trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), multi as (SELECT trackDivided.tid, array_agg(trackDivided.velPerPoint ORDER BY trackDivided.tid, trackDivided.data_time) as velPerPoint, ST_MakeLine(array_agg(trackDivided.linegeom ORDER BY trackDivided.tid,trackDivided.data_time)) AS linegeom FROM trackDivided, trajectoryLine WHERE trackDivided.tid = trajectoryLine.track_id GROUP BY trackDivided.tid) SELECT multi.linegeom as linegeom, multi.velPerPoint as velPerPoint, trajectoryLine.length as length, trajectoryLine.veloc_avg as veloc_avg, trajectoryLine.duration, trajectoryLine.data_time_End  FROM trajectoryLine , multi WHERE multi.tid = trajectoryLine.track_id";
+  var withsPart ="WITH trackDivided as ( SELECT tid, vel as velPerPoint, linegeom, data_time FROM track_divided_by_time_30s WHERE ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AND ST_Intersects(linegeom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326))), trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), multi as (SELECT trackDivided.tid, array_agg(trackDivided.velPerPoint ORDER BY trackDivided.tid, trackDivided.data_time) as velPerPoint, ST_MakeLine(array_agg(trackDivided.linegeom ORDER BY trackDivided.tid,trackDivided.data_time)) AS linegeom FROM trackDivided, trajectoryLine WHERE trackDivided.tid = trajectoryLine.track_id GROUP BY trackDivided.tid) SELECT multi.linegeom as linegeom, multi.velPerPoint as velPerPoint, trajectoryLine.length as length, trajectoryLine.veloc_avg as veloc_avg, trajectoryLine.duration, trajectoryLine.data_time_End  FROM trajectoryLine , multi WHERE multi.tid = trajectoryLine.track_id";
   var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
   var secondPart = " LIMIT 5000000) 	As f) As fc";
  
@@ -618,3 +626,57 @@ function query_args_DecontructorQUERIES (tab ,long, lat, radius, type, minVal, m
 
   return firstPart + activeQuery + secondPart;
 }
+
+// Turf functions
+
+router.get('/intersect/:firstGeom/:secondGeom', function(req, res) {
+  
+  var firsGeom = JSON.parse(req.params.firstGeom);
+  var secondGeom = JSON.parse(req.params.secondGeom);
+  var intersectionVar = intersect.default(firsGeom,secondGeom);
+  res.send(JSON.stringify(intersectionVar));
+  
+
+});
+
+router.get('/difference/:firstGeom/:secondGeom', function(req, res) {
+
+  var firsGeom = JSON.parse(req.params.firstGeom);
+  var secondGeom = JSON.parse(req.params.secondGeom);
+  var differenceVar = difference(firsGeom,secondGeom);
+  res.send(JSON.stringify(differenceVar));
+  
+
+});
+
+router.get('/interdif/:firstGeom/:secondGeom', function(req, res) {
+
+  var firstGeom = JSON.parse(req.params.firstGeom);
+  var secondGeom = JSON.parse(req.params.secondGeom);
+  if(firstGeom != null && secondGeom != null){
+    var intersectionVar = turf.intersect(firstGeom,secondGeom);
+    var options = {precision: 6, coordinates: 2};
+    if(intersectionVar != null){
+      var differenceVar = turf.difference(firstGeom,secondGeom);
+      var list = [truncate.default(cleancoords.default(intersectionVar),options),truncate.default(cleancoords.default(differenceVar),options)];
+      res.send(JSON.stringify(list));
+    }
+    else{
+      res.send(JSON.stringify([null, null]));
+    }
+  }
+  else{
+    res.send(JSON.stringify([null, null]));
+  }
+  
+
+});
+
+router.get('/union/:firstGeom/:secondGeom', function(req, res) {
+  var firsGeom = JSON.parse(req.params.firstGeom);
+  var secondGeom = JSON.parse(req.params.secondGeom);
+  var unionVar = union.default(firsGeom,secondGeom);
+  res.send(JSON.stringify(unionVar));
+  
+
+});
