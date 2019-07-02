@@ -77,25 +77,6 @@ block content
 
         var attLensesArray = [];
 
-
-        //black and white, when it is a greyish color its hard to see
-        /*L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
-            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            subdomains: 'abcd',
-            minZoom: 2,
-            maxZoom: 25,
-            ext: 'png'
-        }).addTo(map);*/
-
-        //Terrain is coloured, colors sometimes hard to see
-       /* L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}', {
-            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            subdomains: 'abcd',
-            minZoom: 0,
-            maxZoom: 18,
-            ext: 'png'
-        }).addTo(map);*/
-
         //ALL black and dark grey
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -192,20 +173,6 @@ block content
             "pane": "attLensPane"
             
         };
-        /*var color2;
-            var r = Math.min(Math.max(Math.floor(Math.random() * 255), 55), 200);
-            var g = Math.min(Math.max(Math.floor(Math.random() * 255), 75), 255);
-            var b = Math.min(Math.max(Math.floor(Math.random() * 255), 100), 225);
-            color2= "rgb("+r+" ,"+g+","+ b+")"; 
-
-            
-
-            var individualStyle = {
-                "color": color2,
-                "weight": 2,
-                "opacity": 0.5
-            };*/
-
      
         // Add JSON to map
         
@@ -1224,9 +1191,11 @@ block content
                 
             });*/
         }
-        function attributeLensMenu(e){
+        async function attributeLensMenu(e){
             //lensPreCreationLayer.clearLayers();
-            createALens(e.latlng, 1000,'time','color').createAreas().createLayers();
+            var holder = createALens(e.latlng, 1000,'time','color')
+            holder = await holder.createAreas();
+            //holder.createLayers();
         }
 
         /////
@@ -2332,7 +2301,7 @@ block content
                             break;
                     }   
                 },
-                addToLensArrayAndIntersections : function(){
+                addIntersections : function(){
                     for(i=0; i< attLensesArray.length;i++){
                         if(this.areaQuery.getBounds().intersects(attLensesArray[i].areaQuery.getBounds())){
                             this.addIntersection(attLensesArray[i]);
@@ -2341,7 +2310,7 @@ block content
                     attLensesArray.push(this);
                 },
                 createAreas : function(){
-                    this.addToLensArrayAndIntersections();
+                    this.addIntersections();
                     var radius = this.getRadius()/1000;
                     var options = {steps: 32,units: 'kilometers'};
                     var circle = turf.circle([this.getLngLat().lng, this.getLngLat().lat], radius, options);
@@ -2352,207 +2321,23 @@ block content
                     var areaCounnt =1;
                     var numberOfAreasVisited = 0;
                     var conaca = 0;
-
-                    recursiveArea(this, this.intersections.length - 1, 0);
-
+                    var thisVar = this;
+                    recursiveArea(thisVar, this.intersections.length - 1, 0);
+                    
                    
-                    return this;
+                    return thisVar;
                 },
                 createLayers : function(){
-
                     this.areas.forEach(function(eachArea, index, array) {
                         eachArea.createLayers();
                     });
                     this.colorSuccess();
-
-                    /*var attLayer = L.featureGroup({pane: 'attLensPane'}).addTo(attLenResults);
-                    var _attLayer = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
-                    var _attLayer1 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
-                    var _attLayer2 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
-                    var _attLayer3 = L.featureGroup({pane: 'attLensPane'}).addTo(attLayer);
-                    
-                    var radius = this.getRadius()/1000;
-                    var options = {steps: 64, units: 'kilometers'};
-                    var circle = turf.circle([this.getLngLat().lng, this.getLngLat().lat], radius, options);
-                    circle = turf.toMercator(circle);
-                    circle = turf.toWgs84(circle);
-                    var strCircle = JSON.stringify(circle.geometry);
-                    
-                    console.log("yoooooooo");console.log(strCircle);
-
-                        // Create URL
-                    var urlString3 = "attQueryNEW/trajectory_lines/"  + strCircle;
-                    var urlString2 = "attQueryNEW/trajectory_lines1/" + strCircle;
-                    var urlString1 = "attQueryNEW/trajectory_lines2/" + strCircle;
-                    var urlString  = "attQueryNEW/trajectory_lines3/" + strCircle;
-                    
-                    this.setlID(attLayer._leaflet_id);
-                    var newData = $.ajax({
-                        url: urlString,
-                        type: 'GET',
-                        dataType:'json',
-                        success: console.log("Data successfully loaded!"),
-                        error: function (xhr) {
-                            alert(xhr.statusText)
-                        }
-                        
-                    }) 
-                    $.when(newData).done(function() {
-                        
-                        if(newData.responseJSON.features != null){
-                            newData.responseJSON.features.forEach(function(item, index, array) {
-                                var tracksToDraw = L.geoJson(item,firstStyleATT);
-                                switch(lens.att) {
-                                    case "length":
-                                        lengthAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "duration":
-                                        // code block
-                                        durationAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "vel":
-                                        velocityAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "time":
-                                        timeAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                } 
-                                lens.intersections.forEach(function(lensInt, index, array) {
-                                    if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
-                                        lensInt.updateLayer(tracksToDraw,item.properties)
-                                    }
-                                });
-                                tracksToDraw.addTo(_attLayer);
-                            });
-                            
-                        }
-                    }); 
-                    var newData1 = $.ajax({
-                        url: urlString1,
-                        type: 'GET',
-                        dataType:'json',
-                        success: console.log("Data successfully loaded!"),
-                        error: function (xhr) {
-                            alert(xhr.statusText)
-                        }
-                        
-                    }) 
-                    $.when(newData1).done(function() {
-                        if(newData1.responseJSON.features != null){
-                            newData1.responseJSON.features.forEach(function(item, index, array) {
-                                var tracksToDraw = L.geoJson(item,firstStyleATT);
-                                switch(lens.att) {
-                                    case "length":
-                                        lengthAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "duration":
-                                        // code block
-                                        durationAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "vel":
-                                        velocityAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "time":
-                                        timeAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                } 
-                                lens.intersections.forEach(function(lensInt, index, array) {
-                                    if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
-                                        lensInt.updateLayer(tracksToDraw,item.properties)
-                                    }
-                                });
-                                tracksToDraw.addTo(_attLayer1);
-                            });
-                            
-                        }
-                    });
-                    var newData2 = $.ajax({
-                        url: urlString2,
-                        type: 'GET',
-                        dataType:'json',
-                        success: console.log("Data successfully loaded!"),
-                        error: function (xhr) {
-                            alert(xhr.statusText)
-                        }
-                        
-                    }) 
-                    $.when(newData2).done(function() {
-                        if(newData2.responseJSON.features != null){
-                            newData2.responseJSON.features.forEach(function(item, index, array) {
-                                var tracksToDraw = L.geoJson(item,firstStyleATT);
-                                switch(lens.att) {
-                                    case "length":
-                                        lengthAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "duration":
-                                        // code block
-                                        durationAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "vel":
-                                        velocityAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "time":
-                                        timeAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                } 
-                                lens.intersections.forEach(function(lensInt, index, array) {
-                                    if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
-                                        lensInt.updateLayer(tracksToDraw,item.properties)
-                                    }
-                                });
-                                tracksToDraw.addTo(_attLayer2);
-                            });
-                            
-                        }
-                    });
-                    var newData3 = $.ajax({
-                        url: urlString3,
-                        type: 'GET',
-                        dataType:'json',
-                        success: console.log("Data successfully loaded!"),
-                        error: function (xhr) {
-                            alert(xhr.statusText)
-                        }
-                        
-                    }) 
-                    $.when(newData3).done(function() {
-                        if(newData3.responseJSON.features != null){
-                            newData3.responseJSON.features.forEach(function(item, index, array) {
-                                var tracksToDraw = L.geoJson(item,firstStyleATT);
-                                switch(lens.att) {
-                                    case "length":
-                                        lengthAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "duration":
-                                        // code block
-                                        durationAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "vel":
-                                        velocityAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                    case "time":
-                                        timeAtt(tracksToDraw, item.properties, lens.enc);
-                                        break;
-                                } 
-                                lens.intersections.forEach(function(lensInt, index, array) {
-                                    if(lensInt.areaQuery.getBounds().intersects(tracksToDraw.getBounds())){
-                                        lensInt.updateLayer(tracksToDraw,item.properties)
-                                    }
-                                });
-                                tracksToDraw.addTo(_attLayer3);
-                            });
-                            
-                            
-                        }
-                    });
-                    this.colorSuccess();
-                   */ 
                 },
                 updateALL : function (){
                     //TODO CHAMAR ARRAY DE TRAS PARA A FRENTE PARA NAO TER DE FAZER VERIFICACOES  
-                    this.delete();
-                    this.updateOthersV2(false);
-                    this.createAreas();
+                    this.deleteLayers();
+                    /*this.updateOthersV2(false);
+                    this.createAreas();*/
                     this.createLayers();
                 },
                 updateLENS : function(attORenc , value){
@@ -2560,7 +2345,7 @@ block content
                     var foundMyself = false;
                     console.log(attLensesArray);
                     for(var i = 0;i<attLensesArray.length ;i++) {
-                        console.log("I enntered the array");
+                        console.log("I entered the array");
                         console.log(attLensesArray[i]);
                         if(attLensesArray[i] === this) {
                             console.log("Found the lens");
@@ -2569,7 +2354,6 @@ block content
                         else if(foundMyself){
                             for(var j = 0; j < attLensesArray[i].intersections.length; j++) {
                                 if(attLensesArray[i].intersections[j] === this){
-                                    console.log("YOOOOOO IM FUCKING HERE ONCE AGAIN BIATCH");
                                     if(attORenc){
                                         attLensesArray[i].intersections[j].att = value;
                                     }
@@ -2594,46 +2378,19 @@ block content
                         this.enc = value;
                     }
                     this.areas.forEach( function(item,index,array){
+                        console.log(item.getlID());
                         item.updateLayer();
                     });
-                    /*this.intersections.splice(0,this.intersections.length);
-                    //this.updateOthers();
-                    var thisVar = this;
-                    
-                    attLensesArray.forEach(function(item, index, array) {
-                        if(thisVar.areaQuery.getBounds().intersects(item.areaQuery.getBounds())){
-                            thisVar.addIntersection(item);
-                        }
-                    });
-                    console.log("BELLOW IS THE INTNERSECTIONS OF THE LENS THAT WAS UPDATED");
-                    console.log(this.intersections);
-                    attLensesArray.push(lens);
-                    console.log("Bellow is the attLensesArray");
-                    console.log(attLensesArray);
-                    attLenResults.getLayer(this.getlID()).eachLayer(function(oneOfFourATTLayers){
-                        oneOfFourATTLayers.eachLayer(function(oneOfSmallLayerContainer){
-                            oneOfSmallLayerContainer.eachLayer(function(oneOfSmallLayers) {
-                                oneOfSmallLayers.setStyle(firstStyleATT);
-                                thisVar.updateLayer(oneOfSmallLayers,oneOfSmallLayers.feature.properties);
-                                thisVar.intersections.forEach(function(lensInt, index, array) {
-                                    console.log(lensInt.areaQuery);
-                                    if(lensInt.areaQuery.getBounds().intersects(oneOfSmallLayers.getBounds())){
-
-                                        console.log("This layer intersects the other lenses");
-                                        
-                                        lensInt.updateLayer(oneOfSmallLayers,oneOfSmallLayers.feature.properties);
-                                    }
-                                });
-                            });
-                        });
-                    });
-                    attLenResults.getLayer(this.getlID()).bringToFront();
-                    */
                 },
                 delete: function(){
                     for(var areaIndex = this.areas.length - 1;areaIndex>=0; areaIndex--){
                         this.areas[areaIndex].delete();
                         this.areas.pop();
+                    }
+                },
+                deleteLayers: function(){
+                    for(var areaIndex = this.areas.length - 1;areaIndex>=0; areaIndex--){
+                        this.areas[areaIndex].delete();
                     }
                 },
                 removeFromAttLen : function(){
@@ -2659,7 +2416,7 @@ block content
                                 console.log("CIMAAAAAAAA");
                                 for(var areaIndex = 0;areaIndex < attLensesArray[i].areas.length; areaIndex++){
                                     if(attLensesArray[i].areas[areaIndex].removeLens(this)){
-                                        if(attLensesArray[i].areas[areaIndex].getLensArray().length ==1){
+                                        if(attLensesArray[i].areas[areaIndex].getLensArray().length == 1){
                                             //IF ERROR APPEArS WHERE SOME PARTS ARE somewhat forgotten it might mean that splice allows for a jump?
                                             console.log("AGORA VOU MOSTRAR Os ARRAYs a JUNTAR");
                                             console.log(attLensesArray[i].areas[0].area);
@@ -2779,7 +2536,7 @@ block content
                     
                     map.on('mousemove', function (e) {
                         if(!(moved)){
-
+                            lens.delete();
                             lens.updateOthersV2(true);
                         }
                         map.dragging.disable();
@@ -2794,10 +2551,10 @@ block content
                     if(moved){ 
                         moved = false;   
                         map.dragging.enable();
-                        lens.delete();
 
+                        lens.delete();
                         lens.createAreas();
-                        lens.createLayers();
+                        //lens.createLayers();
                         lens.setBounds(lens.areaQuery.getBounds());
                     }
                 },
@@ -2862,7 +2619,6 @@ block content
                                         if (moved){
                                             moved = false;
                                             lens.createAreas();
-                                            lens.createLayers();
                                             lens.setBounds(lens.areaQuery.getBounds());
                                         }
                                     })
@@ -2871,8 +2627,9 @@ block content
                                         if(mdown)
                                         {
                                             if(!(moved)){
-                                                lens.updateOthersV2(true);
                                                 lens.delete();
+                                                lens.updateOthersV2(true);
+                                                
                                             }
                                             moved = true;      
                                             e.originalEvent.preventDefault();
@@ -3117,6 +2874,7 @@ block content
                 },
                 updateLayer : function(){
                     var thisVar = this;
+                    //if(this.getlID() != null){
                     attLenResults.getLayer(this.getlID()).eachLayer(function(oneOfFourATTLayers){
                         oneOfFourATTLayers.eachLayer(function(oneOfSmallLayerContainer){
                             oneOfSmallLayerContainer.eachLayer(function(oneOfSmallLayers) {
@@ -3127,6 +2885,10 @@ block content
                             });
                         });
                     });
+                    /*}
+                    else{
+                        console.log("This area has no lID");
+                    }*/
                 },
                 delete : function(){
                     attLenResults.removeLayer(this.getlID());
@@ -3463,47 +3225,6 @@ block content
             console.log("Look alive");
             if(indexI >= 0){
 
-                console.log(thisVar.intersections[indexI].areas);
-                //for(let indexI = this.intersections.length - 1; indexI >= 0; indexI--){
-                //for(let j = 0; j < this.intersections[indexI].areas.length ; j++){
-                //var kinks1 = turf.unkinkPolygon(this.areas[0].area);
-                //var kinks2 = turf.unkinkPolygon(this.intersections[i].areas[j].area);
-                /*var noSelfInter1;
-                if(kinks1.features.length > 0) {
-                    
-                    noSelfInter1 = turf.buffer(this.areas[0].area.geometry, 0, 'meters');
-                    console.log("Polygon with no self itnersection 11");
-                    console.log(kinks1);
-                    console.log(noSelfInter1);
-                } 
-                else {
-                        console.log("Kinks1 with no features");
-
-                    console.log(kinks1);
-                    // if there are no self-intersection, intersect by unbuffered features
-                    noSelfInter1 = this.areas[0].area.geometry; 
-                }
-                var kinks2 = turf.kinks(this.intersections[i].areas[j].area);
-                var noSelfInter2;
-                if(kinks2.features.length > 0) {
-                    noSelfInter2 = turf.buffer(this.intersections[i].areas[j].area.geometry, 0, 'meters');
-                    console.log("Polygon with no self itnersection   2222222");
-
-                    console.log(kinks2);
-                    console.log(noSelfInter2);
-                } 
-                else {
-                    console.log("Kinks2 with no features");
-
-                    console.log(kinks2);
-                    // if there are no self-intersection, intersect by unbuffered features
-                    noSelfInter2 = this.intersections[i].areas[j].area.geometry; 
-                }*/
-                //console.log(kinks1.features);
-                
-                //for(var yo = 0; yo<kinks1.features.length;yo++){
-                    //for(var yo2 = 0; yo2<kinks2.features.length;yo2++){
-                
                 console.log("Before intersection and difference");
                 //var optionsTruncate = {coordinates: 2};
                 var urlIntersectDifference = "interdif/"  + JSON.stringify(thisVar.areas[0].area) + "/" +  JSON.stringify(thisVar.intersections[indexI].areas[j].area);
@@ -3536,7 +3257,7 @@ block content
                         }
                         newArea.addLens(thisVar);
                         thisVar.addArea(newArea);
-                        var color2;
+                        /*var color2;
                         var r = Math.min(Math.max(Math.floor(Math.random() * 255), 55), 200);
                         var g = Math.min(Math.max(Math.floor(Math.random() * 255), 75), 255);
                         var b = Math.min(Math.max(Math.floor(Math.random() * 255), 100), 225);
@@ -3546,10 +3267,9 @@ block content
                         var cona = L.geoJson(responseInter[0], {
                             color: '#ff3636',
                             fillColor: color2,
-                            fillOpacity:1,
-                            pane: 'areaPane'
+                            fillOpacity:1
                         });
-                        cona.addTo(areasLayer);
+                        cona.addTo(areasLayer);*/
                         //})
                         
                         j++;
@@ -3562,7 +3282,7 @@ block content
                     }
                     else{
                         console.log(responseInter);
-                        console.log("FODASS CARALHO PQ E Q EStA MERDA NAP DA?????");
+                        console.log("There was no intersection");
                         
                         j++;
                         if(j==thisVar.intersections[indexI].areas.length){
@@ -3579,7 +3299,7 @@ block content
                 });
             } 
             else{
-                return thisVar;
+                return thisVar.createLayers();
             }     
         }
                 
