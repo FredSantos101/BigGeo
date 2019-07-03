@@ -163,12 +163,12 @@ block content
         
         //var defaultLayer = new L.GeoJSON().addTo(map);
         var firstStyle = {
-            "color": '#FF6347',
+            "color": '#43A7DF',
             "weight": 1.5
             
         };
         var firstStyleATT = {
-            "color": '#FF6347',
+            "color": '#43A7DF',
             "weight": 1.5,
             "pane": "attLensPane"
             
@@ -1445,7 +1445,7 @@ block content
                         lensesLayer.bringToFront();
                     });
                     
-                    for(i = attLensesArray.length-1; i >= 0; i--){
+                    for(i = 0; i < attLensesArray.length; i++){
                         attLensesArray[i].updateALL();
                     };
                 },
@@ -1563,7 +1563,7 @@ block content
                         lensesLayer.bringToFront();
                     });
 
-                    for(i = attLensesArray.length-1; i >= 0; i--){
+                    for(i = 0; i < attLensesArray.length; i++){
                         attLensesArray[i].updateALL();
                     };
                     
@@ -1688,7 +1688,7 @@ block content
                         lensesLayer.bringToFront();
                     });
 
-                    for(i = attLensesArray.length-1; i >= 0; i--){
+                    for(i = 0; i < attLensesArray.length; i++){
                         attLensesArray[i].updateALL();
                     };
 
@@ -1705,7 +1705,7 @@ block content
             var numOfPixl = northVar.distanceTo(southVar);*/
             var myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [100,100],iconAnchor:[90,90], html: 
                 "<input type='button' value='X' class='myDeleteButton' style='z-index: 1000;     position: fixed;margin: -16%;'/>"+
-                "<div class='dropdown' style='        margin-left: -9.5%; margin-top: 87.5%;'><button class='dropbtn'><img src='images/type.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>" + 
+                "<div class='dropdown' style='        margin-left: -9.5%; margin-top: 87.5%;'><button class='dropbtn'><img src='images/type.png' style='width: 20px; height: 20px;   margin: inherit;margin-left: -1px;margin-top: -1px;'></button><div class='dropdown-content'>" + 
                 "<button class='dropbtnOpt-default'>Pass by</button>"+
                 "<button class='dropbtnOpt-start'>Start point</button>"+
                 "<button class='dropbtnOpt-end'>End point</button>"+
@@ -1714,7 +1714,7 @@ block content
                 "<button class='dropbtnOpt-length'>Length</button>"+
                 "<button class='dropbtnOpt-velocity'>Average velocity</button>"+
                 "</div></div>" +
-                "<button class='myIntervalsButton' style='z-index: 1025; position:fixed;     margin-left: 81.5%;margin-top: 83%;'><img src='images/intervals.png' style='z-index: 999;width: 25px;height: 25px;    margin: inherit;margin-left: -3px;margin-top: -4px;'></button>"+
+                "<button class='myIntervalsButton' style='z-index: 1025; position:fixed;     margin-left: 81.5%;margin-top: 83%;'><img src='images/intervals.png' style='z-index: 999;width: 20px;height: 20px;    margin: inherit;margin-left: -1px;margin-top: -1px;'></button>"+
                 "<button class='myRadiusButton' style='z-index: 1019; position:fixed;     margin-left: 78.5%; margin-top: -19%;'><img src='images/radius.png' style='z-index: 999;width: 25px;height: 25px;    margin: inherit;margin-left: -3px;margin-top: -4px;'></button>"+
                 "<div id='sliderRadius' style='z-index:1018;left:-80px; top:-80px;display:none;'></div>"+
                 "<div id='sliderIntervalVel' style='z-index:1020;left:-80px; top:-80px;display:none;'></div>"+
@@ -1830,7 +1830,7 @@ block content
                         lens.updateLENS();
                         lens.setLngLatOLD([e.latlng.lat,e.latlng.lng]);
                         lens.setBounds(lens.areaQuery.getBounds());
-                        for(i = attLensesArray.length-1; i >= 0; i--){
+                        for(i = 0; i < attLensesArray.length; i++){
                             attLensesArray[i].updateALL();
                         };
                     }
@@ -1849,7 +1849,7 @@ block content
                     $('.myDeleteButton').click(function (e) {
                     
                         lens.deleteLayers();
-                        for(i = attLensesArray.length-1; i >= 0; i--){
+                        for(i = 0; i < attLensesArray.length; i++){
                             attLensesArray[i].updateALL();
                         };
                     });
@@ -2088,7 +2088,7 @@ block content
                                         map.dragging.enable();
                                         lens.updateLENS();
                                         lens.setBounds(lens.areaQuery.getBounds());
-                                        for(i = attLensesArray.length-1; i >= 0; i--){
+                                        for(i = 0; i < attLensesArray.length; i++){
                                             attLensesArray[i].updateALL();
                                         };
                                         lens.setRadiusOLD(lens.getRadius());
@@ -2414,24 +2414,47 @@ block content
                             if(onlyRemoveInter){
                                 console.log(attLensesArray[i]);
                                 console.log("CIMAAAAAAAA");
-                                for(var areaIndex = 0;areaIndex < attLensesArray[i].areas.length; areaIndex++){
-                                    if(attLensesArray[i].areas[areaIndex].removeLens(this)){
-                                        if(attLensesArray[i].areas[areaIndex].getLensArray().length == 1){
-                                            //IF ERROR APPEArS WHERE SOME PARTS ARE somewhat forgotten it might mean that splice allows for a jump?
-                                            console.log("AGORA VOU MOSTRAR Os ARRAYs a JUNTAR");
-                                            console.log(attLensesArray[i].areas[0].area);
-                                            console.log(attLensesArray[i].areas[areaIndex].area);
-                                            console.log("Before union");
-                                            var unionVar = turf.union(attLensesArray[i].areas[0].area, attLensesArray[i].areas[areaIndex].area);
-                                            console.log("After union");
-                                            attLensesArray[i].areas[0].setArea(unionVar);
-                                            attLensesArray[i].areas[areaIndex].delete();
-                                            attLensesArray[i].areas[0].delete();
-                                            attLensesArray[i].areas.splice(areaIndex, 1);
-                                            attLensesArray[i].areas[0].createLayers();
-                                        }
-                                        else attLensesArray[i].areas[areaIndex].updateLayer();
+                                for(let areaIndex = 1;areaIndex < attLensesArray[i].areas.length; areaIndex++){
+                                    var flag = attLensesArray[i].areas[areaIndex].removeLens(this);
+                                    console.log(flag);
+                                }
+                                for(let areaIndex = 1;areaIndex < attLensesArray[i].areas.length; areaIndex++){
+                                    if(attLensesArray[i].areas[areaIndex].getLensArray().length == 1){
+                                        //IF ERROR APPEArS WHERE SOME PARTS ARE somewhat forgotten it might mean that splice allows for a jump?
+                                        console.log("AGORA VOU MOSTRAR Os ARRAYs a JUNTAR");
+                                        console.log(attLensesArray[i].areas[0].area);
+                                        console.log(attLensesArray[i].areas[areaIndex].area);
+                                        console.log("Before union");
+                                        var unionVar = turf.union(attLensesArray[i].areas[0].area, attLensesArray[i].areas[areaIndex].area);
+                                        console.log("After union");
+                                        attLensesArray[i].areas[0].setArea(unionVar);
+                                        attLensesArray[i].areas[areaIndex].delete();
+                                        attLensesArray[i].areas[0].delete();
+                                        attLensesArray[i].areas.splice(areaIndex, 1);
+                                        attLensesArray[i].areas[0].createLayers();
                                     }
+                                    else{
+                                        for(let ind = 1;ind < attLensesArray[i].areas.length; ind++){
+                                            if(areaIndex != ind) {  
+
+                                                if(isEqual(attLensesArray[i].areas[areaIndex].getLensArray(),attLensesArray[i].areas[ind].getLensArray())){
+                                                    console.log("isEQUAL ALRIGHTY");
+                                                    console.log(attLensesArray[i].areas[ind].getLensArray());
+                                                    console.log(attLensesArray[i].areas[areaIndex].getLensArray());
+                                                    console.log("Before union");
+                                                    var unionVar = turf.union(attLensesArray[i].areas[ind].area, attLensesArray[i].areas[areaIndex].area);
+                                                    console.log("After union");
+                                                    attLensesArray[i].areas[ind].setArea(unionVar);
+                                                    attLensesArray[i].areas[areaIndex].delete();
+                                                    attLensesArray[i].areas[ind].delete();
+                                                    attLensesArray[i].areas.splice(areaIndex, 1);
+                                                    attLensesArray[i].areas[ind].createLayers();
+                                                }
+                                            }
+                                        }
+                                        
+                                    }
+                                    
                                 }
                             }
                         }
@@ -2518,7 +2541,7 @@ block content
                 "<button class='dropbtnOpt-opacity'>Opacity</button>"+
                 "</div></div>" +
                 "<button class='myRadiusButton' style='z-index: 1019; position:fixed;     margin-left: 78.5%; margin-top: -19%;'><img src='images/radius.png' style='z-index: 999;width: 25px;height: 25px;    margin: inherit;margin-left: -3px;margin-top: -4px;'></button>"+
-                "<div id='rotationSliderContainer' style='display:none;'><div id='rotationSlider'style='display:none;'></div> <div id='rotationSliderDegrees'style='display:none;'></div></div>"
+                "<div id='sliderRadius' style='z-index:1018;left:-80px; top:-80px;display:none;'></div>"
                 //"<div class='dropdown'style='margin-left: 102.5%; margin-top: 75%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>"
             });
             var outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
@@ -2552,7 +2575,7 @@ block content
                         moved = false;   
                         map.dragging.enable();
 
-                        lens.delete();
+                        //lens.delete();
                         lens.createAreas();
                         //lens.createLayers();
                         lens.setBounds(lens.areaQuery.getBounds());
@@ -2580,110 +2603,49 @@ block content
                     });
                     $('.myRadiusButton').click(function (e) {
                         L.DomEvent.stopPropagation(e); 
-                        if(document.getElementById("rotationSliderContainer").style.display=='none'){
+                        if(document.getElementById("sliderRadius").style.display=='none' && document.getElementById("sliderRadius").style.display=='none'){
+                            document.getElementById("sliderRadius").style.display="block";
+                            var $sliderRadius = $('#sliderRadius');
+                            $sliderRadius.mousedown( function (e){
+                                //TODO VELOCITY REMOVING BADLY??
+                                L.DomEvent.stopPropagation(e);
+                                map.dragging.disable();
+                                e.originalEvent.preventDefault();
+                            });
                             $(function(){
-                                var $container = $('#rotationSliderContainer');
-                                var $slider = $('#rotationSlider');
-                                var $degrees = $('#rotationSliderDegrees');
-                                
-                                    document.getElementById("rotationSliderContainer").style.display="block";
-                                    document.getElementById("rotationSlider").style.display="block";
-                                    document.getElementById("rotationSliderDegrees").style.display="block";
-
-                                    
-                                    var sliderWidth = $slider.width();
-                                    var sliderHeight = $slider.height();
-                                    var radius = $container.width()/2;
-                                    var deg = 0; 
-
-                                    deg = lens.getRadius()*360/10000;  
-                                    
-                                    X = Math.round(radius* Math.sin(deg*Math.PI/180));
-                                    Y = Math.round(radius*  -Math.cos(deg*Math.PI/180));
-                                    $slider.css({ left: X+radius-sliderWidth/2, top: Y+radius-sliderHeight/2 });
-                                    
-                                    var mdown = false;
-                                    $container
-                                    //.mousedown(function (e) {e.originalEvent.preventDefault();});
-                                    .mousedown(function (e) {
+                                $("#sliderRadius").roundSlider({
+                                    sliderType: "min-range",
+                                    radius: "130px",
+                                    value: lens.getRadius(),
+                                    min: 0,
+                                    max: 10000,
+                                    //lineCap: "round",
+                                    width: 5,
+                                    editableTooltip: false,
+                                    handleSize: "+10",
+                                    handleShape: "dot",
+                                    drag: function (e) {
                                         L.DomEvent.stopPropagation(e);
-                                        mdown = true; e.originalEvent.preventDefault();
-                                        map.dragging.disable(); 
-                                        
-                                        
-                                    })
-                                    .mouseup(function (e) { 
+                                        lens.setRadius(e.value); 
+                                    },
+                                    start: function(e) {
+                                        lens.delete();
+                                        lens.updateOthersV2(true);
+                                    },
+                                    stop: function (e) {
                                         L.DomEvent.stopPropagation(e);
-                                        mdown = false;
                                         map.dragging.enable();
-                                        if (moved){
-                                            moved = false;
-                                            lens.createAreas();
-                                            lens.setBounds(lens.areaQuery.getBounds());
-                                        }
-                                    })
-                                    .mousemove(function (e) {
-
-                                        if(mdown)
-                                        {
-                                            if(!(moved)){
-                                                lens.delete();
-                                                lens.updateOthersV2(true);
-                                                
-                                            }
-                                            moved = true;      
-                                            e.originalEvent.preventDefault();
-                                            L.DomEvent.stopPropagation(e);
-                                            // firefox compatibility
-                                            if(typeof e.offsetX === "undefined" || typeof e.offsetY === "undefined") {
-                                            var targetOffset = $(e.target).offset();
-                                            e.offsetX = e.pageX - targetOffset.left;
-                                            e.offsetY = e.pageY - targetOffset.top;
-                                            }
-                                            
-                                            if($(e.target).is('#rotationSliderContainer'))
-                                                var mPos = {x: e.offsetX, y: e.offsetY};
-                                            else
-                                                var mPos = {x: e.target.offsetLeft + e.offsetX, y: e.target.offsetTop + e.offsetY};
-                                                
-                                            var atan = Math.atan2(mPos.x-radius, mPos.y-radius);
-                                            deg = -atan/(Math.PI/180) + 180; // final (0-360 positive) degrees from mouse position 
-                                            
-                                            
-                                            // for attraction to multiple of 90 degrees
-                                            var distance = Math.abs( deg - ( Math.round(deg / 90) * 90 ) );
-                                            
-                                            if( distance <= 5 )
-                                                deg = Math.round(deg / 90) * 90;
-                                                
-                                            if(deg == 360)
-                                                deg = 0;
-                                            
-                                            X = Math.round(radius* Math.sin(deg*Math.PI/180));
-                                            Y = Math.round(radius*  -Math.cos(deg*Math.PI/180));
-
-                                            $slider.css({ left: X+radius-sliderWidth/2, top: Y+radius-sliderHeight/2 });              
-                                            
-                                            var roundDeg = Math.round(deg);
-                                            
-                                            var percentage = deg/360;
-
-                                            var radiusMet = Math.round(10000 * percentage);
-                                            lens.setRadius(radiusMet); 
-                                            $degrees.html(radiusMet + 'Meters');
-                                            //$('#imageRotateDegrees').val(radiusMet);
-                                        }
-                                     });      
-                                    });            
-                                
-                                
-                            }
-                            else{
-                                document.getElementById("rotationSliderContainer").style.display="none";
-                                document.getElementById("rotationSlider").style.display="none";
-                                document.getElementById("rotationSliderDegrees").style.display="none";
-                            }
-
+                                        lens.createAreas();
+                                        //lens.createLayers();
+                                        lens.setBounds(lens.areaQuery.getBounds());
+                                    }
+                                });
+                            }); 
+                            
+                        }
+                        else{
+                            document.getElementById("sliderRadius").style.display="none";
+                        }
                     }); 
                     
                     $('.dropbtnOpt-length').click(function () {
@@ -2946,71 +2908,71 @@ block content
                     hotlineLayer.addTo(layerToPaint);
                     */
 
-                    if(velAtt <= 1)          {
-                            layer.setStyle({color :'#29FF9A'});
+                    if(velAtt <= 10)          {
+                            layer.setStyle({color :'#ff3232'});
                     }
-                    else if(velAtt <= 2)     {
-                            layer.setStyle({color :'#40E49B'});
+                    else if(velAtt <= 20)     {
+                            layer.setStyle({color :'#ff6928'});
                     }
-                    else if(velAtt <= 5)    {
-                            layer.setStyle({color :'#58CA9C'});
+                    else if(velAtt <= 30)    {
+                            layer.setStyle({color :'#fcb42f'});
                     }
-                    else if(velAtt <= 10)    {
-                            layer.setStyle({color :'#70B09D'});
+                    else if(velAtt <= 40)    {
+                            layer.setStyle({color :'#fcce28'});
                     }
-                    else if(velAtt <= 15)    {
-                            layer.setStyle({color :'#88969E'});
+                    else if(velAtt <= 50)    {
+                            layer.setStyle({color :'#fcd62f'});
                     }
-                    else if(velAtt <= 20)    {
-                            layer.setStyle({color :'#9F7C9F'});
+                    else if(velAtt <= 60)    {
+                            layer.setStyle({color :'#fcf528'});
                     }
-                    else if(velAtt <=  30)   {
-                            layer.setStyle({color :'#B762A0'});
-                    }
-                    else if(velAtt <=  50)   {
-                            layer.setStyle({color :'#CF48A1'});
+                    else if(velAtt <=  70)   {
+                            layer.setStyle({color :'#d5fc28'});
                     }
                     else if(velAtt <=  80)   {
-                            layer.setStyle({color :'#E72EA2'});
+                            layer.setStyle({color :'#b9fc28'});
                     }
-                    else    layer.setStyle({color :'#FF14A3'});
+                    else if(velAtt <=  90)   {
+                            layer.setStyle({color :'#80fc28'});
+                    }
+                    else    layer.setStyle({color :'#00ff00'});
                     break;
                     
                     break;
                 case "brightness":
-                    if(velAtt <= 1)          {
+                    if(velAtt <= 10)          {
                         var colr = ColorLuminance(layer.options.color,-0.95);
                         layer.setStyle({"color":colr});
                     }
-                    else if(velAtt <= 2)     {
+                    else if(velAtt <= 20)     {
                         var colr = ColorLuminance(layer.options.color,-0.9);
                         layer.setStyle({"color":colr});
                     }
-                    else if(velAtt <= 5)    {
+                    else if(velAtt <= 30)    {
                         var colr = ColorLuminance(layer.options.color,-0.8);
                         layer.setStyle({"color":colr});
                     }
-                    else if(velAtt <= 10)    {
+                    else if(velAtt <= 40)    {
                         var colr = ColorLuminance(layer.options.color,-0.65);
                         layer.setStyle({"color":colr});
                     }
-                    else if(velAtt <= 15)    {
+                    else if(velAtt <= 50)    {
                         var colr = ColorLuminance(layer.options.color,-0.5);
                         layer.setStyle({"color":colr});
                     }
-                    else if(velAtt <= 20)    {
+                    else if(velAtt <= 60)    {
                         var colr = ColorLuminance(layer.options.color,-0.35);
                         layer.setStyle({"color":colr});
                     }
-                    else if(velAtt <=  30)   {
+                    else if(velAtt <=  70)   {
                         var colr = ColorLuminance(layer.options.color,-0.2);
                         layer.setStyle({"color":colr});
                     }
-                    else if(velAtt <=  50)   {
+                    else if(velAtt <=  80)   {
                         var colr = ColorLuminance(layer.options.color,-0.1);
                         layer.setStyle({"color":colr});
                     }
-                    else if(velAtt <=  80)   {
+                    else if(velAtt <=  90)   {
                         var colr = ColorLuminance(layer.options.color,-0.05);
                         layer.setStyle({"color":colr});
                     }
@@ -3020,7 +2982,16 @@ block content
                 
                     break;
                 case "width":
-                
+                    if(velAtt <= 10)        layer.setStyle({"weight": 1});
+                    else if(velAtt <= 20)   layer.setStyle({"weight": 1.5});
+                    else if(velAtt <= 30)   layer.setStyle({"weight": 2});
+                    else if(velAtt <= 40)   layer.setStyle({"weight": 2.5});
+                    else if(velAtt <= 50)   layer.setStyle({"weight": 3});
+                    else if(velAtt <= 60)   layer.setStyle({"weight": 3.5});
+                    else if(velAtt <= 70)   layer.setStyle({"weight": 4});
+                    else if(velAtt <= 80)   layer.setStyle({"weight": 4.5});
+                    else if(velAtt <= 90)   layer.setStyle({"weight": 5});
+                    else                    layer.setStyle({"weight": 6});
                     break;
             }
         }
@@ -3030,16 +3001,16 @@ block content
             var len = properties.f1;
             switch(encoding){
                 case "color":
-                    if(len <= 250)          layer.setStyle({color :'#29FF9A'}) 
-                    else if(len <= 500)     layer.setStyle({color :'#40E49B'})
-                    else if(len <= 1000)    layer.setStyle({color :'#58CA9C'}) 
-                    else if(len <= 2000)    layer.setStyle({color :'#70B09D'})
-                    else if(len <= 4000)    layer.setStyle({color :'#88969E'}) 
-                    else if(len <= 8000)    layer.setStyle({color :'#9F7C9F'}) 
-                    else if(len <= 16000)   layer.setStyle({color :'#B762A0'})
-                    else if(len <= 32000)   layer.setStyle({color :'#CF48A1'})
-                    else if (len <= 128000) layer.setStyle({color :'#E72EA2'})
-                    else                    layer.setStyle({color :'#FF14A3'})
+                    if(len <= 250)          layer.setStyle({color :'#ff3232'}) 
+                    else if(len <= 500)     layer.setStyle({color :'#ff6928'})
+                    else if(len <= 1000)    layer.setStyle({color :'#fcb42f'}) 
+                    else if(len <= 2000)    layer.setStyle({color :'#fcce28'})
+                    else if(len <= 4000)    layer.setStyle({color :'#fcd62f'}) 
+                    else if(len <= 8000)    layer.setStyle({color :'#fcf528'}) 
+                    else if(len <= 16000)   layer.setStyle({color :'#d5fc28'})
+                    else if(len <= 32000)   layer.setStyle({color :'#b9fc28'})
+                    else if (len <= 128000) layer.setStyle({color :'#80fc28'})
+                    else                    layer.setStyle({color :'#00ff00'})
                     break;
                 case "brightness":
                     if(len <= 250)          {
@@ -3257,7 +3228,7 @@ block content
                         }
                         newArea.addLens(thisVar);
                         thisVar.addArea(newArea);
-                        /*var color2;
+                        var color2;
                         var r = Math.min(Math.max(Math.floor(Math.random() * 255), 55), 200);
                         var g = Math.min(Math.max(Math.floor(Math.random() * 255), 75), 255);
                         var b = Math.min(Math.max(Math.floor(Math.random() * 255), 100), 225);
@@ -3269,7 +3240,7 @@ block content
                             fillColor: color2,
                             fillOpacity:1
                         });
-                        cona.addTo(areasLayer);*/
+                        cona.addTo(areasLayer);
                         //})
                         
                         j++;
@@ -3324,6 +3295,19 @@ block content
 
             return stringDate;
         }
+
+        function isEqual(a, b) { 
+            // if length is not equal 
+            if(a.length!=b.length) 
+                return false; 
+            else{ 
+            // comapring each element of array 
+                for(var i=0;i<a.length;i++){
+                    if(a[i]!=b[i]) return false; 
+                } 
+                return true; 
+            } 
+        } 
 
         function ColorLuminance(hex, lum) {
 
