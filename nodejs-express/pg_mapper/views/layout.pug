@@ -24,3 +24,13 @@ html
 
   body
     block content
+
+    <div style="position: absolute; bottom: 1%;">
+      <label for="track">Choose the file you want to upload (must be .gpx):</label>
+      <form action="/fileUpload" method="post" enctype="multipart/form-data">
+        <input type="file" name="track" multiple />
+        <button> Submit </button>
+      </form>
+    </div>
+
+    

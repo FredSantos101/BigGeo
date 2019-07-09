@@ -8,8 +8,9 @@ a {
 }
 
 #map {
+  position: absolute;
   width: 37cm;
-  height: 21cm;
+  height: 92%;
 }
 
 .popup {

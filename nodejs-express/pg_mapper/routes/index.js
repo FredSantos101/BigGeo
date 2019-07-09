@@ -8,6 +8,7 @@ var truncate = require('@turf/truncate');
 var polygon = require("@turf/helpers")
 var cleancoords = require("@turf/clean-coords");
 var turf = require("turf");
+var multer  = require('multer')   //Use to pass files from client to server using connect-busboy
 
 /* PostgreSQL and PostGIS module and connection setup */
 const { Client, Query } = require('pg')
@@ -680,3 +681,27 @@ router.get('/union/:firstGeom/:secondGeom', function(req, res) {
   
 
 });
+
+//UPLOAD FILES FUNCTIONS
+
+var storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/data')
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname )
+  }
+});
+var upload = multer({storage: storage}).array('track', 1000);
+
+router.post('/fileUpload', (req, res, next) => {
+  upload(req,res,function(err) {
+      console.log(req.body);
+      console.log(req.files);
+      if(err) {
+          return res.end("Error uploading file.");
+      }
+      res.end("File is uploaded");
+  });
+});
+module.exports = router;
