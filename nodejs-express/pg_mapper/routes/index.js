@@ -1,14 +1,15 @@
-var express = require('express');
-var router = express.Router();
-var union = require('@turf/union');
-var difference = require('@turf/difference');
-var intersect = require("@turf/intersect")
-var clone = require('@turf/clone');
-var truncate = require('@turf/truncate');
-var polygon = require("@turf/helpers")
-var cleancoords = require("@turf/clean-coords");
-var turf = require("turf");
-var multer  = require('multer')   //Use to pass files from client to server using connect-busboy
+const express = require('express');
+const router = express.Router();
+const union = require('@turf/union');
+const difference = require('@turf/difference');
+const intersect = require("@turf/intersect")
+const clone = require('@turf/clone');
+const truncate = require('@turf/truncate');
+const polygon = require("@turf/helpers")
+const cleancoords = require("@turf/clean-coords");
+const turf = require("turf");
+const multer  = require('multer')   //Use to pass files from client to server using connect-busboy
+const {spawn} = require('child_process')
 
 /* PostgreSQL and PostGIS module and connection setup */
 const { Client, Query } = require('pg')
@@ -685,23 +686,141 @@ router.get('/union/:firstGeom/:secondGeom', function(req, res) {
 //UPLOAD FILES FUNCTIONS
 
 var storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/data')
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname )
+  destination: function(req, file, cb) {
+      cb(null, './public/data');
+   },
+  filename: function (req, file, cb) {
+      cb(null , file.originalname);
   }
 });
 var upload = multer({storage: storage}).array('track', 1000);
 
 router.post('/fileUpload', (req, res, next) => {
   upload(req,res,function(err) {
-      console.log(req.body);
-      console.log(req.files);
-      if(err) {
-          return res.end("Error uploading file.");
+      const subprocess = callPython(1);
+      try {
+        res.send(req.body);
+        console.log("Files have been uploaded");
+        console.log("Starting the parsing, joining different file formats as one");
+        //const pyProg = spawn('python', ['./public/python/joinTracks-1.py']);
+        
+      } catch(err) {
+            console.log(err);
+            res.send(400);
       }
-      res.end("File is uploaded");
+      // print output of script
+      subprocess.stdout.on('data', (data) => {
+        console.log("Files have been parsed");
+      });
+      subprocess.stderr.on('data', (data) => {
+        console.log(`error:${data}`);
+      });
+      subprocess.stderr.on('close', () => {
+        console.log("Dividing the trajectories");
+        preProcessFiles2();
+        //res.send(JSON.stringify(req.files));
+      });
+      
+  
   });
+  
 });
-module.exports = router;
+
+function preProcessFiles2(){
+  const subprocess2 = callPython(2);
+  // print output of script
+  subprocess2.stdout.on('data', (data) => {
+    console.log("Tracks have been divided");
+  });
+  subprocess2.stderr.on('data', (data) => {
+    console.log(`error:${data}`);
+  });
+  subprocess2.stderr.on('close', () => {
+    console.log("Deleting trajectories with the same time");
+    preProcessFiles3();
+  });
+}
+function preProcessFiles3(){
+  const subprocess3 = callPython(3);
+  // print output of script
+  subprocess3.stdout.on('data', (data) => {
+    console.log("Points with the same time deleted");
+  });
+  subprocess3.stderr.on('data', (data) => {
+    console.log(`error:${data}`);
+  });
+  subprocess3.stderr.on('close', () => {
+    console.log("Deleting stop points");
+    preProcessFiles4();
+  });
+}
+function preProcessFiles4(){
+  const subprocess4 = callPython(4);
+  // print output of script
+  subprocess4.stdout.on('data', (data) => {
+    console.log("Stop points deleted");
+  });
+  subprocess4.stderr.on('data', (data) => {
+    console.log(`error:${data}`);
+  });
+  subprocess4.stderr.on('close', () => {
+    console.log("Deleting trajectories with only 1 point");
+    preProcessFiles5();
+  });
+}
+function preProcessFiles5(){
+  const subprocess5 = callPython(5);
+  // print output of script
+  subprocess5.stdout.on('data', (data) => {
+    console.log("Trajectories with only 1 point deleted");
+  });
+  subprocess5.stderr.on('data', (data) => {
+    console.log(`error:${data}`);
+  });
+  subprocess5.stderr.on('close', () => {
+    console.log("Creating tracks");
+    preProcessFiles6();
+  });
+}
+function preProcessFiles6(){
+  const subprocess6 = callPython(6);
+  // print output of script
+  subprocess6.stdout.on('data', (data) => {
+    console.log("Creating tracks");
+  });
+  subprocess6.stderr.on('data', (data) => {
+    console.log(`error:${data}`);
+  });
+  subprocess6.stderr.on('close', () => {
+    console.log("Going to upload to the DB");
+  });
+}
+
+
+function callPython(number){
+  console.log("Gonna call the script now");
+  if(number == 1)
+    return spawn('python3',["-u",'./public/python/joinTracks-1.py']); 
+  else if (number == 2)
+    return spawn('python3',["-u",'./public/python/separate_tracks-2.py']); 
+  else if (number == 3)
+    return spawn('python3',["-u",'./public/python/delete_Same_time_Points-3.py']); 
+  else if (number == 4)
+    return spawn('python3',["-u",'./public/python/delete_Stop_Points-4.py']);
+  else if (number == 5)
+    return spawn('python3',["-u",'./public/python/delete1Point-5.py']);  
+  else if (number == 6)
+    return spawn('python3',["-u",'./public/python/Create_Tracks-6.py']); 
+  else  
+    console.log("something is wrong, the number is wrong :S");
+}
+/*const { spawn } = require('child_process');
+  const pyProg = spawn('python', ['./public/python/joinTracks-1.py']);
+
+  pyProg.stdout.on('data', function(data) {
+
+      console.log(data.toString());
+      res.end('end');
+  });
+  
+  console.log("Dividing the trajectories")*/

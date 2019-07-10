@@ -1,15 +1,13 @@
-import glob
-import pandas as pd
+import glob, os
 from xml.dom import minidom
 import datetime
 
 
-
+os.chdir("public/data")
 read_filesTXT = glob.glob("*.txt")
 read_filesXML = glob.glob("*.xml")
 read_filesGPX = glob.glob("*.gpx")
 idTrack = 0
-
 with open("final.txt", "w") as outfile:
     for f in read_filesTXT:
         with open(f, "r") as infile:
@@ -49,3 +47,5 @@ with open("final.txt", "w") as outfile:
                 time = point3.getElementsByTagName('time')[0].firstChild.nodeValue.replace('T', ' ')
                 outfile.write(str(idTrack) + "," + time.replace('Z', '') + "," + lon + "," + lat + "\n")
         idTrack = idTrack + 1
+
+    print("All files parsed")
