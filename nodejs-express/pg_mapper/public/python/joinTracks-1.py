@@ -4,6 +4,7 @@ import datetime
 
 
 os.chdir("public/data")
+#os.chdir("../data")
 read_filesTXT = glob.glob("*.txt")
 read_filesXML = glob.glob("*.xml")
 read_filesGPX = glob.glob("*.gpx")
@@ -11,15 +12,18 @@ idTrack = 0
 with open("final.txt", "w") as outfile:
     for f in read_filesTXT:
         with open(f, "r") as infile:
-            thisDoc = minidom.parse(f)
+            print(infile.name)
+            if(infile.name != 'finalOfALL.txt' and infile.name != 'final.txt' and infile.name != 'remove_Same_Time_Points.txt' and infile.name != 'remove_Stop_Points.txt' and infile.name != 'separateTracksByTime.txt' and infile.name != 'delete1Point.txt' and infile.name != 'Tracks-to-Trips-ft-BigGeo.txt'):
+        
+                thisDoc = minidom.parse(f)
 
-            points1 = thisDoc.getElementsByTagName('trkpt')
-            for point1 in points1:  
-                lon = point1.attributes['lon'].value
-                lat = point1.attributes['lat'].value
-                time = point1.getElementsByTagName('time')[0].firstChild.nodeValue.replace('T', ' ')
-                
-                outfile.write(str(idTrack) + "," + time.replace('Z', '') + "," + lon + "," + lat + "\n")
+                points1 = thisDoc.getElementsByTagName('trkpt')
+                for point1 in points1:  
+                    lon = point1.attributes['lon'].value
+                    lat = point1.attributes['lat'].value
+                    time = point1.getElementsByTagName('time')[0].firstChild.nodeValue.replace('T', ' ')
+                    
+                    outfile.write(str(idTrack) + "," + time.replace('Z', '') + "," + lon + "," + lat + "\n")
         idTrack = idTrack + 1 
                 
     for g in read_filesXML:
