@@ -684,7 +684,7 @@ var upload = multer({storage: storage}).array('track', 1000);
 
 router.post('/fileUpload', (req, res, next) => {
   upload(req,res,function(err) {
-    const subprocess = callPython(1);
+    const subprocess = callPython(1,1);
       try {
         
         console.log("Files have been uploaded");
@@ -713,7 +713,7 @@ router.post('/fileUpload', (req, res, next) => {
 });
 
 function preProcessFiles2(){
-  const subprocess2 = callPython(2);
+  const subprocess2 = callPython(2,1);
   // print output of script
   subprocess2.stdout.on('data', (data) => {
     console.log("Tracks have been divided");
@@ -727,7 +727,7 @@ function preProcessFiles2(){
   });
 }
 function preProcessFiles3(){
-  const subprocess3 = callPython(3);
+  const subprocess3 = callPython(3,1);
   // print output of script
   subprocess3.stdout.on('data', (data) => {
     console.log("Points with the same time deleted");
@@ -741,7 +741,7 @@ function preProcessFiles3(){
   });
 }
 function preProcessFiles4(){
-  const subprocess4 = callPython(4);
+  const subprocess4 = callPython(4,1);
   // print output of script
   subprocess4.stdout.on('data', (data) => {
     console.log("Stop points deleted");
@@ -755,7 +755,7 @@ function preProcessFiles4(){
   });
 }
 function preProcessFiles5(){
-  const subprocess5 = callPython(5);
+  const subprocess5 = callPython(5,1);
   // print output of script
   subprocess5.stdout.on('data', (data) => {
     console.log("Trajectories with only 1 point deleted");
@@ -769,7 +769,7 @@ function preProcessFiles5(){
   });
 }
 function preProcessFiles6(){
-  const subprocess6 = callPython(6);
+  const subprocess6 = callPython(6,1);
   // print output of script
   subprocess6.stdout.on('data', (data) => {
     console.log("Creating tracks");
@@ -783,17 +783,27 @@ function preProcessFiles6(){
   });
 }
 function preProcessFiles7(){
-  const subprocess7 = callPython(7);
-  // print output of script
-  subprocess7.stdout.on('data', (data) => {
-    console.log("Unique ID placed");
+  var clientPost = new Client(conString); // Setup our Postgres Client
+  clientPost.connect(); // connect to the client
+  var queryViewMaxTid = clientPost.query(new Query("SELECT max(tid) FROM track_divided_by_time_30s"), (err, res) => {
+    if(err)
+      console.log(err);
   });
-  subprocess7.stderr.on('data', (data) => {
-    console.log(`error:${data}`);
-  });
-  subprocess7.stderr.on('close', () => {
-    console.log("Going to upload to the DB");
-    createDB();
+  queryViewMaxTid.on("end", function (result) {
+    console.log(result.rows[0].max);
+   
+    const subprocess7 = callPython(7,parseInt(result.rows[0].max));
+    // print output of script
+    subprocess7.stdout.on('data', (data) => {
+      console.log("Unique ID placed");
+    });
+    subprocess7.stderr.on('data', (data) => {
+      console.log(`error:${data}`);
+    });
+    subprocess7.stderr.on('close', () => {
+      console.log("Going to upload to the DB");
+      createDB();
+    });
   });
 }
 
@@ -963,7 +973,7 @@ function unifySubSegsANDDivide(){
 }
 
 
-function callPython(number){
+function callPython(number,tidNumber){
   console.log("Gonna call the script now");
   if(number == 1)
     return spawn('python3',["-u",'./public/python/joinTracks-1.py']); 
@@ -978,7 +988,7 @@ function callPython(number){
   else if (number == 6)
     return spawn('python3',["-u",'./public/python/Create_Tracks-6.py']); 
   else if (number == 7)
-    return spawn('python3',["-u",'./public/python/txtJoinPosition-7.py']); 
+    return spawn('python3',["-u",'./public/python/txtJoinPosition-7.py', tidNumber]); 
   else  
     console.log("something is wrong, the number is wrong :S");
 }

@@ -1,11 +1,13 @@
 import glob,os
 import pandas as pd
+import sys
 
+print(sys.argv[1])
 os.chdir("./public/data")
 with open("finalOfALL.txt", "w") as outfile:
         with open("Tracks-to-Trips-ft-BigGeo.txt", "r") as infile:
             line = infile.readline()
-            trajID=-1
+            trajID=int(sys.argv[1])
             taxi_idPrev = 1000000
             track_idPrev = 100000
             while line: 
