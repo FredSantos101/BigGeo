@@ -110,7 +110,33 @@ router.get('/data', function (req, res) {
 /* GET the map page */
 var timeB4draw = Math.floor( new Date().getTime()/1000);
 router.get('/map', function(req, res) {
-
+  var client = new Client(conString); // Setup our Postgres Client
+  client.connect(); // connect to the client
+  var createDB =  "CREATE TABLE IF NOT EXISTS public.track_divided_by_time_30s(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_upload OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_upload TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_upload USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_upload USING btree(tid)TABLESPACE pg_default;";
+  var createDB1 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist ON public.trajectory_lines USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist ON public.trajectory_lines USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist ON public.trajectory_lines USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index ON public.trajectory_lines USING btree (track_id) TABLESPACE pg_default;"
+  var createDB2 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines1(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines1 OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines1 TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist1 ON public.trajectory_lines1 USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist1 ON public.trajectory_lines1 USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist1 ON public.trajectory_lines1 USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index1 ON public.trajectory_lines1 USING btree (track_id) TABLESPACE pg_default;"
+  var createDB3 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines2(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines2 OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines2 TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist2 ON public.trajectory_lines2 USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist2 ON public.trajectory_lines2 USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist2 ON public.trajectory_lines2 USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index2 ON public.trajectory_lines2 USING btree (track_id) TABLESPACE pg_default;"
+  var createDB4 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines3(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines3 OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines3 TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist3 ON public.trajectory_lines3 USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist3 ON public.trajectory_lines3 USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist3 ON public.trajectory_lines3 USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index3 ON public.trajectory_lines3 USING btree (track_id) TABLESPACE pg_default;"
+  var createAllDBs = client.query(new Query(createDB));
+  var createAllDBs1 = client.query(new Query(createDB1));
+  var createAllDBs2 = client.query(new Query(createDB2));
+  var createAllDBs3 = client.query(new Query(createDB3));
+  var createAllDBs4 = client.query(new Query(createDB4));
+  createAllDBs.on("end",function(){
+    console.log("Table track_divided_by_time_30s created");
+  })
+  createAllDBs1.on("end",function(){
+    console.log("Table trajectory_lines created");
+  })
+  createAllDBs2.on("end",function(){
+    console.log("Table trajectory_lines1 created");
+  })
+  createAllDBs3.on("end",function(){
+    console.log("Table trajectory_lines2 created");
+  })
+  createAllDBs4.on("end",function(){
+    console.log("Table trajectory_lines3 created");
+  })
   activeQuery = "";
 
   var client = new Client(conString); // Setup our Postgres Client
@@ -811,7 +837,7 @@ var ClientEndTimes = 0;
 function createDB(){
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-  var createDB = "CREATE TABLE public.track_divided_by_time_upload(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_upload OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_upload TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_upload USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_upload USING btree(tid)TABLESPACE pg_default;";
+  var createDB = "CREATE TABLE public.track_divided_by_time_30s(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_upload OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_upload TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_upload USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_upload USING btree(tid)TABLESPACE pg_default;";
   client.query(createDB, async function (err, result) {
     if (err) {
       console.log(err)
