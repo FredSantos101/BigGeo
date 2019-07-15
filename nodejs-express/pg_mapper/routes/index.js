@@ -684,8 +684,9 @@ var upload = multer({storage: storage}).array('track', 1000);
 
 router.post('/fileUpload', (req, res, next) => {
   upload(req,res,function(err) {
-      const subprocess = callPython(1);
+    const subprocess = callPython(1);
       try {
+        
         console.log("Files have been uploaded");
         console.log("Starting the parsing, joining different file formats as one");
         //const pyProg = spawn('python', ['./public/python/joinTracks-1.py']);
@@ -701,7 +702,7 @@ router.post('/fileUpload', (req, res, next) => {
       subprocess.stderr.on('data', (data) => {
         console.log(`error:${data}`);
       });
-      subprocess.stderr.on('close', () => {
+      subprocess.stderr.on('close', (data) => {
         console.log("Dividing the trajectories");
         preProcessFiles2();
       });
@@ -792,23 +793,29 @@ function preProcessFiles7(){
   });
   subprocess7.stderr.on('close', () => {
     console.log("Going to upload to the DB");
-    insertToDB();
+    createDB();
   });
 }
 
 var ClientEndTimes = 0;
-async function insertToDB() {
+function createDB(){
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-  var createDB = "CREATE TABLE IF NOT EXISTS public.track_divided_by_time_upload(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_upload OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_upload TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_upload USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_upload USING btree(tid)TABLESPACE pg_default;";
-  await client.query(createDB, // Run our Query
-  function (err, result) {
+  var createDB = "CREATE TABLE public.track_divided_by_time_upload(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_upload OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_upload TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_upload USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_upload USING btree(tid)TABLESPACE pg_default;";
+  client.query(createDB, async function (err, result) {
     if (err) {
       console.log(err)
       console.log("Database already exists, going to clean it now");
-      client.query("DELETE FROM track_divided_by_time_upload");
+      await client.query(new Query("DELETE FROM track_divided_by_time_upload")).on("end",function(){client.end()
+        insertToDB();});
     }
-    client.end();
+    else{
+      client.end();
+      insertToDB();
+    }
+  });
+}
+function insertToDB() {
     var exec = require('child_process').exec;
     var numberOfLinesBy2k;
     exec("wc –l  ./public/data/finalOfALL.txt", function (err, stdout) {
@@ -821,6 +828,7 @@ async function insertToDB() {
         if(remainder > 0){ 
           numberOfLinesBy2k++;
         }
+        console.log("Number of lines by 4k in the file generated");
         console.log(numberOfLinesBy2k);
     });
     var lineReader = require('readline').createInterface({
@@ -845,10 +853,6 @@ async function insertToDB() {
     }).on('close', function(){
       insertLines(stringOfRows,numberOfLinesBy2k);
     })
-
-   
-
-  });
 }
 
 function insertLines(stringOfRows,numberOfLinesBy2k){
@@ -861,6 +865,7 @@ function insertLines(stringOfRows,numberOfLinesBy2k){
   queryPost.on("end", function (result) {
     clientPost.end();
     ClientEndTimes++;
+    console.log("Inserted 4k lines");
     console.log(ClientEndTimes);
     if(ClientEndTimes >= numberOfLinesBy2k){
       calculateGeoms();
@@ -885,7 +890,7 @@ function calculateGeoms(){
     console.log("Main Geom query completed")
     if(geomsCalcualted == 3){
       geomsCalcualted = 0;
-      unifySubSegsANDDivide();
+      //unifySubSegsANDDivide();
     }
   });
   geom2.on("end", function(){
@@ -894,7 +899,7 @@ function calculateGeoms(){
     console.log("Start Geom query completed")
     if(geomsCalcualted == 3){
       geomsCalcualted = 0;
-      unifySubSegsANDDivide();
+      //unifySubSegsANDDivide();
     }
   });
   geom3.on("end", function(){
@@ -903,7 +908,7 @@ function calculateGeoms(){
     console.log("End Geom query completed")
     if(geomsCalcualted == 3){
       geomsCalcualted = 0;
-      unifySubSegsANDDivide();
+      //unifySubSegsANDDivide();
     }
   });
 }
@@ -914,43 +919,47 @@ function unifySubSegsANDDivide(){
   console.log("Gonna unify the point by pairs for attribute lenses");
   var query = clientUnify.query(new Query(" WITH tryingToDivide AS (SELECT tid as idThis, geom as geomThis, data_time as dataTime, lag(tid) over (order by tid asc,data_time asc) as idPrev, lag(geom) over (order by tid asc, data_time asc) as geomPrev FROM track_divided_by_time_upload) UPDATE track_divided_by_time_upload SET linegeom = CASE WHEN idThis = idPrev THEN ST_SetSRID(ST_MakeLine(geomPrev,geomThis),4326) ELSE NULL END FROM tryingToDivide WHERE tid = idThis AND  data_time = dataTime")); // Run our Query
   query.on("end", function (result) {
-    clientUnify.end();
     console.log("Completed pairs for attribute lenses");
+    var queryUpload = clientUnify.query(new Query("INSERT INTO track_divided_by_time_30s SELECT * FROM track_divided_by_time_upload"));
+    queryUpload.on("end", function (result) {
+      console.log("Tracks ready for attribute lenses");
+      
+    });
   });
-  /*
+  
   var clientCreateLines1 = new Client(conString); // Setup our Postgres Client
   clientCreateLines1.connect(); // connect to the client
-  console.log("Gonna unify the point by pairs for attribute lenses 1");
-  var query = clientCreateLines1.query(new Query("WITH multis AS (SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid)SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) , velo FROM multis WHERE ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) < 100")); // Run our Query
+  console.log("Gonna unify and upload them to table 1");
+  var query = clientCreateLines1.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng <= 300)")); // Run our Query
   query.on("end", function (result) {
     clientCreateLines1.end();
     console.log(result);
   });
   var clientCreateLines2 = new Client(conString); // Setup our Postgres Client
   clientCreateLines2.connect(); // connect to the client
-  console.log("Gonna unify the point by pairs for attribute lenses 2");
-  var query = clientCreateLines2.query(new Query("WITH multis AS (SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid)SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) , velo FROM multis WHERE 100 <= ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) AND ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) < 1000")); // Run our Query
+  console.log("Gonna unify and upload them to table 2");
+  var query = clientCreateLines2.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines1 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 300 AND leng <= 700)")); // Run our Query
   query.on("end", function (result) {
     clientCreateLines2.end();
     console.log(result);
   });
   var clientCreateLines3 = new Client(conString); // Setup our Postgres Client
   clientCreateLines3.connect(); // connect to the client
-  console.log("Gonna unify the point by pairs for attribute lenses 3");
-  var query = clientCreateLines3.query(new Query("WITH multis AS (SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid)SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) , velo FROM multis WHERE 1000 <= ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) AND ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) < 3000")); // Run our Query
+  console.log("Gonna unify and upload them to table 3");
+  var query = clientCreateLines3.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines2 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 700 AND leng <= 1500)")); // Run our Query
   query.on("end", function (result) {
     clientCreateLines3.end();
     console.log(result);
   });
   var clientCreateLines4 = new Client(conString); // Setup our Postgres Client
   clientCreateLines4.connect(); // connect to the client
-  console.log("Gonna unify the point by pairs for attribute lenses 4");
-  var query = clientCreateLines4.query(new Query("WITH multis AS (SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid)SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) , velo FROM multis WHERE ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) >= 3000")); // Run our Query
+  console.log("Gonna unify and upload them to table 4");
+  var query = clientCreateLines4.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines3 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 1500)")); // Run our Query
   query.on("end", function (result) {
     clientCreateLines4.end();
     console.log(result);
   });
-  */
+  
 }
 
 
@@ -973,13 +982,3 @@ function callPython(number){
   else  
     console.log("something is wrong, the number is wrong :S");
 }
-/*const { spawn } = require('child_process');
-  const pyProg = spawn('python', ['./public/python/joinTracks-1.py']);
-
-  pyProg.stdout.on('data', function(data) {
-
-      console.log(data.toString());
-      res.end('end');
-  });
-  
-  console.log("Dividing the trajectories")*/

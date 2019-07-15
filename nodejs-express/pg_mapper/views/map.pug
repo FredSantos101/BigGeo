@@ -1,7 +1,15 @@
 extends layout
 block content
-
+   
+    <div style="position: absolute; bottom: 1%;">
+        <label for="track">Choose the files you want to upload (must be in gpx format):</label>
+        <form id='myform' action="/fileUpload" method="post" enctype="multipart/form-data">
+            <input type="file" name="track" multiple />
+            <button> Submit </button>
+        </form>
+    </div>
     #map
+    
     script.
 
         
@@ -2617,6 +2625,22 @@ block content
                 }) 
             });
         }
+
+        
+        $('#myform').submit(function() {
+            $(this).ajaxSubmit({
+
+                error: function(xhr) {
+            
+                },
+
+                success: function(response) {
+                    console.log(response);
+                }
+        });
+            //Very important line, it disable the page refresh.
+        return false;
+        });   
 
         
 

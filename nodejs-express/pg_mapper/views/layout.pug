@@ -10,6 +10,7 @@ html
     script(src='/javascripts/leaflet.hotline.js')
     
     script(src="//code.jquery.com/jquery-1.11.3.js")
+    script(src="http://malsup.github.com/jquery.form.js")
 
     script(src="//cdnjs.cloudflare.com/ajax/libs/roundSlider/1.3.3/roundslider.min.js")
 
@@ -25,12 +26,6 @@ html
   body
     block content
 
-    <div style="position: absolute; bottom: 1%;">
-      <label for="track">Choose the file you want to upload (must be .gpx):</label>
-      <form action="/fileUpload" method="post" enctype="multipart/form-data">
-        <input type="file" name="track" multiple />
-        <button> Submit </button>
-      </form>
-    </div>
+    
 
     
