@@ -1170,7 +1170,7 @@ block content
                                 else document.getElementById("sliderIntervalTime").style.display="none";
                             }
                         } 
-                        
+                    
                         $(function(){
                             $("#sliderIntervalVel").roundSlider({
                                 sliderType: "range",
@@ -1178,11 +1178,14 @@ block content
                                 value: lens.getMinV() + "," + lens.getMaxV(),
                                 min: 0,
                                 max: 250,
+                                
                                 //lineCap: "round",
                                 width: 5,
-                                editableTooltip: false,
                                 handleSize: "+10",
                                 handleShape: "dot",
+                                tooltipFormat: function (e) {
+                                    return e.value + "Km/h";
+                                },
                                 drag: function (e) {
                                     L.DomEvent.stopPropagation(e);
                                     
@@ -1214,9 +1217,11 @@ block content
                                 max: 500000,
                                 //lineCap: "round",
                                 width: 5,
-                                editableTooltip: false,
                                 handleSize: "+10",
                                 handleShape: "dot",
+                                tooltipFormat: function (e) {
+                                    return e.value/1000 + "Km";
+                                },
                                 drag: function (e) {
                                     L.DomEvent.stopPropagation(e);
                                     
@@ -1248,9 +1253,25 @@ block content
                                 max: 85839, // 2008-02-08 17:39:18
                                 //lineCap: "round",
                                 width: 5,
-                                editableTooltip: false,
                                 handleSize: "+10",
                                 handleShape: "dot",
+                                tooltipFormat: function (e) {
+                                    var delta = e.value;
+                                    var days = Math.floor(delta / 86400);
+                                    delta -= days * 86400;
+
+                                    // calculate (and subtract) whole hours
+                                    var hours = Math.floor(delta / 3600) % 24;
+                                    delta -= hours * 3600;
+
+                                    // calculate (and subtract) whole minutes
+                                    var minutes = Math.floor(delta / 60) % 60;
+                                    delta -= minutes * 60;
+
+                                    // what's left is seconds
+                                    var seconds = delta % 60;  // in theory the modulus is not required
+                                    return hours + 'h ' + minutes + 'm ' + seconds + 's';
+                                },
                                 drag: function (e) {
                                     L.DomEvent.stopPropagation(e);
                                     
@@ -1282,9 +1303,30 @@ block content
                                 max: 1202492358 , // 2008-02-08 17:39:18
                                 //lineCap: "round",
                                 width: 5,
-                                editableTooltip: false,
                                 handleSize: "+10",
                                 handleShape: "dot",
+                                tooltipFormat: function (e) {
+                                    // Unixtimestamp
+                                    var unixtimestamp = e.value;
+                                    // Convert timestamp to milliseconds
+                                    var date = new Date(unixtimestamp*1000);
+                                    // Year
+                                    var year = date.getFullYear();
+                                    // Month
+                                    var month = date.getMonth();
+                                    // Day
+                                    var day = date.getDate();
+                                    // Hours
+                                    var hours = date.getHours();
+                                    // Minutes
+                                    var minutes = "0" + date.getMinutes();
+                                    // Seconds
+                                    var seconds = "0" + date.getSeconds();
+                                    // Display date time in MM-dd-yyyy h:m:s format
+                                    var convdataTime = month+'-'+day+'-'+year+' '+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+                                    
+                                    return convdataTime;
+                                },
                                 drag: function (e) {
                                     L.DomEvent.stopPropagation(e);
                                     
@@ -1331,9 +1373,11 @@ block content
                                     max: 10000,
                                     //lineCap: "round",
                                     width: 5,
-                                    editableTooltip: false,
                                     handleSize: "+10",
                                     handleShape: "dot",
+                                    tooltipFormat: function (e) {
+                                        return e.value + "m";
+                                    },
                                     drag: function (e) {
                                         L.DomEvent.stopPropagation(e);
                                         lens.setRadius(e.value); 
@@ -1878,9 +1922,11 @@ block content
                                     max: 10000,
                                     //lineCap: "round",
                                     width: 5,
-                                    editableTooltip: false,
                                     handleSize: "+10",
                                     handleShape: "dot",
+                                    tooltipFormat: function (e) {
+                                        return e.value + "m";
+                                    },
                                     drag: function (e) {
                                         L.DomEvent.stopPropagation(e);
                                         lens.setRadius(e.value); 
