@@ -1,5 +1,4 @@
 import glob,os
-import pandas as pd
 import datetime
 
 os.chdir("public/data")
@@ -14,7 +13,7 @@ with open("delete1Point.txt", "w") as outfile:
 
             line = infile.readline()
             lineNext = infile.readline()
-            
+
             numPointInTrack = 0
             lastID = 15000
             lastTrajNum = 100000
@@ -22,15 +21,15 @@ with open("delete1Point.txt", "w") as outfile:
             while (lineNext):
                 if(lineNext == "\n"):
                     break
-                
-                
+
+
                 #assign variables form each line
 
                 taxi_id, date, longi ,lati, trajNum = line.split(",")
-                    
+
                 taxi_id2, date2, longi2 ,lati2, trajNum2 = lineNext.split(",")
 
-                
+
                 #if same id and track num
                 if(taxi_id == taxi_id2 and trajNum == trajNum2):
                     numPointInTrack +=1
@@ -47,17 +46,10 @@ with open("delete1Point.txt", "w") as outfile:
                         lastEqual = False
                         cont += 1
                         print(cont)
-                   
-                    
-            
+
+
+
                 line = lineNext
                 lineNext = infile.readline()
             if(lastEqual):
                 outfile.write(line)
-
-
-
-                
-                
-                
-                

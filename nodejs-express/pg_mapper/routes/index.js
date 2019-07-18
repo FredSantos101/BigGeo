@@ -876,7 +876,7 @@ var ClientEndTimes = 0;
 function createDB(){
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-  var createDB = "CREATE TABLE public.track_divided_by_time_30s(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_upload OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_upload TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_upload USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_upload USING btree(tid)TABLESPACE pg_default;";
+  var createDB = "CREATE TABLE public.track_divided_by_time_upload(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_upload OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_upload TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_upload USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_upload USING btree(tid)TABLESPACE pg_default;";
   client.query(createDB, async function (err, result) {
     if (err) {
       console.log(err)
@@ -1009,6 +1009,7 @@ function unifySubSegsANDDivide(){
   query.on("end", function (result) {
     clientCreateLines1.end();
     console.log(result);
+    console.log("table 1 completed");
   });
   var clientCreateLines2 = new Client(conString); // Setup our Postgres Client
   clientCreateLines2.connect(); // connect to the client
@@ -1017,6 +1018,7 @@ function unifySubSegsANDDivide(){
   query.on("end", function (result) {
     clientCreateLines2.end();
     console.log(result);
+    console.log("table 2 completed");
   });
   var clientCreateLines3 = new Client(conString); // Setup our Postgres Client
   clientCreateLines3.connect(); // connect to the client
@@ -1025,14 +1027,17 @@ function unifySubSegsANDDivide(){
   query.on("end", function (result) {
     clientCreateLines3.end();
     console.log(result);
+    console.log("table 3 completed");
   });
   var clientCreateLines4 = new Client(conString); // Setup our Postgres Client
   clientCreateLines4.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 4");
   var query = clientCreateLines4.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines3 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 1500)")); // Run our Query
   query.on("end", function (result) {
+
     clientCreateLines4.end();
     console.log(result);
+    console.log("table 4 completed");
   });
 
 }
@@ -1041,19 +1046,19 @@ function unifySubSegsANDDivide(){
 function callPython(number,tidNumber){
   console.log("Gonna call the script now");
   if(number == 1)
-    return spawn('python3',["-u",'./public/python/joinTracks-1.py']);
+    return spawn('python',["-u",'./public/python/joinTracks-1.py']);
   else if (number == 2)
-    return spawn('python3',["-u",'./public/python/separate_tracks-2.py']);
+    return spawn('python',["-u",'./public/python/separate_tracks-2.py']);
   else if (number == 3)
-    return spawn('python3',["-u",'./public/python/delete_Same_time_Points-3.py']);
+    return spawn('python',["-u",'./public/python/delete_Same_time_Points-3.py']);
   else if (number == 4)
-    return spawn('python3',["-u",'./public/python/delete_Stop_Points-4.py']);
+    return spawn('python',["-u",'./public/python/delete_Stop_Points-4.py']);
   else if (number == 5)
-    return spawn('python3',["-u",'./public/python/delete1Point-5.py']);
+    return spawn('python',["-u",'./public/python/delete1Point-5.py']);
   else if (number == 6)
-    return spawn('python3',["-u",'./public/python/Create_Tracks-6.py']);
+    return spawn('python',["-u",'./public/python/Create_Tracks-6.py']);
   else if (number == 7)
-    return spawn('python3',["-u",'./public/python/txtJoinPosition-7.py', tidNumber]);
+    return spawn('python',["-u",'./public/python/txtJoinPosition-7.py', tidNumber]);
   else
     console.log("something is wrong, the number is wrong :S");
 }
