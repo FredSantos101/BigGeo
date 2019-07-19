@@ -855,9 +855,17 @@ function preProcessFiles7(){
       console.log(err);
   });
   queryViewMaxTid.on("end", function (result) {
-    console.log(result.rows[0].max);
+    console.log("BELLOW IS THE VALUE OF MAX");
 
-    const subprocess7 = callPython(7,parseInt(result.rows[0].max));
+    var maxNumber = result.rows[0].max;
+    if(maxNumber == null){
+      maxNumber = 0;
+    }
+    else {
+      maxNumber = parseInt(result.rows[0].max);
+    }
+    console.log(maxNumber);
+    const subprocess7 = callPython(7, maxNumber);
     // print output of script
     subprocess7.stdout.on('data', (data) => {
       console.log("Unique ID placed");
@@ -872,7 +880,7 @@ function preProcessFiles7(){
   });
 }
 
-var ClientEndTimes = 0;
+
 function createDB(){
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
@@ -890,46 +898,54 @@ function createDB(){
     }
   });
 }
+
+
 function insertToDB() {
-    var exec = require('child_process').exec;
     var numberOfLinesBy2k;
-    exec("wc –l  ./public/data/finalOfALL.txt", function (err, stdout) {
-        console.log(stdout);
-        console.log("wc above");
-        var numberL = parseInt(stdout.toString().trim());
-        console.log(numberL);
-        numberOfLinesBy2k = Math.floor(numberL/4000);
-        var remainder = numberL % 4000;
-        if(remainder > 0){
-          numberOfLinesBy2k++;
+    const countLinesInFile = require('count-lines-in-file')
+    countLinesInFile('./public/data/finalOfALL.txt' , (error,number) => {
+
+      console.log("Number of lines bellow");
+      var numberL = parseInt(number);
+      console.log(number);
+      numberOfLinesBy2k = Math.floor(numberL/4000);
+      var remainder = numberL % 4000;
+      if(remainder > 0){
+        numberOfLinesBy2k++;
+      }
+      console.log("Number of lines by 4k in the file generated");
+      console.log(numberOfLinesBy2k);
+      var exec = require('child_process').exec;
+      //var childCountNumberLines = spawn("(get-Content ./public/data/finalOfALL.txt | measure-object -Line).Lines");
+      //childCountNumberLines.stdout.on("data",function(data){
+      //exec("wc –l  ./public/data/finalOfALL.txt", function (err, stdout) {
+
+      var lineReader = require('readline').createInterface({
+        input: require('fs').createReadStream('./public/data/finalOfALL.txt')
+      });
+      var contLine = 0;
+
+      var stringOfRows = "";
+      lineReader.on('line',function (line) {
+        if(contLine ==0){
+          stringOfRows = "("+line.replace(/\n/g,'')+")";
         }
-        console.log("Number of lines by 4k in the file generated");
-        console.log(numberOfLinesBy2k);
-    });
-    var lineReader = require('readline').createInterface({
-      input: require('fs').createReadStream('./public/data/finalOfALL.txt')
-    });
-    var contLine = 0;
-
-    var stringOfRows = "";
-    lineReader.on('line',function (line) {
-      if(contLine ==0){
-        stringOfRows = "("+line.replace(/\n/g,'')+")";
-      }
-      else{
-        stringOfRows = stringOfRows + ",("+line.replace(/\n/g,'')+")";
-      }
-      contLine ++;
-      if (contLine == 4000){
+        else{
+          stringOfRows = stringOfRows + ",("+line.replace(/\n/g,'')+")";
+        }
+        contLine ++;
+        if (contLine == 4000){
+          insertLines(stringOfRows,numberOfLinesBy2k);
+          contLine = 0;
+          stringOfRows = "";
+        }
+      }).on('close', function(){
         insertLines(stringOfRows,numberOfLinesBy2k);
-        contLine = 0;
-        stringOfRows = "";
-      }
-    }).on('close', function(){
-      insertLines(stringOfRows,numberOfLinesBy2k);
-    })
-}
+      })
+    });
 
+}
+var ClientEndTimes = 0;
 function insertLines(stringOfRows,numberOfLinesBy2k){
   var clientPost = new Client(conString); // Setup our Postgres Client
   clientPost.connect(); // connect to the client
@@ -942,9 +958,12 @@ function insertLines(stringOfRows,numberOfLinesBy2k){
     ClientEndTimes++;
     console.log("Inserted 4k lines");
     console.log(ClientEndTimes);
+    console.log(numberOfLinesBy2k);
     if(ClientEndTimes >= numberOfLinesBy2k){
-      calculateGeoms();
+
       ClientEndTimes=0;
+      console.log("Will now calculate the geoms");
+      calculateGeoms();
     }
   });
 }

@@ -3,6 +3,7 @@ import sys
 
 print(sys.argv[1])
 os.chdir("./public/data")
+#os.chdir("../data")
 with open("finalOfALL.txt", "w") as outfile:
         with open("Tracks-to-Trips-ft-BigGeo.txt", "r") as infile:
             line = infile.readline()
@@ -26,20 +27,3 @@ with open("finalOfALL.txt", "w") as outfile:
 
 
                 line = infile.readline()
-
-
-
-
-'''
-PATH_INPUT='tracks.csv'
-PATH_OUTPUT='dataset_output.csv'
-
-if __name__ == "__main__":
-    df = pd.read_csv(PATH_INPUT)
-
-    df['points'] = df[['taxi_id','data_time','longitude', 'latitude']].groupby(['points'])['data_time','longitude', 'latitude'].transform(lambda x: ','.join(x))
-    df[['taxi_id','data_time','longigute','latitude']].drop_duplicates()
-    df.groupby('taxi_id').agg(lambda col: ''.join(col))
-    print("ola")
-    df.to_csv(PATH_OUTPUT, encoding='utf-8')
-    print("skr")'''
