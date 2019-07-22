@@ -13,7 +13,10 @@ with open("remove_Stop_Points.txt", "w") as outfile:
         with open(f, "r") as infile:
             line = infile.readline()
             lineNext = infile.readline()
-
+            taxi_id  = int()
+            longit  = int()
+            latit = int()
+            trajNum = int()
             longi3 = lati3 = 0.0
             taxi_id3=100000
             trajNum3 = 100000
@@ -68,18 +71,3 @@ with open("remove_Stop_Points.txt", "w") as outfile:
 
             if not (taxi_id == taxi_id3 and longi == longi3 and lati == lati3 and trajNum == trajNum3):
                 outfile.write(line)
-
-
-'''
-PATH_INPUT='tracks.csv'
-PATH_OUTPUT='dataset_output.csv'
-
-if __name__ == "__main__":
-    df = pd.read_csv(PATH_INPUT)
-
-    df['points'] = df[['taxi_id','data_time','longitude', 'latitude']].groupby(['points'])['data_time','longitude', 'latitude'].transform(lambda x: ','.join(x))
-    df[['taxi_id','data_time','longigute','latitude']].drop_duplicates()
-    df.groupby('taxi_id').agg(lambda col: ''.join(col))
-    print("ola")
-    df.to_csv(PATH_OUTPUT, encoding='utf-8')
-    print("skr")'''
