@@ -10,9 +10,12 @@ const cleancoords = require("@turf/clean-coords");
 const turf = require("turf");
 const multer  = require('multer')   //Use to pass files from client to server using connect-busboy
 const {spawn} = require('child_process')
+const os =  require('os')
 
 /* PostgreSQL and PostGIS module and connection setup */
 const { Client, Query } = require('pg')
+
+var isWindows = (os.platform() === 'win32');
 
 
 //Create db script
@@ -143,7 +146,7 @@ function startMap(req, res){
   console.log("New client connected to new taxi_beij");
 
   var createPostgisExt = "CREATE EXTENSION IF NOT EXISTS postgis;CREATE EXTENSION IF NOT EXISTS postgis_topology;"
-  var createDB =  "CREATE TABLE IF NOT EXISTS public.track_divided_by_time_30s(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_30s OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_30s TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_30s USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_30s USING btree(tid)TABLESPACE pg_default;";
+  var createDB =  "CREATE TABLE IF NOT EXISTS public.track_divided_by_time_30s(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_30s OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_30s TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_30s USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_30s USING btree (tid) TABLESPACE pg_default;";
   var createDB1 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist ON public.trajectory_lines USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist ON public.trajectory_lines USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist ON public.trajectory_lines USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index ON public.trajectory_lines USING btree (track_id) TABLESPACE pg_default;"
   var createDB2 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines1(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines1 OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines1 TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist1 ON public.trajectory_lines1 USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist1 ON public.trajectory_lines1 USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist1 ON public.trajectory_lines1 USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index1 ON public.trajectory_lines1 USING btree (track_id) TABLESPACE pg_default;"
   var createDB3 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines2(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines2 OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines2 TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist2 ON public.trajectory_lines2 USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist2 ON public.trajectory_lines2 USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist2 ON public.trajectory_lines2 USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index2 ON public.trajectory_lines2 USING btree (track_id) TABLESPACE pg_default;"
@@ -239,7 +242,7 @@ router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(
 
 });
 
-router.get('/attQuery/:tab/:long/:lat/:radius', function(req, res) {
+/*router.get('/attQuery/:tab/:long/:lat/:radius', function(req, res) {
   console.log(req.params.long);
   console.log(req.params.lat);
 
@@ -271,7 +274,7 @@ router.get('/attQuery/:tab/:long/:lat/:radius', function(req, res) {
       client.end();
   });
 
-});
+});*/
 
 router.get('/attQueryNEW/:tab/:geom', function(req, res) {
 
@@ -496,12 +499,23 @@ function query_args_ContructorATTQUERIES (tab,long, lat, radius){
 
 }
 
+function query_args_ContructorATTQUERIESNEW_V1 (tab,geomGeoJson){
+  //SELECT tid, array_agg(vel ORDER BY tid, data_time) as velPerPoint, ST_MakeLine(array_agg(linegeom ORDER BY tid,data_time)) AS linegeom
+
+  var withsPart ="WITH trackDivided as ( SELECT tid,tidsubseg, vel as velPerPoint, linegeom, data_time FROM track_divided_by_time_30s WHERE ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AND ST_Intersects(linegeom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326))), trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), prevLag as (SELECT trackDivided.tid as tid,trackDivided.tidsubseg as tidsubseg,trackDivided.velPerPoint, trackDivided.linegeom, trackDivided.data_time,lag(trackDivided.tidsubseg) over (ORDER BY trackDivided.tidsubseg) as idPrev FROM trackDivided), multi as (SELECT prevLag.tid, array_agg(prevLag.velPerPoint ORDER BY prevLag.tid, prevLag.data_time) as velPerPoint, ST_Intersection(ST_MakeLine(array_agg(prevLag.linegeom ORDER BY prevLag.tid,prevLag.data_time)),ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AS linegeom FROM trajectoryLine,prevLag WHERE prevLag.tid = trajectoryLine.track_id AND prevLag.tidsubseg = prevLag.idprev+1 GROUP BY prevLag.tid ) SELECT multi.linegeom as linegeom, multi.velPerPoint as velPerPoint, trajectoryLine.length as length, trajectoryLine.veloc_avg as veloc_avg, trajectoryLine.duration, trajectoryLine.data_time_End  FROM trajectoryLine , multi WHERE multi.tid = trajectoryLine.track_id";
+  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
+  var secondPart = " LIMIT 5000000) 	As f) As fc";
+
+  console.log("Im on an attribute Lens");
+  console.log(withsPart);
+  return firstPart + secondPart;
+
+}
 function query_args_ContructorATTQUERIESNEW (tab,geomGeoJson){
   //SELECT tid, array_agg(vel ORDER BY tid, data_time) as velPerPoint, ST_MakeLine(array_agg(linegeom ORDER BY tid,data_time)) AS linegeom
 
-
-  var withsPart ="WITH trackDivided as ( SELECT tid, vel as velPerPoint, linegeom, data_time FROM track_divided_by_time_30s WHERE ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AND ST_Intersects(linegeom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326))), trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), multi as (SELECT trackDivided.tid, array_agg(trackDivided.velPerPoint ORDER BY trackDivided.tid, trackDivided.data_time) as velPerPoint, ST_Intersection(ST_MakeLine(array_agg(trackDivided.linegeom ORDER BY trackDivided.tid,trackDivided.data_time)),ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AS linegeom FROM trackDivided, trajectoryLine WHERE trackDivided.tid = trajectoryLine.track_id GROUP BY trackDivided.tid) SELECT multi.linegeom as linegeom, multi.velPerPoint as velPerPoint, trajectoryLine.length as length, trajectoryLine.veloc_avg as veloc_avg, trajectoryLine.duration, trajectoryLine.data_time_End  FROM trajectoryLine , multi WHERE multi.tid = trajectoryLine.track_id";
-  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
+  var withsPart ="WITH trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), trajLine_Intersect as (SELECT * FROM trajectoryLine WHERE ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AND ST_Intersects(trajectoryLine.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)))  SELECT ST_Intersection(trajLine_Intersect.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) as linegeom, trajLine_Intersect.length as length, trajLine_Intersect.veloc_avg as veloc_avg, trajLine_Intersect.duration, trajLine_Intersect.data_time_End  FROM trajLine_Intersect ";
+  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg)) As properties FROM (" + withsPart + ") As lg";
   var secondPart = " LIMIT 5000000) 	As f) As fc";
 
   console.log("Im on an attribute Lens");
@@ -745,7 +759,7 @@ var storage = multer.diskStorage({
       cb(null , file.originalname);
   }
 });
-var upload = multer({storage: storage}).array('track', 1000);
+var upload = multer({storage: storage}).array('track', 2000);
 
 router.post('/fileUpload', (req, res, next) => {
   upload(req,res,function(err) {
@@ -887,7 +901,6 @@ function createDB(){
   var createDB = "CREATE TABLE public.track_divided_by_time_upload(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_upload OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_upload TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_upload USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_upload USING btree(tid)TABLESPACE pg_default;";
   client.query(createDB, async function (err, result) {
     if (err) {
-      console.log(err)
       console.log("Database already exists, going to clean it now");
       await client.query(new Query("DELETE FROM track_divided_by_time_upload")).on("end",function(){client.end()
         insertToDB();});
@@ -1014,7 +1027,7 @@ function unifySubSegsANDDivide(){
   var query = clientUnify.query(new Query(" WITH tryingToDivide AS (SELECT tid as idThis, geom as geomThis, data_time as dataTime, lag(tid) over (order by tid asc,data_time asc) as idPrev, lag(geom) over (order by tid asc, data_time asc) as geomPrev FROM track_divided_by_time_upload) UPDATE track_divided_by_time_upload SET linegeom = CASE WHEN idThis = idPrev THEN ST_SetSRID(ST_MakeLine(geomPrev,geomThis),4326) ELSE NULL END FROM tryingToDivide WHERE tid = idThis AND  data_time = dataTime")); // Run our Query
   query.on("end", function (result) {
     console.log("Completed pairs for attribute lenses");
-    var queryUpload = clientUnify.query(new Query("INSERT INTO track_divided_by_time_30s SELECT * FROM track_divided_by_time_upload"));
+    var queryUpload = clientUnify.query(new Query("INSERT INTO track_divided_by_time_30s (taxi_id,long,lat,data_time,vel,traj_id,start_long,start_lat,end_long,end_lat ,tid,geom,startpointgeom,endpointgeom,linegeom) SELECT * FROM track_divided_by_time_upload"));
     queryUpload.on("end", function (result) {
       console.log("Tracks ready for attribute lenses");
 
@@ -1065,19 +1078,26 @@ function unifySubSegsANDDivide(){
 function callPython(number,tidNumber){
   console.log("Gonna call the script now");
   if(number == 1)
-    return spawn('python',["-u",'./public/python/joinTracks-1.py']);
+    if (isWindows) return spawn('python',["-u",'./public/python/joinTracks-1.py']);
+    else return spawn('python3',["-u",'./public/python/joinTracks-1.py']);
   else if (number == 2)
-    return spawn('python',["-u",'./public/python/separate_tracks-2.py']);
+    if (isWindows) return spawn('python',["-u",'./public/python/separate_tracks-2.py']);
+    else return spawn('python3',["-u",'./public/python/separate_tracks-2.py']);
   else if (number == 3)
-    return spawn('python',["-u",'./public/python/delete_Same_time_Points-3.py']);
+    if (isWindows) return spawn('python',["-u",'./public/python/delete_Same_time_Points-3.py']);
+    else return spawn('python3',["-u",'./public/python/delete_Same_time_Points-3.py']);
   else if (number == 4)
-    return spawn('python',["-u",'./public/python/delete_Stop_Points-4.py']);
+    if (isWindows) return spawn('python',["-u",'./public/python/delete_Stop_Points-4.py']);
+    else return spawn('python3',["-u",'./public/python/delete_Stop_Points-4.py']);
   else if (number == 5)
-    return spawn('python',["-u",'./public/python/delete1Point-5.py']);
+    if (isWindows) return spawn('python',["-u",'./public/python/delete1Point-5.py']);
+    else return spawn('python3',["-u",'./public/python/delete1Point-5.py']);
   else if (number == 6)
-    return spawn('python',["-u",'./public/python/Create_Tracks-6.py']);
+    if (isWindows) return spawn('python',["-u",'./public/python/Create_Tracks-6.py']);
+    else return spawn('python3',["-u",'./public/python/Create_Tracks-6.py']);
   else if (number == 7)
-    return spawn('python',["-u",'./public/python/txtJoinPosition-7.py', tidNumber]);
+    if (isWindows) return spawn('python',["-u",'./public/python/txtJoinPosition-7.py', tidNumber]);
+    else return spawn('python3',["-u",'./public/python/txtJoinPosition-7.py', tidNumber]);
   else
     console.log("something is wrong, the number is wrong :S");
 }
