@@ -81,7 +81,7 @@ a {
 	border-radius:50%;
 	display:inline-block;
 	cursor:pointer;
-	color:hsl(41, 88%, 41%);
+	color:#c48a0c;
 	font-family:Arial;
   padding:7px 7px;
   width: 33px;
@@ -199,6 +199,11 @@ a {
 .dropdown-content .dropbtnOpt-start:hover {background-color: hsl(41, 95%, 48%);}
 .dropdown-content .dropbtnOpt-end:hover {background-color: hsl(41, 95%, 48%);}
 
+.dropdown-content .dropbtnOpt-color:hover {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-width:hover {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-opacity:hover {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-brightness:hover {background-color: hsl(41, 95%, 48%);}
+
 .dropdown-content .dropbtnOpt-length:active {background-color: hsl(41, 95%, 48%);}
 .dropdown-content .dropbtnOpt-time:active {background-color: hsl(41, 95%, 48%);}
 .dropdown-content .dropbtnOpt-velocity:active {background-color: hsl(41, 95%, 48%);}
@@ -206,6 +211,11 @@ a {
 .dropdown-content .dropbtnOpt-default:active {background-color: hsl(41, 95%, 48%);}
 .dropdown-content .dropbtnOpt-start:active {background-color: hsl(41, 95%, 48%);}
 .dropdown-content .dropbtnOpt-end:active {background-color: hsl(41, 95%, 48%);}
+
+.dropdown-content .dropbtnOpt-color:active {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-width:active {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-opacity:active {background-color: hsl(41, 95%, 48%);}
+.dropdown-content .dropbtnOpt-brightness:active {background-color: hsl(41, 95%, 48%);}
 
 
 /* Show the dropdown menu on hover */
@@ -215,13 +225,13 @@ a {
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {background-color: #d45500;}
 
-.outside-Circle{
+/*.outside-Circle{
   display: inline-block;
   box-sizing: content-box;
   border: 40px solid hsla(209, 96%, 46%, 0.808);
   border-radius: 50%;
   z-index: 500;
-}
+}*/
 
 .myDeleteButton {
 	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #c62d1f), color-stop(1, #f24437));
@@ -260,6 +270,26 @@ a {
 	position:relative;
 	top:1px;
 }
+.myMoveButton {
+  background-color:#ff8400;
+	-moz-border-radius:25px;
+	-webkit-border-radius:25px;
+	border-radius:50%;
+	display:inline-block;
+	cursor:pointer;
+	color:#c48a0c;
+	font-family:Arial;
+  padding:7px 7px;
+  width: 33px;
+  height:33px; 
+	text-decoration:none;
+}
+.myMoveButton:hover {
+	background-color:#ff0000;
+}
+.myMoveButton:active {
+	background-color:#ff0000;
+}
 .myRadiusButton {
   background-color:#ff8400;
 	-moz-border-radius:25px;
@@ -267,7 +297,7 @@ a {
 	border-radius:50%;
 	display:inline-block;
 	cursor:pointer;
-	color:hsl(41, 88%, 41%);
+	color:#c48a0c;
 	font-family:Arial;
   padding:7px 7px;
   width: 33px;
@@ -275,7 +305,10 @@ a {
 	text-decoration:none;
 }
 .myRadiusButton:hover {
-	background-color:hsl(0, 100%, 50%);
+	background-color:#ff0000;
+}
+.myRadiusButton:active {
+	background-color:#ff0000;
 }
 .myIntervalsButton {
   background-color:#ff8400;
@@ -284,7 +317,7 @@ a {
 	border-radius:50%;
 	display:inline-block;
 	cursor:pointer;
-	color:hsl(41, 88%, 41%);
+	color:#c48a0c;
 	font-family:Arial;
   padding:7px 7px;
   width: 33px;
@@ -292,9 +325,13 @@ a {
 	text-decoration:none;
 }
 .myIntervalsButton:hover {
-	background-color:hsl(0, 100%, 50%);
+	background-color:#ff0000;
 }
 
+.explanation {
+  margin-left: 5px;
+  vertical-align: sub;
+}
 
 /***********************/
 
@@ -355,3 +392,4 @@ a {
 .rs-border  {
     border-color: #00B7FF;
 }
+
