@@ -142,7 +142,15 @@ router.get('/map', function(req, res) {
 
 function startMap(req, res){
   var client = new Client(conString); // Setup our Postgres Client
+  var client1 = new Client(conString);
+  var client2 = new Client(conString);
+  var client3 = new Client(conString);
+  var client4 = new Client(conString);
   client.connect(); // connect to the client
+  client1.connect();
+  client2.connect();
+  client3.connect();
+  client4.connect();
   console.log("New client connected to new taxi_beij");
 
   var createPostgisExt = "CREATE EXTENSION IF NOT EXISTS postgis;CREATE EXTENSION IF NOT EXISTS postgis_topology;"
@@ -157,30 +165,34 @@ function startMap(req, res){
       }
       console.log("Extentions created");
       var createAllDBs = client.query(new Query(createDB));
-      var createAllDBs1 = client.query(new Query(createDB1));
-      var createAllDBs2 = client.query(new Query(createDB2));
-      var createAllDBs3 = client.query(new Query(createDB3));
-      var createAllDBs4 = client.query(new Query(createDB4));
+      var createAllDBs1 = client1.query(new Query(createDB1));
+      var createAllDBs2 = client2.query(new Query(createDB2));
+      var createAllDBs3 = client3.query(new Query(createDB3));
+      var createAllDBs4 = client4.query(new Query(createDB4));
       createAllDBs.on("end",function(){
         console.log("Table track_divided_by_time_30s created");
+        client.end();
       })
       createAllDBs1.on("end",function(){
         console.log("Table trajectory_lines created");
+        client1.end();
       })
       createAllDBs2.on("end",function(){
         console.log("Table trajectory_lines1 created");
+        client2.end();
       })
       createAllDBs3.on("end",function(){
         console.log("Table trajectory_lines2 created");
+        client3.end();
       })
       createAllDBs4.on("end",function(){
-
+        client4.end();
         activeQuery = "";
         console.log("Table trajectory_lines3 created");
-        var client1 = new Client(conString); // Setup our Postgres Client
-        client1.connect(); // connect to the client
+        var clientFetchFirst = new Client(conString); // Setup our Postgres Client
+        clientFetchFirst.connect(); // connect to the client
         console.log("Fetching on database");
-        var query = client1.query(new Query(drawTracksMap)); // Run our Query
+        var query = clientFetchFirst.query(new Query(drawTracksMap)); // Run our Query
         query.on("row", function (row, result) {
             result.addRow(row);
         });
@@ -199,7 +211,8 @@ function startMap(req, res){
                 title: "BigGeo", // Give a title to our page
                 jsonData: data // Pass data to the View
             });
-            client.end();
+            clientFetchFirst.end();
+            
         });
       })
 
