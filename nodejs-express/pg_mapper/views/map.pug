@@ -15,7 +15,7 @@ block content
         //Array that will save all the layers
         var layerArray = [];
 
-        var map = L.map('map',{preferCanvas: true,renderer: L.canvas({}), center: [38.736946,-9.142685], zoom: 10});
+        var map = L.map('map',{preferCanvas: true,renderer: L.canvas({}), center: [38.736946,-9.142685], zoom: 10,worldCopyJump: true});
         map.createPane('lensPane');
         map.createPane('outtterLensPane');
         map.createPane('outtterLensDeletePane');
@@ -191,6 +191,7 @@ block content
         // Add JSON to map
         
         var defaultLayer = new L.geoJson(myData,firstStyle).addTo(map);
+        map.panTo(defaultLayer.getBounds().getCenter());
     
         map.on('zoomend', function() {
             console.log(map.getZoom())
@@ -897,7 +898,7 @@ block content
                                 "<button class='dropbtnOpt-length'>Length</button>"+
                                 "<button class='dropbtnOpt-velocity'>Average velocity</button>"+
                                 "</div></div>" +
-                                "<button class='myIntervalsButton' style='z-index: 1019; position:fixed;margin-left: 96%;margin-top: 24%;'><img src='images/intervals.png' style='z-index: 999;width: 20px;height: 20px;    margin: inherit;margin-left: -1px;margin-top: -1px;'></button>"+
+                                "<button class='myIntervalsButton' style='background-color:grey; z-index: 1019; position:fixed;margin-left: 96%;margin-top: 24%;'><img src='images/intervals.png' style='z-index: 999;width: 20px;height: 20px;    margin: inherit;margin-left: -1px;margin-top: -1px;'></button>"+
                                 "<button class='myRadiusButton' style='margin-left: 89%;margin-top: 82.5%;position: static;'><img src='images/radius.png' style='z-index: 999;width: 150%;height: 150%;margin: inherit;margin-left: -3px;margin-top: -4px;'><span class='explanation' style='color:white;margin: -50%;'> \n"+lens.getRadius().toFixed(0)+"meters</span></button>"+
                                 "<button class='myMoveButton' style='margin-left: 77%;margin-top: 5%;position: static;'><img src='images/move.png' style='    z-index: 999; width: 190%; height: 190%; margin: inherit; margin-left: -48%;margin-top: -43%;'></button>"+
                                 "<div id='sliderRadius' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%)display:none;'></div>"+
@@ -925,9 +926,25 @@ block content
                                 L.DomEvent.stopPropagation(e); 
                                 lensCanMove = !lensCanMove;
                                 if(lensCanMove){
+                                    document.getElementsByClassName('myRadiusButton')[0].style.visibility = "hidden";
+                                    document.getElementsByClassName('dropdown')[0].style.visibility = "hidden";
+                                    document.getElementsByClassName('myIntervalsButton')[0].style.visibility = "hidden";
+                                    document.getElementsByClassName('myDeleteButton')[0].style.visibility = "hidden";
+                                    map.zoomOut(1,true);
+                                    
+                                   
+
                                     document.getElementsByClassName('myMoveButton')[0].style.backgroundColor = "#ff0000";
                                 }
                                 else{
+                                    map.zoomIn(1,true);
+                                    map.fitBounds(lens.getBound());
+
+                                    document.getElementsByClassName('myRadiusButton')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('dropdown')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('myIntervalsButton')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('myDeleteButton')[0].style.visibility = "visible";
+
                                     document.getElementsByClassName('myMoveButton')[0].style.backgroundColor = "#ff8400";
                                 }
                                 var mouseDown = false;
@@ -954,11 +971,7 @@ block content
                                             if(lensCanMove && mouseDown){
                                                 
                                                 if(!(moved)){
-                                                    document.getElementsByClassName('myRadiusButton')[0].style.visibility = "hidden";
                                                     document.getElementsByClassName('myMoveButton')[0].style.visibility = "hidden";
-                                                    document.getElementsByClassName('dropdown')[0].style.visibility = "hidden";
-                                                    document.getElementsByClassName('myIntervalsButton')[0].style.visibility = "hidden";
-                                                    document.getElementsByClassName('myDeleteButton')[0].style.visibility = "hidden";
                                                 
                                                 }
                                                 
@@ -968,9 +981,8 @@ block content
                                                 lens.outsideCircle.setLatLng(e.latlng);
                                                 lens.lngLat = e.latlng;
                                                 lens.setBounds(lens.areaQuery.getBounds());
-                                                if(!(map.getBounds().contains(lens.getBound()))){
-                                                    map.fitBounds(lens.getBound());
-                                                }
+                                                map.panInside(lens.getLngLat(),{padding:[200,200],duration:0.35});
+                                                
                                             }
                                         });
                                     },
@@ -981,11 +993,7 @@ block content
                                         if(lensCanMove){
                                             
                                             if(moved){ 
-                                                document.getElementsByClassName('myRadiusButton')[0].style.visibility = "visible";
                                                 document.getElementsByClassName('myMoveButton')[0].style.visibility = "visible";
-                                                document.getElementsByClassName('dropdown')[0].style.visibility = "visible";
-                                                document.getElementsByClassName('dropdown')[1].style.visibility = "visible";
-                                                document.getElementsByClassName('myDeleteButton')[0].style.visibility = "visible";
                                                 moved = false;   
                                                 map.dragging.enable();
                                                 
@@ -993,6 +1001,7 @@ block content
                                                 lens.updateLENS();
                                                 lens.setLngLatOLD([e.latlng.lat,e.latlng.lng]);
                                                 lens.setBounds(lens.areaQuery.getBounds());
+                                                
                                                 for(i = 0; i < attLensesArray.length; i++){
                                                     attLensesArray[i].updateALL();
                                                 };
