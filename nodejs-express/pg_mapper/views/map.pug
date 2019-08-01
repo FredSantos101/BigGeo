@@ -361,8 +361,7 @@ block content
         /////
 
         function createLens(lng, lat, radiusQuery, _type, minVal, maxVal){
-            var lens = { type: _type, 
-                areaQuery : L.circle([lat, lng], {
+            var lens = { areaQuery : L.circle([lat, lng], {
                     color: 'DarkRed',
                     fillColor: 'red',
                     fillOpacity: 0.6,
@@ -898,23 +897,43 @@ block content
                                 "<button class='dropbtnOpt-length'>Length</button>"+
                                 "<button class='dropbtnOpt-velocity'>Average velocity</button>"+
                                 "</div></div>" +
-                                "<button class='myIntervalsButton' style='background-color:grey; z-index: 1019; position:fixed;margin-left: 96%;margin-top: 24%;'><img src='images/intervals.png' style='z-index: 999;width: 20px;height: 20px;    margin: inherit;margin-left: -1px;margin-top: -1px;'></button>"+
+                                "<button class='myIntervalsButton' style='z-index: 1019; position:fixed;margin-left: 96%;margin-top: 24%;'><img src='images/intervals.png' style='z-index: 999;width: 20px;height: 20px;    margin: inherit;margin-left: -1px;margin-top: -1px;'></button>"+
                                 "<button class='myRadiusButton' style='margin-left: 89%;margin-top: 82.5%;position: static;'><img src='images/radius.png' style='z-index: 999;width: 150%;height: 150%;margin: inherit;margin-left: -3px;margin-top: -4px;'><span class='explanation' style='color:white;margin: -50%;'> \n"+lens.getRadius().toFixed(0)+"meters</span></button>"+
                                 "<button class='myMoveButton' style='margin-left: 77%;margin-top: 5%;position: static;'><img src='images/move.png' style='    z-index: 999; width: 190%; height: 190%; margin: inherit; margin-left: -48%;margin-top: -43%;'></button>"+
-                                "<div id='sliderRadius' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%)display:none;'></div>"+
-                                "<div id='sliderIntervalVel' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%)display:none;'></div>"+
-                                "<div id='sliderIntervalLength' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%)display:none;'></div>"+
-                                "<div id='sliderIntervalDuration' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%)display:none;'></div>"+
-                                "<div id='sliderIntervalTime' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%)display:none;'></div>"
+                                "<div id='sliderRadius' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%);display:none;'></div>"+
+                                "<div id='sliderIntervalVel' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%);display:none;'></div>"+
+                                "<div id='sliderIntervalLength' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%);display:none;'></div>"+
+                                "<div id='sliderIntervalDuration' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%);display:none;'></div>"+
+                                "<div id='sliderIntervalTime' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%);display:none;'></div>"
                               });
                       
-                            
+
                             console.log(myOutsideCircle.options);
                             var outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
                             lens.setOutsideCircle(outsideCircVar);
                   
                             outterLensesLayer.addLayer(lens.outsideCircle);
-                            
+
+                            if (lens.getType() == "Default" || lens.getType() == "Start" || lens.getType() == "End") {
+                                document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "grey";
+                                if(lens.getType() == "Default")
+                                    document.getElementsByClassName('dropbtnOpt-default')[0].style.backgroundColor = "#ff1144";
+                                else if (lens.getType() == "Start")
+                                    document.getElementsByClassName('dropbtnOpt-start')[0].style.backgroundColor = "#ff1144";
+                                else
+                                    document.getElementsByClassName('dropbtnOpt-end')[0].style.backgroundColor = "#ff1144";
+                            } else {
+                                document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
+                                if (lens.getType() == "Time_Duration")
+                                    document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "#ff1144";
+                                else if (lens.getType() == "Time_Interval")
+                                    document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "#ff1144";
+                                else if (lens.getType() == "Vel_avg")
+                                    document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "#ff1144";
+                                else
+                                    document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "#ff1144";
+                            }
+
                             $('.myDeleteButton').click(function (e) {
                             
                                 lens.deleteLayers();
@@ -1017,8 +1036,11 @@ block content
                                 });
                             });
                             $('.myIntervalsButton').click(function(e){
+                                L.DomEvent.stopPropagation(e);
+
                                 if(document.getElementById("sliderRadius").style.display=='none'){
                                     if(lens.getType() == "Vel_avg") {
+
                                         if(document.getElementById("sliderIntervalVel").style.display=='none'){
                                             document.getElementById("sliderIntervalVel").style.display="block";
 
@@ -1032,7 +1054,7 @@ block content
                                         }
                                         else document.getElementById("sliderIntervalVel").style.display="none";
                                     }
-                                    if(lens.getType() == "Length") {
+                                    else if(lens.getType() == "Length") {
                                         if(document.getElementById("sliderIntervalLength").style.display=='none'){
                                             document.getElementById("sliderIntervalLength").style.display="block";
 
@@ -1046,7 +1068,7 @@ block content
                                         }
                                         else document.getElementById("sliderIntervalLength").style.display="none";
                                     }
-                                    if(lens.getType() == "Time_Duration") {
+                                    else if(lens.getType() == "Time_Duration") {
                                         if(document.getElementById("sliderIntervalDuration").style.display=='none'){
                                             document.getElementById("sliderIntervalDuration").style.display="block";
 
@@ -1060,7 +1082,7 @@ block content
                                         }
                                         else document.getElementById("sliderIntervalDuration").style.display="none";
                                     }
-                                    if(lens.getType() == "Time_Interval") {
+                                    else if(lens.getType() == "Time_Interval") {
                                         if(document.getElementById("sliderIntervalTime").style.display=='none'){
                                             document.getElementById("sliderIntervalTime").style.display="block";
 
@@ -1073,6 +1095,9 @@ block content
                                             });
                                         }
                                         else document.getElementById("sliderIntervalTime").style.display="none";
+                                    }
+                                    else{
+                                        console.log("Lens not of the type that allows for intervals");
                                     }
                                 } 
                             
@@ -1255,10 +1280,95 @@ block content
                                         }
                                     });
                                 });
-                            }); 
+                            });
+                            var changeRadius = false;
+                            var correctSizeVar = false;
                             $('.myRadiusButton').click(function (e) {
-                                L.DomEvent.stopPropagation(e); 
-                                if(document.getElementById("sliderRadius").style.display=='none' && document.getElementById("sliderRadius").style.display=='none'){
+                                L.DomEvent.stopPropagation(e);
+                                changeRadius = !changeRadius;
+                                if(changeRadius){
+
+                                    map.zoomOut(1, true);
+                                    document.getElementsByClassName('myMoveButton')[0].style.visibility = "hidden";
+                                    document.getElementsByClassName('dropdown')[0].style.visibility = "hidden";
+                                    document.getElementsByClassName('myIntervalsButton')[0].style.visibility = "hidden";
+                                    document.getElementsByClassName('myDeleteButton')[0].style.visibility = "hidden";
+
+                                    document.getElementsByClassName('myRadiusButton')[0].style.backgroundColor = "#ff0000";
+                                    map.on({
+                                        mousedown: function (e) {
+                                            L.DomEvent.stopPropagation(e);
+
+                                            var from = turf.point(lens.getLngLat());
+                                            var optionsCreateCirc = {units: 'kilometers'};
+
+                                            let mapPressForCreation = true;
+                                            map.on('mousemove', function (event) {
+
+                                                L.DomEvent.stopPropagation(event);
+
+
+                                                if (mapPressForCreation && changeRadius) {
+
+                                                    map.dragging.disable();
+                                                    movedCreateLens = true;
+
+                                                    var to = turf.point([event.latlng.lat, event.latlng.lng]);
+
+
+                                                    var distance = turf.distance(from, to, optionsCreateCirc);
+                                                    radiusValue = distance * 1000;
+                                                    if (radiusValue >= 50 && radiusValue <= 25000) {
+                                                        correctSizeVar = true;
+
+                                                        lens.setRadius(radiusValue);
+                                                    } else {
+                                                        correctSizeVar = false;
+                                                        lens.areaQuery.setStyle({fillCorlor: 'DarkRed',color:'red'});
+                                                    }
+                                                }
+
+
+                                            });
+                                        },
+                                        mouseup: function () {
+                                            map.removeEventListener('mousemove');
+
+                                            if (movedCreateLens && correctSizeVar && changeRadius) {
+
+                                                lens.updateLENS();
+                                                lens.setBounds(lens.areaQuery.getBounds());
+                                                map.fitBounds(lens.getBound());
+                                                for (i = 0; i < attLensesArray.length; i++) {
+                                                    attLensesArray[i].updateALL();
+                                                }
+                                                lens.setRadiusOLD(lens.getRadius());
+                                            }
+                                            else{
+                                                lens.setRadius(lens.getRadiusOLD());
+                                            }
+                                            movedCreateLens = false;
+                                            correctSizeVar = false;
+                                            map.dragging.enable();
+
+
+
+
+
+                                        }
+                                    });
+
+
+                                } else {
+                                    document.getElementsByClassName('myMoveButton')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('dropdown')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('myIntervalsButton')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('myDeleteButton')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('myRadiusButton')[0].style.backgroundColor = "#ff8400";
+                                }
+                                /*if(document.getElementById("sliderRadius").style.display=='none'){
+                                    document.getElementsByClassName('myRadiusButton')[0].style.backgroundColor = "#ff0000";
+
                                     document.getElementById("sliderRadius").style.display="block";
                                     var $sliderRadius = $('#sliderRadius');
                                     $sliderRadius.mousedown( function (e){
@@ -1298,76 +1408,140 @@ block content
                                                 lens.setRadiusOLD(lens.getRadius());
                                             }
                                         });
-                                    }); 
+                                    });
                                     
                                 }
                                 else{
                                     document.getElementById("sliderRadius").style.display="none";
-                                }
+                                    document.getElementsByClassName('myRadiusButton')[0].style.backgroundColor = "#ff8400";
+                                }*/
                             }); 
-                            $('.dropbtnOpt-default').click(function () {
-                                    lens.setType("Default");
-                                    lens.setMinV(0);
-                                    lens.setMaxV(0);
-                                    lens.updateLENS();
-                                    lens.setTypeOLD("Default");
-                                    lens.setMinVOLD(0);
-                                    lens.setMaxVOLD(0);
+                            $('.dropbtnOpt-default').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                lens.setType("Default");
+                                document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "grey";
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.backgroundColor = "#ff1144";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "buttonface";
+
+                                lens.setMinV(0);
+                                lens.setMaxV(0);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Default");
+                                lens.setMinVOLD(0);
+                                lens.setMaxVOLD(0);
                             });
-                            $('.dropbtnOpt-start').click(function () {
-                                    lens.setType("Start");
-                                    lens.setMinV(0);
-                                    lens.setMaxV(0);
-                                    lens.updateLENS();
-                                    lens.setTypeOLD("Start");
-                                    lens.setMinVOLD(0);
-                                    lens.setMaxVOLD(0);
+                            $('.dropbtnOpt-start').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                lens.setType("Start");
+                                document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "grey";
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.backgroundColor = "#ff1144";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "buttonface";
+                                lens.setMinV(0);
+                                lens.setMaxV(0);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Start");
+                                lens.setMinVOLD(0);
+                                lens.setMaxVOLD(0);
                             });
-                            $('.dropbtnOpt-end').click(function () {
-                                    lens.setType("End");
-                                    lens.setMinV(0);
-                                    lens.setMaxV(0);
-                                    lens.updateLENS();
-                                    lens.setTypeOLD("End");
-                                    lens.setMinVOLD(0);
-                                    lens.setMaxVOLD(0);
+                            $('.dropbtnOpt-end').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                lens.setType("End");
+                                document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "grey";
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.backgroundColor = "#ff1144";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "buttonface";
+                                lens.setMinV(0);
+                                lens.setMaxV(0);
+                                lens.updateLENS();
+                                lens.setTypeOLD("End");
+                                lens.setMinVOLD(0);
+                                lens.setMaxVOLD(0);
                             });
-                            $('.dropbtnOpt-length').click(function () {
-                                    
-                                    lens.setType("Length");
-                                    lens.setMinV(1);
-                                    lens.setMaxV(500000);
-                                    lens.updateLENS();
-                                    lens.setTypeOLD("Length");
-                                    lens.setMinVOLD(1);
-                                    lens.setMaxVOLD(500000);
+                            $('.dropbtnOpt-length').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                lens.setType("Length");
+                                document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "#ff1144";
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "buttonface";
+                                lens.setMinV(1);
+                                lens.setMaxV(500000);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Length");
+                                lens.setMinVOLD(1);
+                                lens.setMaxVOLD(500000);
                             });
-                            $('.dropbtnOpt-velocity').click(function () {
-                                    lens.setType("Vel_avg");
-                                    lens.setMinV(0);
-                                    lens.setMaxV(250);
-                                    lens.updateLENS();
-                                    lens.setTypeOLD("Vel_avg");
-                                    lens.setMinVOLD(0);
-                                    lens.setMaxVOLD(250);
+                            $('.dropbtnOpt-velocity').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                lens.setType("Vel_avg");
+                                document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "#ff1144";
+                                lens.setMinV(0);
+                                lens.setMaxV(250);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Vel_avg");
+                                lens.setMinVOLD(0);
+                                lens.setMaxVOLD(250);
                             });
-                            $('.dropbtnOpt-time').click(function () {
-                                    lens.setType("Time_Interval");
-                                    lens.setMinV(1201959044);
-                                    lens.setMaxV(1202492358);
-                                    lens.updateLENS();
-                                    lens.setTypeOLD("Time_Interval");
-                                    lens.setMinVOLD(1201959044);
-                                    lens.setMaxVOLD(1202492358);
+                            $('.dropbtnOpt-time').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                lens.setType("Time_Interval");
+                                document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "#ff1144";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "buttonface";
+                                lens.setMinV(1201959044);
+                                lens.setMaxV(1202492358);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Time_Interval");
+                                lens.setMinVOLD(1201959044);
+                                lens.setMaxVOLD(1202492358);
                             });
-                            $('.dropbtnOpt-duration').click(function () {
-                                    lens.setType("Time_Duration");
-                                    lens.setMinV(0);
-                                    lens.setMaxV(85839);
-                                    lens.updateLENS();
-                                    lens.setTypeOLD("Time_Duration");
-                                    lens.setMinVOLD(0);
-                                    lens.setMaxVOLD(85839);
+                            $('.dropbtnOpt-duration').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                lens.setType("Time_Duration");
+                                document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "#ff1144";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "buttonface";
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "buttonface";
+                                lens.setMinV(0);
+                                lens.setMaxV(85839);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Time_Duration");
+                                lens.setMinVOLD(0);
+                                lens.setMaxVOLD(85839);
                             });  
          
                         }
