@@ -236,12 +236,17 @@ block content
         var mapPressForCreation = false;
         var notClickedLens = false;
         var clicked = false;
+        var changeRadius = false;
+        var correctSizeVar = false;
         map.on({
-            click:function(){
-                outterLensesLayer.clearLayers();
-                moved = false;
-                lensCanMove = false;
-                clicked = false;
+            click:function(e){
+                map.removeEventListener('mousemove');
+                if(!changeRadius){    
+                    outterLensesLayer.clearLayers();
+                    moved = false;
+                    lensCanMove = false;
+                    clicked = false;
+                }
             },
             mousedown: function (e) {
                 L.DomEvent.stopPropagation(e);
@@ -302,9 +307,10 @@ block content
                     });
                 }
             },
-            mouseup: function () {
-                lensPreCreationLayer.clearLayers();
+            mouseup: function (e) {
+                L.DomEvent.stopPropagation(e);
                 map.removeEventListener('mousemove');
+                lensPreCreationLayer.clearLayers();
                 if (movedCreateLens && createdAlreadyFlag && sizeBellow25k) {
                     map.dragging.enable();
                     onMapClick(locationCreation, radiusValue);
@@ -381,6 +387,14 @@ block content
                 maxVOLD : maxVal,
                 lID : null,
                 bounds : null,
+                radiusChangeFlag: false,
+                getRadiusFlag(){
+                    return this.radiusChangeFlag;
+                },
+                setRadiusFlag(value){
+                    if(value == true || value == false)
+                        this.radiusChangeFlag = value;
+                },
                 getMinV: function (){
                     return this.minV;
                 },
@@ -865,8 +879,8 @@ block content
                 dbclick:function(e){
                     L.DomEvent.stopPropagation(e);
                 },
-                click: function(ev){
-                    L.DomEvent.stopPropagation(ev);
+                click: function(event1){
+                    L.DomEvent.stopPropagation(event1);
                     createQueryLensesFlag = false;
                     createAttributeLensesFlag = false;
                     container1.style.backgroundColor = 'white'; 
@@ -875,12 +889,12 @@ block content
                     clicked = true;
                     var once = true;
                     map.fitBounds(lens.getBound());
-                    map.on('moveend', function(ev) {
-                        
+                    map.on('moveend', function(event) {
+                        L.DomEvent.stopPropagation(event);
                         if(clicked && once){
                             once = false;
                             console.log("Im on the move event again...");
-                            L.DomEvent.stopPropagation(ev);
+                            
                             
                             // code stuff
                             let northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
@@ -900,11 +914,11 @@ block content
                                 "<button class='myIntervalsButton' style='z-index: 1019; position:fixed;margin-left: 96%;margin-top: 24%;'><img src='images/intervals.png' style='z-index: 999;width: 20px;height: 20px;    margin: inherit;margin-left: -1px;margin-top: -1px;'></button>"+
                                 "<button class='myRadiusButton' style='margin-left: 89%;margin-top: 82.5%;position: static;'><img src='images/radius.png' style='z-index: 999;width: 150%;height: 150%;margin: inherit;margin-left: -3px;margin-top: -4px;'><span class='explanation' style='color:white;margin: -50%;'> \n"+lens.getRadius().toFixed(0)+"meters</span></button>"+
                                 "<button class='myMoveButton' style='margin-left: 77%;margin-top: 5%;position: static;'><img src='images/move.png' style='    z-index: 999; width: 190%; height: 190%; margin: inherit; margin-left: -48%;margin-top: -43%;'></button>"+
-                                "<div id='sliderRadius' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%);display:none;'></div>"+
-                                "<div id='sliderIntervalVel' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%);display:none;'></div>"+
-                                "<div id='sliderIntervalLength' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%);display:none;'></div>"+
-                                "<div id='sliderIntervalDuration' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%);display:none;'></div>"+
-                                "<div id='sliderIntervalTime' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%);display:none;'></div>"
+                                "<div id='sliderRadius' align='center' style='z-index:1018;    position: absolute;    top: 50%;left: 50%;transform: translate(-50%, -50%);display:none;'></div>"+
+                                "<div id='sliderIntervalVel' align='center' style='z-index:1018;    position: absolute;    top: 50%;left: 50%;transform: translate(-50%, -50%);display:none;'></div>"+
+                                "<div id='sliderIntervalLength' align='center' style='z-index:1018;    position: absolute;    top: 50%;left: 50%;transform: translate(-50%, -50%);display:none;'></div>"+
+                                "<div id='sliderIntervalDuration' align='center' style='z-index:1018;    position: absolute;    top: 50%;left: 50%;transform: translate(-50%, -50%);display:none;'></div>"+
+                                "<div id='sliderIntervalTime' align='center' style='z-index:1018;    position: absolute;        top: 50%;left: 50%;transform: translate(-50%, -50%);display:none;'></div>"
                               });
                       
 
@@ -922,7 +936,8 @@ block content
                                     document.getElementsByClassName('dropbtnOpt-start')[0].style.backgroundColor = "#ff1144";
                                 else
                                     document.getElementsByClassName('dropbtnOpt-end')[0].style.backgroundColor = "#ff1144";
-                            } else {
+                            } 
+                            else {
                                 document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
                                 if (lens.getType() == "Time_Duration")
                                     document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "#ff1144";
@@ -935,7 +950,7 @@ block content
                             }
 
                             $('.myDeleteButton').click(function (e) {
-                            
+                                outterLensesLayer.clearLayers();
                                 lens.deleteLayers();
                                 for(i = 0; i < attLensesArray.length; i++){
                                     attLensesArray[i].updateALL();
@@ -991,7 +1006,6 @@ block content
                                                 
                                                 if(!(moved)){
                                                     document.getElementsByClassName('myMoveButton')[0].style.visibility = "hidden";
-                                                
                                                 }
                                                 
                                                 map.dragging.disable();
@@ -1042,6 +1056,7 @@ block content
                                     if(lens.getType() == "Vel_avg") {
 
                                         if(document.getElementById("sliderIntervalVel").style.display=='none'){
+                                            document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalVel").style.display="block";
 
                                             var $sliderIntervalVel = $('#sliderIntervalVel');
@@ -1052,10 +1067,14 @@ block content
                                                 e.originalEvent.preventDefault();
                                             });
                                         }
-                                        else document.getElementById("sliderIntervalVel").style.display="none";
+                                        else {
+                                            document.getElementById("sliderIntervalVel").style.display="none";
+                                            document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
+                                        }
                                     }
                                     else if(lens.getType() == "Length") {
                                         if(document.getElementById("sliderIntervalLength").style.display=='none'){
+                                            document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalLength").style.display="block";
 
                                             var $sliderIntervalLength = $('#sliderIntervalLength');
@@ -1066,10 +1085,14 @@ block content
                                                 e.originalEvent.preventDefault();
                                             });
                                         }
-                                        else document.getElementById("sliderIntervalLength").style.display="none";
+                                        else {
+                                            document.getElementById("sliderIntervalLength").style.display="none";
+                                            document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
+                                        }
                                     }
                                     else if(lens.getType() == "Time_Duration") {
                                         if(document.getElementById("sliderIntervalDuration").style.display=='none'){
+                                            document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalDuration").style.display="block";
 
                                             var $sliderIntervalDuration = $('#sliderIntervalDuration');
@@ -1080,10 +1103,14 @@ block content
                                                 e.originalEvent.preventDefault();
                                             });
                                         }
-                                        else document.getElementById("sliderIntervalDuration").style.display="none";
+                                        else {
+                                            document.getElementById("sliderIntervalDuration").style.display="none";
+                                            document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
+                                        }
                                     }
                                     else if(lens.getType() == "Time_Interval") {
                                         if(document.getElementById("sliderIntervalTime").style.display=='none'){
+                                            document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalTime").style.display="block";
 
                                             var $sliderIntervalTime = $('#sliderIntervalTime');
@@ -1094,7 +1121,10 @@ block content
                                                 e.originalEvent.preventDefault();
                                             });
                                         }
-                                        else document.getElementById("sliderIntervalTime").style.display="none";
+                                        else {
+                                            document.getElementById("sliderIntervalTime").style.display="none";
+                                            document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
+                                        }
                                     }
                                     else{
                                         console.log("Lens not of the type that allows for intervals");
@@ -1281,13 +1311,13 @@ block content
                                     });
                                 });
                             });
-                            var changeRadius = false;
-                            var correctSizeVar = false;
-                            $('.myRadiusButton').click(function (e) {
-                                L.DomEvent.stopPropagation(e);
+                            
+                            $('.myRadiusButton').click(function (ev) {
+                                L.DomEvent.stopPropagation(ev);
                                 changeRadius = !changeRadius;
+                                
                                 if(changeRadius){
-
+                                    lens.setRadiusFlag(true);
                                     map.zoomOut(1, true);
                                     document.getElementsByClassName('myMoveButton')[0].style.visibility = "hidden";
                                     document.getElementsByClassName('dropdown')[0].style.visibility = "hidden";
@@ -1296,70 +1326,77 @@ block content
 
                                     document.getElementsByClassName('myRadiusButton')[0].style.backgroundColor = "#ff0000";
                                     map.on({
+                                        click: function(e){
+                                            L.DomEvent.stopPropagation(e);
+                                            mapPressForCreation = false;
+                                            correctSizeVar = false;
+                                        },
                                         mousedown: function (e) {
                                             L.DomEvent.stopPropagation(e);
 
-                                            var from = turf.point(lens.getLngLat());
-                                            var optionsCreateCirc = {units: 'kilometers'};
+                                            if(changeRadius){    
+                                                var from = turf.point(lens.getLngLat());
+                                                var optionsCreateCirc = {units: 'kilometers'};
 
-                                            let mapPressForCreation = true;
-                                            map.on('mousemove', function (event) {
+                                                mapPressForCreation = true;
+                                                map.on('mousemove', function (event) {
+                                                    if(lens.getRadiusFlag()){
+                                                        L.DomEvent.stopPropagation(event);
 
-                                                L.DomEvent.stopPropagation(event);
+                                                        if (mapPressForCreation && changeRadius) {
 
+                                                            map.dragging.disable();
 
-                                                if (mapPressForCreation && changeRadius) {
+                                                            var to = turf.point([event.latlng.lat, event.latlng.lng]);
 
-                                                    map.dragging.disable();
-                                                    movedCreateLens = true;
-
-                                                    var to = turf.point([event.latlng.lat, event.latlng.lng]);
-
-
-                                                    var distance = turf.distance(from, to, optionsCreateCirc);
-                                                    radiusValue = distance * 1000;
-                                                    if (radiusValue >= 50 && radiusValue <= 25000) {
-                                                        correctSizeVar = true;
-
-                                                        lens.setRadius(radiusValue);
-                                                    } else {
-                                                        correctSizeVar = false;
-                                                        lens.areaQuery.setStyle({fillCorlor: 'DarkRed',color:'red'});
+                                                            var distance = turf.distance(from, to, optionsCreateCirc);
+                                                            radiusValue = distance * 1000;
+                                                            if (radiusValue >= 50 && radiusValue <= 25000) {
+                                                                correctSizeVar = true;
+                                                                lens.colorSuccess();
+                                                                lens.setRadius(radiusValue);
+                                                            } else {
+                                                                correctSizeVar = false;
+                                                                lens.areaQuery.setStyle({fillColor: 'DarkRed',color:'red'});
+                                                            }
+                                                        }
+                                                        else
+                                                            console.log("Mouse down but flags are false :S");
                                                     }
-                                                }
-
-
-                                            });
+                                                });
+                                            }
                                         },
-                                        mouseup: function () {
+                                        mouseup: function (e) {
+                                            L.DomEvent.stopPropagation(e);
                                             map.removeEventListener('mousemove');
-
-                                            if (movedCreateLens && correctSizeVar && changeRadius) {
-
-                                                lens.updateLENS();
-                                                lens.setBounds(lens.areaQuery.getBounds());
-                                                map.fitBounds(lens.getBound());
-                                                for (i = 0; i < attLensesArray.length; i++) {
-                                                    attLensesArray[i].updateALL();
-                                                }
-                                                lens.setRadiusOLD(lens.getRadius());
-                                            }
-                                            else{
-                                                lens.setRadius(lens.getRadiusOLD());
-                                            }
-                                            movedCreateLens = false;
-                                            correctSizeVar = false;
                                             map.dragging.enable();
+                                            if(changeRadius && lens.getRadiusFlag()){
+                                                
+                                                console.log(correctSizeVar);
+                                                if (mapPressForCreation,correctSizeVar) {
 
+                                                    lens.updateLENS();
+                                                    lens.setBounds(lens.areaQuery.getBounds());
+                                                    
+                                                    for (i = 0; i < attLensesArray.length; i++) {
+                                                        attLensesArray[i].updateALL();
+                                                    }
+                                                    lens.setRadiusOLD(lens.getRadius());
+                                                }
+                                                else{
+                                                    lens.setRadius(lens.getRadiusOLD());
+                                                }
 
-
-
+                                                map.fitBounds(lens.getBound());
+                                                mapPressForCreation = false;
+                                                correctSizeVar = false;
+                                            }
 
                                         }
                                     });
-
-
                                 } else {
+                                    lens.setRadiusFlag(false);
+                                    map.fitBounds(lens.getBound());
                                     document.getElementsByClassName('myMoveButton')[0].style.visibility = "visible";
                                     document.getElementsByClassName('dropdown')[0].style.visibility = "visible";
                                     document.getElementsByClassName('myIntervalsButton')[0].style.visibility = "visible";
@@ -1564,12 +1601,27 @@ block content
                 outsideCircle : null,
                 lngLat : lngLat,
                 radiusQuery : radiusQuery,
+                radiusQueryOLD : radiusQuery,
                 lID : null,
                 att : _attribute,
                 enc : _encoding,
                 intersections: [],
                 areas: [],
                 bounds : null,
+                radiusChangeFlag: false,
+                getRadiusFlag(){
+                    return this.radiusChangeFlag;
+                },
+                setRadiusFlag(value){
+                    if(value == true || value == false)
+                        this.radiusChangeFlag = value;
+                },
+                setRadiusOLD : function (value){
+                    this.radiusQueryOLD = value;
+                },
+                getRadiusOLD : function (){
+                    return this.radiusQueryOLD;
+                },
                 addIntersection: function (obj){
                     this.intersections.push(obj);
                 },
@@ -1899,13 +1951,13 @@ block content
                             let numOfPixl = northVar.distanceTo(southVar);
                             let myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [numOfPixl,numOfPixl], html: 
                                 "<button class='myDeleteButton' style='z-index: 1000;position: fixed;margin-top: 2%;margin-left: 12.5%;'><img src='images/trash.png' style='width: 85%; height: 80%;'></button>"+
-                                "<div class='dropdown' style='z-index: 1019; position:fixed;margin-left: 76.5%;margin-top: 2%;'><button class='dropbtn'><img src='images/attribute.png' style='width: 150%;height: 150%;margin: -25%;'></button><span class='explanation' style='color:white;margin: 30%;'> "+capitalizeFirstLetter(lens.att)+"</span><div class='dropdown-content'>" + 
+                                "<div class='dropdown' style='z-index: 1019; position:fixed;margin-left: 76.5%;margin-top: 2%;'><button class='dropbtn'><img src='images/attribute.png' style='width: 150%;height: 150%;margin: -25%;'></button><div class='dropdown-content'>" + //<span class='explanation' style='color:white;margin: 30%;'> "+capitalizeFirstLetter(lens.att)+"</span>
                                 "<button class='dropbtnOpt-length'>Length</button>"+
                                 "<button class='dropbtnOpt-velocity'>Velocity</button>"+
                                 "<button class='dropbtnOpt-time'>Time</button>"+
                                 "<button class='dropbtnOpt-duration'>Duration</button>"+
                                 "</div></div>" +
-                                "<div class='dropdown'style='z-index: 1019; position:fixed;margin-left: 96%;margin-top: 24%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 150%;height: 150%;margin: -25%;'></button><span class='explanation' style='color:white;margin: 28%;'> "+capitalizeFirstLetter(lens.enc)+"</span><div class='dropdown-content'>" + 
+                                "<div class='dropdown'style='z-index: 1019; position:fixed;margin-left: 96%;margin-top: 24%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 150%;height: 150%;margin: -25%;'></button><div class='dropdown-content'>" + //<span class='explanation' style='color:white;margin: 28%;'> "+capitalizeFirstLetter(lens.enc)+"</span>
                                 "<button class='dropbtnOpt-color'>Color</button>"+
                                 "<button class='dropbtnOpt-width'>Width</button>"+
                                 "<button class='dropbtnOpt-brightness'>Brightness</button>"+
@@ -1921,6 +1973,24 @@ block content
                             
                             outterLensesLayer.addLayer(lens.outsideCircle);
                             
+                            if(lens.att == "length")
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "#ff1144";
+                            else if(lens.att == "velocity")
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "#ff1144";
+                            else if(lens.att == "time")
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "#ff1144";
+                            else
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "#ff1144";
+                            
+                            if (lens.enc == "color")
+                                document.getElementsByClassName('dropbtnOpt-color')[0].style.backgroundColor = "#ff1144";
+                            else if (lens.enc == "width")
+                                document.getElementsByClassName('dropbtnOpt-width')[0].style.backgroundColor = "#ff1144";
+                            else if (lens.enc == "brightness")
+                                document.getElementsByClassName('dropbtnOpt-brightness')[0].style.backgroundColor = "#ff1144";
+                            else
+                                document.getElementsByClassName('dropbtnOpt-opacity')[0].style.backgroundColor = "#ff1144";
+                            
                             $('.myDeleteButton').click(function (e) {
                                 L.DomEvent.stopPropagation(e); 
                                 clicked= false;
@@ -1933,10 +2003,20 @@ block content
                                 L.DomEvent.stopPropagation(e); 
                                 lensCanMove = !lensCanMove;
                                 if(lensCanMove){
+                                    map.zoomOut(1,true);
                                     document.getElementsByClassName('myMoveButton')[0].style.backgroundColor = "#ff0000";
+                                    document.getElementsByClassName('myRadiusButton')[0].style.visibility = "hidden";
+                                    document.getElementsByClassName('dropdown')[0].style.visibility = "hidden";
+                                    document.getElementsByClassName('dropdown')[1].style.visibility = "hidden";
+                                    document.getElementsByClassName('myDeleteButton')[0].style.visibility = "hidden";
                                 }
                                 else{
+                                    map.fitBounds(lens.getBound());
                                     document.getElementsByClassName('myMoveButton')[0].style.backgroundColor = "#ff8400";
+                                    document.getElementsByClassName('myRadiusButton')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('dropdown')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('dropdown')[1].style.visibility = "visible";
+                                    document.getElementsByClassName('myDeleteButton')[0].style.visibility = "visible";
                                 }
                                 var mouseDown = false;
                                 lens.outsideCircle.on({
@@ -1950,8 +2030,10 @@ block content
                                         L.DomEvent.stopPropagation(event);
                                         mouseDown = true;
                                         notClickedLens = false;
+                                         
                                         
                                         map.on('mousemove', function (e) {
+                                            document.getElementsByClassName('myMoveButton')[0].style.visibility = "hidden";
                                             createQueryLensesFlag = false;
                                             createAttributeLensesFlag = false;
                                             container1.style.backgroundColor = 'white'; 
@@ -1962,11 +2044,7 @@ block content
                                             if(lensCanMove && mouseDown){
                                                 
                                                 if(!(moved)){
-                                                    document.getElementsByClassName('myRadiusButton')[0].style.visibility = "hidden";
-                                                    document.getElementsByClassName('myMoveButton')[0].style.visibility = "hidden";
-                                                    document.getElementsByClassName('dropdown')[0].style.visibility = "hidden";
-                                                    document.getElementsByClassName('dropdown')[1].style.visibility = "hidden";
-                                                    document.getElementsByClassName('myDeleteButton')[0].style.visibility = "hidden";
+                                                    
                                                     lens.delete();
                                                     lens.updateOthersV2(true);
                                                 }
@@ -1977,23 +2055,18 @@ block content
                                                 lens.outsideCircle.setLatLng(e.latlng);
                                                 lens.lngLat = e.latlng;
                                                 lens.setBounds(lens.areaQuery.getBounds());
-                                                if(!(map.getBounds().contains(lens.getBound()))){
-                                                    map.fitBounds(lens.getBound());
-                                                }
+                                                map.panInside(lens.getLngLat(),{padding:[200,200],duration:0.35});
                                             }
                                         });
                                     },
                                     mouseup: function(e){
                                         mouseDown = false;
-                                        L.DomEvent.stopPropagation(e); 
+                                        L.DomEvent.stopPropagation(e);
+                                        
+                                        document.getElementsByClassName('myMoveButton')[0].style.visibility = "visible"; 
                                         if(lensCanMove){
                                             map.removeEventListener('mousemove');
                                             if(moved){ 
-                                                document.getElementsByClassName('myRadiusButton')[0].style.visibility = "visible";
-                                                document.getElementsByClassName('myMoveButton')[0].style.visibility = "visible";
-                                                document.getElementsByClassName('dropdown')[0].style.visibility = "visible";
-                                                document.getElementsByClassName('dropdown')[1].style.visibility = "visible";
-                                                document.getElementsByClassName('myDeleteButton')[0].style.visibility = "visible";
                                                 moved = false;   
                                                 map.dragging.enable();
 
@@ -2001,7 +2074,6 @@ block content
                                                 lens.createAreas();
                                                 //lens.createLayers();
                                                 lens.setBounds(lens.areaQuery.getBounds());
-                                                map.panTo(lens.getLngLat());
 
                                             }
                                         }
@@ -2014,8 +2086,101 @@ block content
                                     }
                                 });
                             });
-                            $('.myRadiusButton').click(function (e) {
-                                L.DomEvent.stopPropagation(e); 
+                            $('.myRadiusButton').click(function (ev) {
+                                L.DomEvent.stopPropagation(ev);
+                                changeRadius = !changeRadius;
+                                
+                                if(changeRadius){
+                                    lens.setRadiusFlag(true);
+                                    map.zoomOut(1, true);
+                                    document.getElementsByClassName('myMoveButton')[0].style.visibility = "hidden";
+                                    document.getElementsByClassName('dropdown')[0].style.visibility = "hidden";
+                                    document.getElementsByClassName('dropdown')[1].style.visibility = "hidden";
+                                    document.getElementsByClassName('myDeleteButton')[0].style.visibility = "hidden";
+
+                                    document.getElementsByClassName('myRadiusButton')[0].style.backgroundColor = "#ff0000";
+                                    map.on({
+                                        click: function(e){
+                                            L.DomEvent.stopPropagation(e);
+                                            mapPressForCreation = false;
+                                            correctSizeVar = false;
+                                        },
+                                        mousedown: function (e) {
+                                            L.DomEvent.stopPropagation(e);
+
+                                            if(changeRadius){    
+                                                var from = turf.point([lens.getLngLat().lat,lens.getLngLat().lng]);
+                                                var optionsCreateCirc = {units: 'kilometers'};
+                                                var once = true;
+                                                mapPressForCreation = true;
+                                                map.on('mousemove', function (event) {
+                                                    if(lens.getRadiusFlag()){
+
+                                                        L.DomEvent.stopPropagation(event);
+                                                        if(once){
+                                                            lens.delete();
+                                                            lens.updateOthersV2(true);
+                                                            once = false;
+                                                        }
+                                                        if (mapPressForCreation && changeRadius) {
+
+                                                            map.dragging.disable();
+
+                                                            var to = turf.point([event.latlng.lat, event.latlng.lng]);
+
+                                                            var distance = turf.distance(from, to, optionsCreateCirc);
+                                                            radiusValue = distance * 1000;
+                                                            if (radiusValue >= 50 && radiusValue <= 25000) {
+                                                                correctSizeVar = true;
+                                                                lens.colorSuccess();
+                                                                lens.setRadius(radiusValue);
+                                                            } else {
+                                                                correctSizeVar = false;
+                                                                lens.areaQuery.setStyle({fillColor: 'DarkRed',color:'red'});
+                                                            }
+                                                        }
+                                                        else
+                                                            console.log("Mouse down but flags are false :S");
+                                                    }
+                                                });
+                                            }
+                                        },
+                                        mouseup: function (e) {
+                                            L.DomEvent.stopPropagation(e);
+                                            map.removeEventListener('mousemove');
+                                            map.dragging.enable();
+                                            if(changeRadius && lens.getRadiusFlag()){
+                                                
+                                                console.log(correctSizeVar);
+                                                if (mapPressForCreation,correctSizeVar) {
+
+                                                    lens.createAreas();
+                                                    lens.setBounds(lens.areaQuery.getBounds());
+                                                    
+                                                    lens.setRadiusOLD(lens.getRadius());
+                                                }
+                                                else{
+                                                    lens.setRadius(lens.getRadiusOLD());
+                                                }
+
+                                                map.fitBounds(lens.getBound());
+                                                mapPressForCreation = false;
+                                                correctSizeVar = false;
+                                            }
+
+                                        }
+                                    });
+                                } else {
+                                    lens.setRadiusFlag(false);
+                                    map.fitBounds(lens.getBound());
+                                    document.getElementsByClassName('myMoveButton')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('dropdown')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('dropdown')[1].style.visibility = "visible";
+                                    document.getElementsByClassName('myDeleteButton')[0].style.visibility = "visible";
+                                    document.getElementsByClassName('myRadiusButton')[0].style.backgroundColor = "#ff8400";
+                                }
+                                
+                                /*L.DomEvent.stopPropagation(e); 
                                 
                                 if(document.getElementById("sliderRadius").style.display=='none'){
                                     document.getElementsByClassName('myRadiusButton')[0].style.backgroundColor = "#ff0000";
@@ -2085,53 +2250,93 @@ block content
                                 else{
                                     document.getElementsByClassName('myRadiusButton')[0].style.backgroundColor ='#ff8400';
                                     document.getElementById("sliderRadius").style.display="none";
-                                }
+                                }*/
                             }); 
-                            $('.dropbtnOpt-length').click(function () {
-                                    //lens.updateOthers();
-                                    lens.updateLENS(true,"length");
-                                    document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                            $('.dropbtnOpt-length').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                //lens.updateOthers();
+                                lens.updateLENS(true,"length");
+                                //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "#ff1144";                        
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "buttonface";                                
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "buttonface";                            
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "buttonface";
                             });
-                            $('.dropbtnOpt-velocity').click(function () {
-                                    //lens.updateOthers();
-                                    lens.updateLENS(true,"velocity");
-                                    document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                            $('.dropbtnOpt-velocity').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                //lens.updateOthers();
+                                lens.updateLENS(true,"velocity");
+                                //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "buttonface";                        
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "#ff1144";                                
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "buttonface";                            
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "buttonface";
                             });
-                            $('.dropbtnOpt-time').click(function () {
-                                    //lens.updateOthers();
-                                    //lens.att = "time"
-                                    lens.updateLENS(true,"time");
-                                    document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                            $('.dropbtnOpt-time').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                //lens.updateOthers();
+                                //lens.att = "time"
+                                lens.updateLENS(true,"time");
+                                //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "buttonface";                        
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "buttonface";                                
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "#ff1144";                            
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "buttonface";
                             });
-                            $('.dropbtnOpt-duration').click(function () {
-                                    //lens.updateOthers();
-                                    //lens.att = "duration"
-                                    lens.updateLENS(true,"duration");
-                                    document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                            $('.dropbtnOpt-duration').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                //lens.updateOthers();
+                                //lens.att = "duration"
+                                lens.updateLENS(true,"duration");
+                                //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "buttonface";                        
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "buttonface";                                
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "buttonface";                            
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.backgroundColor = "#ff1144";
                             });
-                            $('.dropbtnOpt-color').click(function () {
-                                    //lens.updateOthers();
-                                    //lens.enc = "color"
-                                    lens.updateLENS(false,"color");
-                                    document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                            $('.dropbtnOpt-color').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                //lens.updateOthers();
+                                //lens.enc = "color"
+                                lens.updateLENS(false,"color");
+                                //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                                document.getElementsByClassName('dropbtnOpt-color')[0].style.backgroundColor = "#ff1144";             
+                                document.getElementsByClassName('dropbtnOpt-width')[0].style.backgroundColor = "buttonface";                              
+                                document.getElementsByClassName('dropbtnOpt-brightness')[0].style.backgroundColor = "buttonface";                              
+                                document.getElementsByClassName('dropbtnOpt-opacity')[0].style.backgroundColor = "buttonface";
                             });
-                            $('.dropbtnOpt-width').click(function () {
-                                    //lens.updateOthers();
-                                    //lens.enc = "width"
-                                    lens.updateLENS(false,"width");
-                                    document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                            $('.dropbtnOpt-width').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                //lens.updateOthers();
+                                //lens.enc = "width"
+                                lens.updateLENS(false,"width");
+                                //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                                document.getElementsByClassName('dropbtnOpt-color')[0].style.backgroundColor = "buttonface";             
+                                document.getElementsByClassName('dropbtnOpt-width')[0].style.backgroundColor = "#ff1144";                              
+                                document.getElementsByClassName('dropbtnOpt-brightness')[0].style.backgroundColor = "buttonface";                              
+                                document.getElementsByClassName('dropbtnOpt-opacity')[0].style.backgroundColor = "buttonface";
                             });
-                            $('.dropbtnOpt-brightness').click(function () {
-                                    //lens.updateOthers();
-                                    //lens.enc = "brightness"
-                                    lens.updateLENS(false,"brightness");
-                                    document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                            $('.dropbtnOpt-brightness').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                //lens.updateOthers();
+                                //lens.enc = "brightness"
+                                lens.updateLENS(false,"brightness");
+                                //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                                document.getElementsByClassName('dropbtnOpt-color')[0].style.backgroundColor = "buttonface";             
+                                document.getElementsByClassName('dropbtnOpt-width')[0].style.backgroundColor = "buttonface";                              
+                                document.getElementsByClassName('dropbtnOpt-brightness')[0].style.backgroundColor = "#ff1144";                              
+                                document.getElementsByClassName('dropbtnOpt-opacity')[0].style.backgroundColor = "buttonface";
                             });
-                            $('.dropbtnOpt-opacity').click(function () {
-                                    //lens.updateOthers();
-                                    //lens.enc = "opacity"
-                                    lens.updateLENS(false,"opacity");
-                                    document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                            $('.dropbtnOpt-opacity').click(function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                //lens.updateOthers();
+                                //lens.enc = "opacity"
+                                lens.updateLENS(false,"opacity");
+                                //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                                document.getElementsByClassName('dropbtnOpt-color')[0].style.backgroundColor = "buttonface";             
+                                document.getElementsByClassName('dropbtnOpt-width')[0].style.backgroundColor = "buttonface";                              
+                                document.getElementsByClassName('dropbtnOpt-brightness')[0].style.backgroundColor = "buttonface";                              
+                                document.getElementsByClassName('dropbtnOpt-opacity')[0].style.backgroundColor = "#ff1144";
                             }); 
                             
                         }     
