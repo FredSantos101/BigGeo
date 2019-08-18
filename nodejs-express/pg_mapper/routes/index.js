@@ -222,8 +222,6 @@ function startMap(req, res){
 }
 
 router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(req, res) {
-  console.log(req.params.long);
-  console.log(req.params.lat);
 
 
   //Radius in meters to degrees
@@ -240,24 +238,19 @@ router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(
 
   var timefetch = Math.floor( new Date().getTime()/1000);
   var timeafterGet = timefetch-timeB4draw;
-  console.log("Updating map");
   // Pass the result to the map page
   query.on("end", function (result) {
       //var data = require('../public/data/geoJSON.json')
       var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
       res.send(dataNew);
 
-      console.log("DATA PASSED TO BE DRAWN");
       var timeAdraw = Math.floor( new Date().getTime()/1000);
-      console.log(timeAdraw-timefetch);
       client.end();
   });
 
 });
 
 /*router.get('/attQuery/:tab/:long/:lat/:radius', function(req, res) {
-  console.log(req.params.long);
-  console.log(req.params.lat);
 
 
   //Radius in meters to degrees
@@ -289,33 +282,29 @@ router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(
 
 });*/
 
-router.get('/attQueryNEW/:tab/:geom', function(req, res) {
+router.post('/attQueryNEW/:tab/:geom', function(req, res) {
 
   //var minDegrees = req.params.minValue/ 111120;
-
-  var client = new Client(conString); // Setup our Postgres Client
-  client.connect(); // connect to the client
-  var query = client.query(new Query(query_args_ContructorATTQUERIESNEW(req.params.tab, req.params.geom))); // Run our Query
-  query.on("row", function (row, result) {
+  let array = req.body;
+  let clientATT = new Client(conString); // Setup our Postgres Client
+  clientATT.connect(); // connect to the client
+  let queryAtt = clientATT.query(new Query(query_args_ContructorATTQUERIESCUTOpacLens(req.params.tab, req.params.geom, array))); // Run our Query
+  queryAtt.on("row", function (row, result) {
       result.addRow(row);
   });
 
-  console.log("Updating map");
   // Pass the result to the map page
-  query.on("end", function (result) {
-      //var data = require('../public/data/geoJSON.json')
-      var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
+  queryAtt.on("end", function (result) {
+      //let data = require('../public/data/geoJSON.json')
+      let dataNew = result.rows[0].row_to_json // Save the JSON as variable data
       res.send(dataNew);
 
-      console.log("DATA PASSED TO BE DRAWN");
-      client.end();
+      clientATT.end();
   });
 
 });
 
 router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(req, res) {
-  console.log(req.params.long);
-  console.log(req.params.lat);
 
 
   //Radius in meters to degrees
@@ -330,40 +319,31 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
 
   var timefetch = Math.floor( new Date().getTime()/1000);
   var timeafterGet = timefetch-timeB4draw;
-  console.log("Updating map");
   // Pass the result to the map page
   query.on("end", function (result) {
       //var data = require('../public/data/geoJSON.json')
       var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
       res.send(dataNew);
 
-      console.log("DATA PASSED TO BE DRAWN");
       var timeAdraw = Math.floor( new Date().getTime()/1000);
-      console.log(timeAdraw-timefetch);
       client.end();
   });
 
 });
 
 router.get('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:longNEW/:latNEW/:radiusNEW/:typeNEW/:minValueNEW/:maxValueNEW', function(req, res) {
-  console.log(req.params.long);
-  console.log(req.params.lat);
-
 
   //Radius in meters to degrees
   var radiusDegrees = (req.params.radius/ 111120).toFixed(8);
-  console.log(radiusDegrees);
   var radiusDegreesNEW = (req.params.radiusNEW/ 111120).toFixed(8);
 
   var client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
 
   //DELETE OLD QUERY OF THE LENS
-  console.log(activeQuery);
   var deleteOldPos = query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue);
-  console.log(activeQuery);
   var newQuery = query_args_ContructorQUERIES(req.params.tab,req.params.longNEW, req.params.latNEW, radiusDegreesNEW, req.params.typeNEW, req.params.minValueNEW, req.params.maxValueNEW);
-  console.log(activeQuery);
+
   var query = client.query(new Query(newQuery)); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
@@ -371,16 +351,14 @@ router.get('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:longN
 
   var timefetch = Math.floor( new Date().getTime()/1000);
   var timeafterGet = timefetch-timeB4draw;
-  console.log("Updating map");
+
   // Pass the result to the map page
   query.on("end", function (result) {
       //var data = require('../public/data/geoJSON.json')
       var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
       res.send(dataNew);
 
-      console.log("DATA PASSED TO BE DRAWN");
       var timeAdraw = Math.floor( new Date().getTime()/1000);
-      console.log(timeAdraw-timefetch);
       client.end();
   });
 
@@ -402,23 +380,22 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
     activeQuery = activeQuery + " AND ";
   }
   if (type == "Default"){
-    console.log("Im on a Pass by Lens");
     var queryDB =  "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
-      console.log("I already exist");
+
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
     activeQuery = activeQuery + queryDB;
-    console.log(activeQuery);
+
     return firstPart + activeQuery + secondPart;
   }
 
   else if (type == "Start"){
-    console.log("Im on a Start Point Lens");
+
     var queryDB = "ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
-      console.log("I already exist");
+
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
@@ -428,10 +405,9 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
   }
 
   else if (type == "End"){
-    console.log("Im on an End Point Lens");
     var queryDB = "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
-      console.log("I already exist");
+
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
@@ -440,11 +416,11 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
     return firstPart + activeQuery + secondPart;
   }
   else if (type == "Vel_avg"){
-    console.log("Im on an average Velocity Lens");
+
 
     var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ") AND (veloc_avg >=" + minValue + ") AND (veloc_avg <=" + maxValue + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
-      console.log("I already exist");
+
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
@@ -453,12 +429,12 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
     return firstPart + activeQuery + secondPart;
   }
   else if (type == "Length"){
-    console.log("Im on a Length Lens");
+
     var minValDegree = minValue / 111120;
     var maxValDegree = maxValue / 111120;
     var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (ST_Length(geom) >=" + minValDegree + ") AND (ST_Length(geom) <=" + maxValDegree + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
-      console.log("I already exist");
+
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
@@ -467,12 +443,12 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
     return firstPart + activeQuery + secondPart;
   }
   else if (type == "Time_Interval"){
-    console.log("Im on a Time Interval Lens");
+
     var minValTime = minValue;  //UNIX TIME
     var maxValTime = maxValue;  //UNIX TIME
     var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + ") OR data_time_end BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" + maxValTime + "))";
     if (activeQuery.indexOf(queryDB) !=-1){
-      console.log("I already exist");
+
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
@@ -482,12 +458,10 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
   }
 
   else if (type == "Time_Duration"){
-    console.log("Im on a Duration Lens");
     var minValTime = minValue;  //UNIX TIME
     var maxValTime = maxValue;  //UNIX TIME
     var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (extract(epoch from (data_time_end - data_time_start)) BETWEEN  " + minValTime + " AND " +maxValTime + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
-      console.log("I already exist");
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
@@ -496,7 +470,6 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
     return firstPart + activeQuery + secondPart;
   }
   else{
-    console.log("The string is empty");
     return "";}
 
 }
@@ -506,8 +479,6 @@ function query_args_ContructorATTQUERIESOLDEST (tab,long, lat, radius){
   var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
   var secondPart = " LIMIT 5000000) 	As f) As fc";
 
-  console.log("Im on an attribute Lens");
-  console.log(withsPart);
   return firstPart + secondPart;
 
 }
@@ -519,8 +490,6 @@ function query_args_ContructorATTQUERIESOLD (tab,geomGeoJson){
   var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
   var secondPart = " LIMIT 5000000) 	As f) As fc";
 
-  console.log("Im on an attribute Lens");
-  console.log(withsPart);
   return firstPart + secondPart;
 
 }
@@ -531,11 +500,101 @@ function query_args_ContructorATTQUERIESNEW (tab,geomGeoJson){
   var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg)) As properties FROM (" + withsPart + ") As lg";
   var secondPart = " LIMIT 5000000) 	As f) As fc";
 
-  console.log("Im on an attribute Lens");
-  console.log(withsPart);
   return firstPart + secondPart;
 
 }
+
+function query_args_ContructorATTQUERIESCUTOpacLens (tab,geomGeoJson,array){
+  //SELECT tid, array_agg(vel ORDER BY tid, data_time) as velPerPoint, ST_MakeLine(array_agg(linegeom ORDER BY tid,data_time)) AS linegeom
+
+  let stDiffs2 = "intersectionCut.linegeom";
+  
+  for(let j = 0;j<array.areasArrayIntersections.length;j++){
+    stDiffs2 = "ST_Difference("+stDiffs2+",ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(array.areasArrayIntersections[j]) + "'),4326))"
+    
+  }
+  console.log(stDiffs2);
+  
+  let withsPart ="WITH trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + ")," + 
+  " trajLine_Intersect as (SELECT * FROM trajectoryLine WHERE ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AND ST_Intersects(trajectoryLine.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)))," + 
+  " intersectionCut as (  SELECT ST_Intersection(trajLine_Intersect.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) as linegeom, trajLine_Intersect.length as length, trajLine_Intersect.veloc_avg as veloc_avg, trajLine_Intersect.duration, trajLine_Intersect.data_time_End  FROM trajLine_Intersect )" + 
+  " SELECT " +  stDiffs2 +  " as linegeom, intersectionCut.length as length, intersectionCut.veloc_avg as veloc_avg, intersectionCut.duration, intersectionCut.data_time_End  FROM intersectionCut";
+  let firstPart = "SELECT row_to_json(fk) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(k)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(mg.linegeom)::json As geometry, row_to_json((mg.length,mg.duration,mg.data_time_End,mg.veloc_avg)) As properties FROM (" + withsPart + ") As mg";
+  let secondPart = " LIMIT 5000000) 	As k) As fk";
+
+  return firstPart + secondPart;
+
+}
+
+router.post('/updateBaseLayer/:tab', (req, res, next) => {
+  let data = req.body;
+  let stDiffs = "geom";
+  let queryOfDiff = "";
+  let queryOfRest = "";
+  if (activeQuery.length == 0){
+    queryOfDiff = " WHERE ";
+    queryOfRest = " WHERE ";
+  }
+  
+  for(let i = 0;i<data.areasArray.length;i++){
+    stDiffs = "ST_Difference("+stDiffs+",ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))"
+    if(queryOfDiff == " WHERE " && queryOfRest == " WHERE "){
+      queryOfDiff = queryOfDiff + "(ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+      queryOfRest = queryOfRest + "NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+    }
+    else{
+      if(i == 0){  
+        queryOfDiff = queryOfDiff + " AND (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+        queryOfRest = queryOfRest + " AND NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
+      
+      }
+      else{
+        queryOfDiff = queryOfDiff + " OR ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+        queryOfRest = queryOfRest + " AND ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
+      
+      }
+      
+    }
+  }
+  queryOfDiff = queryOfDiff + ")";
+  queryOfRest = queryOfRest + ")";
+  let firstSelect = "SELECT " +  stDiffs + " AS geom FROM " + req.params.tab; 
+  let secondSelect = "SELECT geom AS geom FROM " + req.params.tab; 
+  
+  let firstPart = ""
+  let secondPart = " LIMIT 5000000) 	As kb) As fc";
+  if (data.areasArray.length == 0){
+    firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" + secondSelect + activeQuery + ") As lg";
+  
+  }
+  else{
+    firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" +firstSelect + activeQuery + queryOfDiff + " UNION ALL " + secondSelect + activeQuery + queryOfRest + ") As lg";
+  
+  }
+  console.log(firstPart);
+  let client = new Client(conString); // Setup our Postgres Client
+  client.connect(); // connect to the client
+
+  //DELETE OLD QUERY OF THE LENS
+  
+  let newQuery = firstPart + secondPart;
+
+  let query = client.query(new Query(newQuery)); // Run our Query
+  query.on("row", function (row, result) {
+      result.addRow(row);
+  });
+
+
+  // Pass the result to the map page
+  query.on("end", function (result) {
+      //let data = require('../public/data/geoJSON.json')
+      let dataNew = result.rows[0].row_to_json // Save the JSON as variable data
+      res.send(dataNew);
+
+      client.end();
+  });
+
+});
 
 
 //
@@ -761,6 +820,8 @@ router.get('/union/:firstGeom/:secondGeom', function(req, res) {
 
 
 });
+
+
 
 //UPLOAD FILES FUNCTIONS
 
