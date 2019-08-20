@@ -15,23 +15,23 @@ const os =  require('os')
 /* PostgreSQL and PostGIS module and connection setup */
 const { Client, Query } = require('pg')
 
-var isWindows = (os.platform() === 'win32');
+let isWindows = (os.platform() === 'win32');
 
 
 //Create db script
-var databaseCreation = "template_postgis";
+let databaseCreation = "template_postgis";
 // Setup connection
-var username = "postgres" // sandbox username
-var password = "postgres" // read only privileges on our table
-var host = "localhost:5432"
-var database = "taxi_beij" // database name
-var conString = "postgres://"+username+":"+password+"@"+host+"/"+database; // Your Database Connection
-var conString0 = "postgres://"+username+":"+password+"@"+host+"/"+databaseCreation; // Your Database Connection
+let username = "postgres" // sandbox username
+let password = "postgres" // read only privileges on our table
+let host = "localhost:5432"
+let database = "taxi_beij" // database name
+let conString = "postgres://"+username+":"+password+"@"+host+"/"+database; // Your Database Connection
+let conString0 = "postgres://"+username+":"+password+"@"+host+"/"+databaseCreation; // Your Database Connection
 
 // Set up your database query to display GeoJSON
-var drawLines = "SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (	SELECT 'Feature' As type, ST_AsGeoJSON(lg.geomline)::json As geometry, row_to_json((taxi_id,data_time)) As properties FROM tracks As lg LIMIT 1) 	As f) As fc ";
+let drawLines = "SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (	SELECT 'Feature' As type, ST_AsGeoJSON(lg.geomline)::json As geometry, row_to_json((taxi_id,data_time)) As properties FROM tracks As lg LIMIT 1) 	As f) As fc ";
 
-/*var drawTracks = "SELECT row_to_json(fc) FROM
+/*let drawTracks = "SELECT row_to_json(fc) FROM
                     (SELECT 'ID_Track' As type,array_to_json(array_agg(track_list)) As features FROM
                       (SELECT 'Trajectoria' As type, array_to_json(array_agg(track_indi)) As features FROM
                         (SELECT 'Ponto' As type, ST_AsGeoJSON(lg.geomline)::json As geometry, row_to_json((taxi_id,data_time)) As properties FROM tracks As lg LIMIT 1500000)
@@ -39,8 +39,8 @@ var drawLines = "SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As typ
                     As track_list)
                   As fc ";*/
 
-var drawTracks    = "SELECT row_to_json(fc) FROM (SELECT 'Trajectoria' As type, array_to_json(array_agg(track_indi)) As features FROM (SELECT 'P' As type, ST_AsGeoJSON(lg.geomline)::json As geometry, row_to_json((lg.taxi_id,lg.data_time)) As properties FROM (SELECT taxi_id, data_time FROM trajectory_lines GROUP BY taxi_id,data_time ORDER BY taxi_id,data_time) As t JOIN trajectory_lines As lg ON lg.taxi_id = t.taxi_id AND lg.data_time = t.data_time LIMIT 1400000) As track_indi ) As fc ";
-var drawTracksMap ="SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (	SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.vel)) As properties FROM trajectory_lines3 As lg LIMIT 10000) 	As f) As fc ";
+let drawTracks    = "SELECT row_to_json(fc) FROM (SELECT 'Trajectoria' As type, array_to_json(array_agg(track_indi)) As features FROM (SELECT 'P' As type, ST_AsGeoJSON(lg.geomline)::json As geometry, row_to_json((lg.taxi_id,lg.data_time)) As properties FROM (SELECT taxi_id, data_time FROM trajectory_lines GROUP BY taxi_id,data_time ORDER BY taxi_id,data_time) As t JOIN trajectory_lines As lg ON lg.taxi_id = t.taxi_id AND lg.data_time = t.data_time LIMIT 1400000) As track_indi ) As fc ";
+let drawTracksMap ="SELECT row_to_json(fc) FROM (	SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (	SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.vel)) As properties FROM trajectory_lines3 As lg LIMIT 10000) 	As f) As fc ";
 
 /*WITH multis AS (
                  SELECT tid, min(data_time) AS time_start, max(data_time)
@@ -72,7 +72,7 @@ WHERE tid = idThis AND  data_time = dataTime
  */
 
 
-var select_first = "SELECT taxi_id from (SELECT taxi_id,row_number() as rn,count(*) over () as total_countFROM tracks) t where rn = 1 or rn = total_count";
+let select_first = "SELECT taxi_id from (SELECT taxi_id,row_number() as rn,count(*) over () as total_countFROM tracks) t where rn = 1 or rn = total_count";
 
 
 /* QUERIES TO UTILIZE ON LENSES MECHANISMS*/
@@ -82,7 +82,7 @@ var select_first = "SELECT taxi_id from (SELECT taxi_id,row_number() as rn,count
 // ST_DWithin geom geom, distance (in units of sgrid)--- should be meters but it aint, 0.0009 == 100meters sort of
 
 
-var activeQuery = "";
+let activeQuery = "";
 
 
 /* QUERIES TO UTILIZE ON LENSES MECHANISMS*/
@@ -99,15 +99,15 @@ module.exports = router;
 
 /* GET Postgres JSON data */
 router.get('/data', function (req, res) {
-  var client = new Client(conString);
+  let client = new Client(conString);
   client.connect();
-  var query = client.query(new Query(drawTracksMap));
+  let query = client.query(new Query(drawTracksMap));
   query.on("row", function (row, result) {
       result.addRow(row);
   });
 
   query.on("end", function (result) {
-      var fs = require('fs');
+      let fs = require('fs');
       fs.writeFileSync('./public/data/geoJSON.json', JSON.stringify(result.rows[0].row_to_json));
       res.send(result.rows[0].row_to_json);
       res.end();
@@ -115,12 +115,12 @@ router.get('/data', function (req, res) {
 });
 
 /* GET the map page */
-var timeB4draw = Math.floor( new Date().getTime()/1000);
+let timeB4draw = Math.floor( new Date().getTime()/1000);
 router.get('/map', function(req, res) {
-  var client0 = new Client(conString0); // Setup our Postgres Client
+  let client0 = new Client(conString0); // Setup our Postgres Client
   client0.connect(); // connect to the client
   console.log("Connected to template_postgis");
-  var checkIfDBExists = "SELECT datname FROM pg_catalog.pg_database WHERE datname = 'taxi_beij'";
+  let checkIfDBExists = "SELECT datname FROM pg_catalog.pg_database WHERE datname = 'taxi_beij'";
   client0.query(new Query(checkIfDBExists)).on("end",function(result, err){
     if(result.rowCount != 1){
       client0.query(new Query("CREATE DATABASE taxi_beij")).on("end",function(err){
@@ -141,11 +141,11 @@ router.get('/map', function(req, res) {
 });
 
 function startMap(req, res){
-  var client = new Client(conString); // Setup our Postgres Client
-  var client1 = new Client(conString);
-  var client2 = new Client(conString);
-  var client3 = new Client(conString);
-  var client4 = new Client(conString);
+  let client = new Client(conString); // Setup our Postgres Client
+  let client1 = new Client(conString);
+  let client2 = new Client(conString);
+  let client3 = new Client(conString);
+  let client4 = new Client(conString);
   client.connect(); // connect to the client
   client1.connect();
   client2.connect();
@@ -153,22 +153,22 @@ function startMap(req, res){
   client4.connect();
   console.log("New client connected to new taxi_beij");
 
-  var createPostgisExt = "CREATE EXTENSION IF NOT EXISTS postgis;CREATE EXTENSION IF NOT EXISTS postgis_topology;"
-  var createDB =  "CREATE TABLE IF NOT EXISTS public.track_divided_by_time_30s(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_30s OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_30s TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_30s USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_30s USING btree (tid) TABLESPACE pg_default;";
-  var createDB1 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist ON public.trajectory_lines USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist ON public.trajectory_lines USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist ON public.trajectory_lines USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index ON public.trajectory_lines USING btree (track_id) TABLESPACE pg_default;"
-  var createDB2 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines1(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines1 OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines1 TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist1 ON public.trajectory_lines1 USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist1 ON public.trajectory_lines1 USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist1 ON public.trajectory_lines1 USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index1 ON public.trajectory_lines1 USING btree (track_id) TABLESPACE pg_default;"
-  var createDB3 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines2(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines2 OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines2 TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist2 ON public.trajectory_lines2 USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist2 ON public.trajectory_lines2 USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist2 ON public.trajectory_lines2 USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index2 ON public.trajectory_lines2 USING btree (track_id) TABLESPACE pg_default;"
-  var createDB4 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines3(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines3 OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines3 TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist3 ON public.trajectory_lines3 USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist3 ON public.trajectory_lines3 USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist3 ON public.trajectory_lines3 USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index3 ON public.trajectory_lines3 USING btree (track_id) TABLESPACE pg_default;"
+  let createPostgisExt = "CREATE EXTENSION IF NOT EXISTS postgis;CREATE EXTENSION IF NOT EXISTS postgis_topology;"
+  let createDB =  "CREATE TABLE IF NOT EXISTS public.track_divided_by_time_30s(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_30s OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_30s TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_30s USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_30s USING btree (tid) TABLESPACE pg_default;";
+  let createDB1 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist ON public.trajectory_lines USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist ON public.trajectory_lines USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist ON public.trajectory_lines USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index ON public.trajectory_lines USING btree (track_id) TABLESPACE pg_default;"
+  let createDB2 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines1(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines1 OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines1 TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist1 ON public.trajectory_lines1 USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist1 ON public.trajectory_lines1 USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist1 ON public.trajectory_lines1 USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index1 ON public.trajectory_lines1 USING btree (track_id) TABLESPACE pg_default;"
+  let createDB3 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines2(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines2 OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines2 TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist2 ON public.trajectory_lines2 USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist2 ON public.trajectory_lines2 USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist2 ON public.trajectory_lines2 USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index2 ON public.trajectory_lines2 USING btree (track_id) TABLESPACE pg_default;"
+  let createDB4 = "CREATE TABLE IF NOT EXISTS public.trajectory_lines3(track_id integer,geom geometry(LineString,4326),data_time_start timestamp without time zone,data_time_end timestamp without time zone,startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),veloc_avg double precision,duration interval,length double precision,vel double precision[])WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.trajectory_lines3 OWNER to postgres;GRANT ALL ON TABLE public.trajectory_lines3 TO postgres;CREATE INDEX IF NOT EXISTS lineindexgist3 ON public.trajectory_lines3 USING gist (geom) TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointendindexgist3 ON public.trajectory_lines3 USING gist (endpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS pointstartindexgist3 ON public.trajectory_lines3 USING gist(startpointgeom)TABLESPACE pg_default;CREATE INDEX IF NOT EXISTS trackid_index3 ON public.trajectory_lines3 USING btree (track_id) TABLESPACE pg_default;"
   client.query(new Query(createPostgisExt)).on("end",function(err){
       if(err){
         console.log("Extentions already existed");
       }
       console.log("Extentions created");
-      var createAllDBs = client.query(new Query(createDB));
-      var createAllDBs1 = client1.query(new Query(createDB1));
-      var createAllDBs2 = client2.query(new Query(createDB2));
-      var createAllDBs3 = client3.query(new Query(createDB3));
-      var createAllDBs4 = client4.query(new Query(createDB4));
+      let createAllDBs = client.query(new Query(createDB));
+      let createAllDBs1 = client1.query(new Query(createDB1));
+      let createAllDBs2 = client2.query(new Query(createDB2));
+      let createAllDBs3 = client3.query(new Query(createDB3));
+      let createAllDBs4 = client4.query(new Query(createDB4));
       createAllDBs.on("end",function(){
         console.log("Table track_divided_by_time_30s created");
         client.end();
@@ -189,24 +189,24 @@ function startMap(req, res){
         client4.end();
         activeQuery = "";
         console.log("Table trajectory_lines3 created");
-        var clientFetchFirst = new Client(conString); // Setup our Postgres Client
+        clientFetchFirst = new Client(conString); // Setup our Postgres Client
         clientFetchFirst.connect(); // connect to the client
         console.log("Fetching on database");
-        var query = clientFetchFirst.query(new Query(drawTracksMap)); // Run our Query
+        let query = clientFetchFirst.query(new Query(drawTracksMap)); // Run our Query
         query.on("row", function (row, result) {
             result.addRow(row);
         });
 
-        var timefetch = Math.floor( new Date().getTime()/1000);
-        var timeafterGet = timefetch-timeB4draw;
+        let timefetch = Math.floor( new Date().getTime()/1000);
+        let timeafterGet = timefetch-timeB4draw;
 
         // Pass the result to the map page
         query.on("end", function (result) {
-
+            console.log(result)
             console.log("Passing data to frontend");
-            //var data = require('../public/data/geoJSON.json')
-            var data = result.rows[0].row_to_json // Save the JSON as variable data
-
+            //let data = require('../public/data/geoJSON.json')
+            let data = result.rows[0].row_to_json // Save the JSON as variable data
+            console.log(data)
             res.render('map', {
                 title: "BigGeo", // Give a title to our page
                 jsonData: data // Pass data to the View
@@ -225,26 +225,26 @@ router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(
 
 
   //Radius in meters to degrees
-  var radiusDegrees = (req.params.radius/ 111120).toFixed(8);
+  let radiusDegrees = (req.params.radius/ 111120).toFixed(8);
 
-  //var minDegrees = req.params.minValue/ 111120;
+  //let minDegrees = req.params.minValue/ 111120;
 
-  var client = new Client(conString); // Setup our Postgres Client
+  let client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-  var query = client.query(new Query(query_args_ContructorQUERIES(req.params.tab, req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
+  let query = client.query(new Query(query_args_ContructorQUERIES(req.params.tab, req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
   });
 
-  var timefetch = Math.floor( new Date().getTime()/1000);
-  var timeafterGet = timefetch-timeB4draw;
+  let timefetch = Math.floor( new Date().getTime()/1000);
+  let timeafterGet = timefetch-timeB4draw;
   // Pass the result to the map page
   query.on("end", function (result) {
-      //var data = require('../public/data/geoJSON.json')
-      var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
+      //let data = require('../public/data/geoJSON.json')
+      let dataNew = result.rows[0].row_to_json // Save the JSON as variable data
       res.send(dataNew);
 
-      var timeAdraw = Math.floor( new Date().getTime()/1000);
+      let timeAdraw = Math.floor( new Date().getTime()/1000);
       client.end();
   });
 
@@ -254,28 +254,28 @@ router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(
 
 
   //Radius in meters to degrees
-  var radiusDegrees = (req.params.radius/ 111120).toFixed(8);
+  let radiusDegrees = (req.params.radius/ 111120).toFixed(8);
 
-  //var minDegrees = req.params.minValue/ 111120;
+  //let minDegrees = req.params.minValue/ 111120;
 
-  var client = new Client(conString); // Setup our Postgres Client
+  let client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-  var query = client.query(new Query(query_args_ContructorATTQUERIES(req.params.tab, req.params.long, req.params.lat, radiusDegrees))); // Run our Query
+  let query = client.query(new Query(query_args_ContructorATTQUERIES(req.params.tab, req.params.long, req.params.lat, radiusDegrees))); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
   });
 
-  var timefetch = Math.floor( new Date().getTime()/1000);
-  var timeafterGet = timefetch-timeB4draw;
+  let timefetch = Math.floor( new Date().getTime()/1000);
+  let timeafterGet = timefetch-timeB4draw;
   console.log("Updating map");
   // Pass the result to the map page
   query.on("end", function (result) {
-      //var data = require('../public/data/geoJSON.json')
-      var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
+      //let data = require('../public/data/geoJSON.json')
+      let dataNew = result.rows[0].row_to_json // Save the JSON as variable data
       res.send(dataNew);
 
       console.log("DATA PASSED TO BE DRAWN");
-      var timeAdraw = Math.floor( new Date().getTime()/1000);
+      let timeAdraw = Math.floor( new Date().getTime()/1000);
       console.log(timeAdraw-timefetch);
       client.end();
   });
@@ -284,7 +284,7 @@ router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(
 
 router.post('/attQueryNEW/:tab/:geom', function(req, res) {
 
-  //var minDegrees = req.params.minValue/ 111120;
+  //let minDegrees = req.params.minValue/ 111120;
   let array = req.body;
   let clientATT = new Client(conString); // Setup our Postgres Client
   clientATT.connect(); // connect to the client
@@ -308,24 +308,24 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
 
 
   //Radius in meters to degrees
-  var radiusDegrees = (req.params.radius/ 111120).toFixed(8);
+  let radiusDegrees = (req.params.radius/ 111120).toFixed(8);
 
-  var client = new Client(conString); // Setup our Postgres Client
+  let client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-  var query = client.query(new Query(query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
+  let query = client.query(new Query(query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
   });
 
-  var timefetch = Math.floor( new Date().getTime()/1000);
-  var timeafterGet = timefetch-timeB4draw;
+  let timefetch = Math.floor( new Date().getTime()/1000);
+  let timeafterGet = timefetch-timeB4draw;
   // Pass the result to the map page
   query.on("end", function (result) {
-      //var data = require('../public/data/geoJSON.json')
-      var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
+      //let data = require('../public/data/geoJSON.json')
+      let dataNew = result.rows[0].row_to_json // Save the JSON as variable data
       res.send(dataNew);
 
-      var timeAdraw = Math.floor( new Date().getTime()/1000);
+      let timeAdraw = Math.floor( new Date().getTime()/1000);
       client.end();
   });
 
@@ -334,31 +334,31 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
 router.get('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:longNEW/:latNEW/:radiusNEW/:typeNEW/:minValueNEW/:maxValueNEW', function(req, res) {
 
   //Radius in meters to degrees
-  var radiusDegrees = (req.params.radius/ 111120).toFixed(8);
-  var radiusDegreesNEW = (req.params.radiusNEW/ 111120).toFixed(8);
+  let radiusDegrees = (req.params.radius/ 111120).toFixed(8);
+  let radiusDegreesNEW = (req.params.radiusNEW/ 111120).toFixed(8);
 
-  var client = new Client(conString); // Setup our Postgres Client
+  let client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
 
   //DELETE OLD QUERY OF THE LENS
-  var deleteOldPos = query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue);
-  var newQuery = query_args_ContructorQUERIES(req.params.tab,req.params.longNEW, req.params.latNEW, radiusDegreesNEW, req.params.typeNEW, req.params.minValueNEW, req.params.maxValueNEW);
+  let deleteOldPos = query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue);
+  let newQuery = query_args_ContructorQUERIES(req.params.tab,req.params.longNEW, req.params.latNEW, radiusDegreesNEW, req.params.typeNEW, req.params.minValueNEW, req.params.maxValueNEW);
 
-  var query = client.query(new Query(newQuery)); // Run our Query
+  let query = client.query(new Query(newQuery)); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
   });
 
-  var timefetch = Math.floor( new Date().getTime()/1000);
-  var timeafterGet = timefetch-timeB4draw;
+  let timefetch = Math.floor( new Date().getTime()/1000);
+  let timeafterGet = timefetch-timeB4draw;
 
   // Pass the result to the map page
   query.on("end", function (result) {
-      //var data = require('../public/data/geoJSON.json')
-      var dataNew = result.rows[0].row_to_json // Save the JSON as variable data
+      //let data = require('../public/data/geoJSON.json')
+      let dataNew = result.rows[0].row_to_json // Save the JSON as variable data
       res.send(dataNew);
 
-      var timeAdraw = Math.floor( new Date().getTime()/1000);
+      let timeAdraw = Math.floor( new Date().getTime()/1000);
       client.end();
   });
 
@@ -374,13 +374,13 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
     activeQuery = " WHERE ";
   }
 
-  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.vel)) As properties FROM " + tab + " As lg";
-  var secondPart = " LIMIT 5000000) 	As f) As fc";
+  let firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.vel)) As properties FROM " + tab + " As lg";
+  let secondPart = " LIMIT 5000000) 	As f) As fc";
   if (activeQuery.length != 7){
     activeQuery = activeQuery + " AND ";
   }
   if (type == "Default"){
-    var queryDB =  "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
+    let queryDB =  "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
 
       activeQuery = activeQuery.slice(0,-5);
@@ -393,7 +393,7 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
 
   else if (type == "Start"){
 
-    var queryDB = "ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
+    let queryDB = "ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
 
       activeQuery = activeQuery.slice(0,-5);
@@ -405,7 +405,7 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
   }
 
   else if (type == "End"){
-    var queryDB = "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
+    let queryDB = "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
 
       activeQuery = activeQuery.slice(0,-5);
@@ -418,7 +418,7 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
   else if (type == "Vel_avg"){
 
 
-    var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ") AND (veloc_avg >=" + minValue + ") AND (veloc_avg <=" + maxValue + ")";
+    let queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ") AND (veloc_avg >=" + minValue + ") AND (veloc_avg <=" + maxValue + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
 
       activeQuery = activeQuery.slice(0,-5);
@@ -430,9 +430,9 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
   }
   else if (type == "Length"){
 
-    var minValDegree = minValue / 111120;
-    var maxValDegree = maxValue / 111120;
-    var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (ST_Length(geom) >=" + minValDegree + ") AND (ST_Length(geom) <=" + maxValDegree + ")";
+    let minValDegree = minValue / 111120;
+    let maxValDegree = maxValue / 111120;
+    let queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (ST_Length(geom) >=" + minValDegree + ") AND (ST_Length(geom) <=" + maxValDegree + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
 
       activeQuery = activeQuery.slice(0,-5);
@@ -444,9 +444,9 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
   }
   else if (type == "Time_Interval"){
 
-    var minValTime = minValue;  //UNIX TIME
-    var maxValTime = maxValue;  //UNIX TIME
-    var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + ") OR data_time_end BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" + maxValTime + "))";
+    let minValTime = minValue;  //UNIX TIME
+    let maxValTime = maxValue;  //UNIX TIME
+    let queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + ") OR data_time_end BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" + maxValTime + "))";
     if (activeQuery.indexOf(queryDB) !=-1){
 
       activeQuery = activeQuery.slice(0,-5);
@@ -458,9 +458,9 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
   }
 
   else if (type == "Time_Duration"){
-    var minValTime = minValue;  //UNIX TIME
-    var maxValTime = maxValue;  //UNIX TIME
-    var queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (extract(epoch from (data_time_end - data_time_start)) BETWEEN  " + minValTime + " AND " +maxValTime + ")";
+    let minValTime = minValue;  //UNIX TIME
+    let maxValTime = maxValue;  //UNIX TIME
+    let queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (extract(epoch from (data_time_end - data_time_start)) BETWEEN  " + minValTime + " AND " +maxValTime + ")";
     if (activeQuery.indexOf(queryDB) !=-1){
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
@@ -475,9 +475,9 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
 }
 function query_args_ContructorATTQUERIESOLDEST (tab,long, lat, radius){
   //SELECT tid, array_agg(vel ORDER BY tid, data_time) as velPerPoint, ST_MakeLine(array_agg(linegeom ORDER BY tid,data_time)) AS linegeom
-  var withsPart ="WITH trackDivided as ( SELECT tid, vel as velPerPoint, linegeom, data_time FROM track_divided_by_time_30s WHERE ST_DWithin(linegeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")), trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), multi as (SELECT trackDivided.tid, array_agg(trackDivided.velPerPoint ORDER BY trackDivided.tid, trackDivided.data_time) as velPerPoint, ST_MakeLine(array_agg(trackDivided.linegeom ORDER BY trackDivided.tid,trackDivided.data_time)) AS linegeom FROM trackDivided, trajectoryLine WHERE trackDivided.tid = trajectoryLine.track_id GROUP BY trackDivided.tid) SELECT multi.linegeom as linegeom, multi.velPerPoint as velPerPoint, trajectoryLine.length as length, trajectoryLine.veloc_avg as veloc_avg, trajectoryLine.duration, trajectoryLine.data_time_End  FROM trajectoryLine , multi WHERE multi.tid = trajectoryLine.track_id";
-  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
-  var secondPart = " LIMIT 5000000) 	As f) As fc";
+  let withsPart ="WITH trackDivided as ( SELECT tid, vel as velPerPoint, linegeom, data_time FROM track_divided_by_time_30s WHERE ST_DWithin(linegeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")), trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), multi as (SELECT trackDivided.tid, array_agg(trackDivided.velPerPoint ORDER BY trackDivided.tid, trackDivided.data_time) as velPerPoint, ST_MakeLine(array_agg(trackDivided.linegeom ORDER BY trackDivided.tid,trackDivided.data_time)) AS linegeom FROM trackDivided, trajectoryLine WHERE trackDivided.tid = trajectoryLine.track_id GROUP BY trackDivided.tid) SELECT multi.linegeom as linegeom, multi.velPerPoint as velPerPoint, trajectoryLine.length as length, trajectoryLine.veloc_avg as veloc_avg, trajectoryLine.duration, trajectoryLine.data_time_End  FROM trajectoryLine , multi WHERE multi.tid = trajectoryLine.track_id";
+  let firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
+  let secondPart = " LIMIT 5000000) 	As f) As fc";
 
   return firstPart + secondPart;
 
@@ -486,9 +486,9 @@ function query_args_ContructorATTQUERIESOLDEST (tab,long, lat, radius){
 function query_args_ContructorATTQUERIESOLD (tab,geomGeoJson){
   //SELECT tid, array_agg(vel ORDER BY tid, data_time) as velPerPoint, ST_MakeLine(array_agg(linegeom ORDER BY tid,data_time)) AS linegeom
 
-  var withsPart ="WITH trackDivided as ( SELECT tid,tidsubseg, vel as velPerPoint, linegeom, data_time FROM track_divided_by_time_30s WHERE ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AND ST_Intersects(linegeom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326))), trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), prevLag as (SELECT trackDivided.tid as tid,trackDivided.tidsubseg as tidsubseg,trackDivided.velPerPoint, trackDivided.linegeom, trackDivided.data_time,lag(trackDivided.tidsubseg) over (ORDER BY trackDivided.tidsubseg) as idPrev FROM trackDivided), multi as (SELECT prevLag.tid, array_agg(prevLag.velPerPoint ORDER BY prevLag.tid, prevLag.data_time) as velPerPoint, ST_Intersection(ST_MakeLine(array_agg(prevLag.linegeom ORDER BY prevLag.tid,prevLag.data_time)),ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AS linegeom FROM trajectoryLine,prevLag WHERE prevLag.tid = trajectoryLine.track_id AND prevLag.tidsubseg = prevLag.idprev+1 GROUP BY prevLag.tid ) SELECT multi.linegeom as linegeom, multi.velPerPoint as velPerPoint, trajectoryLine.length as length, trajectoryLine.veloc_avg as veloc_avg, trajectoryLine.duration, trajectoryLine.data_time_End  FROM trajectoryLine , multi WHERE multi.tid = trajectoryLine.track_id";
-  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
-  var secondPart = " LIMIT 5000000) 	As f) As fc";
+  let withsPart ="WITH trackDivided as ( SELECT tid,tidsubseg, vel as velPerPoint, linegeom, data_time FROM track_divided_by_time_30s WHERE ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AND ST_Intersects(linegeom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326))), trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), prevLag as (SELECT trackDivided.tid as tid,trackDivided.tidsubseg as tidsubseg,trackDivided.velPerPoint, trackDivided.linegeom, trackDivided.data_time,lag(trackDivided.tidsubseg) over (ORDER BY trackDivided.tidsubseg) as idPrev FROM trackDivided), multi as (SELECT prevLag.tid, array_agg(prevLag.velPerPoint ORDER BY prevLag.tid, prevLag.data_time) as velPerPoint, ST_Intersection(ST_MakeLine(array_agg(prevLag.linegeom ORDER BY prevLag.tid,prevLag.data_time)),ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AS linegeom FROM trajectoryLine,prevLag WHERE prevLag.tid = trajectoryLine.track_id AND prevLag.tidsubseg = prevLag.idprev+1 GROUP BY prevLag.tid ) SELECT multi.linegeom as linegeom, multi.velPerPoint as velPerPoint, trajectoryLine.length as length, trajectoryLine.veloc_avg as veloc_avg, trajectoryLine.duration, trajectoryLine.data_time_End  FROM trajectoryLine , multi WHERE multi.tid = trajectoryLine.track_id";
+  let firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.velPerPoint)) As properties FROM (" + withsPart + ") As lg";
+  let secondPart = " LIMIT 5000000) 	As f) As fc";
 
   return firstPart + secondPart;
 
@@ -496,9 +496,9 @@ function query_args_ContructorATTQUERIESOLD (tab,geomGeoJson){
 function query_args_ContructorATTQUERIESNEW (tab,geomGeoJson){
   //SELECT tid, array_agg(vel ORDER BY tid, data_time) as velPerPoint, ST_MakeLine(array_agg(linegeom ORDER BY tid,data_time)) AS linegeom
 
-  var withsPart ="WITH trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), trajLine_Intersect as (SELECT * FROM trajectoryLine WHERE ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AND ST_Intersects(trajectoryLine.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)))  SELECT ST_Intersection(trajLine_Intersect.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) as linegeom, trajLine_Intersect.length as length, trajLine_Intersect.veloc_avg as veloc_avg, trajLine_Intersect.duration, trajLine_Intersect.data_time_End  FROM trajLine_Intersect ";
-  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg)) As properties FROM (" + withsPart + ") As lg";
-  var secondPart = " LIMIT 5000000) 	As f) As fc";
+  let withsPart ="WITH trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + "), trajLine_Intersect as (SELECT * FROM trajectoryLine WHERE ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AND ST_Intersects(trajectoryLine.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)))  SELECT ST_Intersection(trajLine_Intersect.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) as linegeom, trajLine_Intersect.length as length, trajLine_Intersect.veloc_avg as veloc_avg, trajLine_Intersect.duration, trajLine_Intersect.data_time_End  FROM trajLine_Intersect ";
+  let firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.linegeom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg)) As properties FROM (" + withsPart + ") As lg";
+  let secondPart = " LIMIT 5000000) 	As f) As fc";
 
   return firstPart + secondPart;
 
@@ -608,15 +608,15 @@ function replaceGlobally(original, searchTxt, replaceTxt) {
 
 function query_args_DecontructorQUERIES (tab ,long, lat, radius, type, minVal, maxVal){
 
-  var andString = " AND ";
-  var firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.vel)) As properties FROM " + tab + " As lg";
-  var secondPart = " LIMIT 40000) 	As f) As fc";
+  let andString = " AND ";
+  let firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry, row_to_json((lg.length,lg.duration,lg.data_time_End,lg.veloc_avg, lg.vel)) As properties FROM " + tab + " As lg";
+  let secondPart = " LIMIT 40000) 	As f) As fc";
 
   if(activeQuery == ""){
       console.log("Query was already empty no need to remove anything")
   }
   else if (type == "Default"){
-    var queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
+    let queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
 
     console.log("Im on a Pass by Lens");
     if (activeQuery.indexOf(queryDB) !=-1){
@@ -635,7 +635,7 @@ function query_args_DecontructorQUERIES (tab ,long, lat, radius, type, minVal, m
   }
 
   else if (type == "Start"){
-    var queryDB = andString + "ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
+    let queryDB = andString + "ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
 
     console.log("Im on a Start Point Lens");
     if (activeQuery.indexOf(" AND ST_DWithin(startPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")") !=-1){
@@ -655,7 +655,7 @@ function query_args_DecontructorQUERIES (tab ,long, lat, radius, type, minVal, m
   }
 
   else if (type == "End"){
-    var queryDB = andString + "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
+    let queryDB = andString + "ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")";
 
     console.log("Im on a End Point Lens");
     if (activeQuery.indexOf(" AND ST_DWithin(endPointGeom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ")") !=-1){
@@ -676,7 +676,7 @@ function query_args_DecontructorQUERIES (tab ,long, lat, radius, type, minVal, m
   }
 
   else if (type == "Vel_avg"){
-    var queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")";
+    let queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")";
 
     console.log("Im on a Velocity Lens");
     if (activeQuery.indexOf(" AND ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326)," + radius + ") AND (veloc_avg >=" + minVal + ") AND (veloc_avg <=" + maxVal + ")") !=-1){
@@ -696,9 +696,9 @@ function query_args_DecontructorQUERIES (tab ,long, lat, radius, type, minVal, m
   }
 
   else if (type == "Length"){
-    var minValDegree = minVal / 111120;
-    var maxValDegree = maxVal / 111120;
-    var queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (ST_Length(geom) >=" + minValDegree + ") AND (ST_Length(geom) <=" + maxValDegree + ")";
+    let minValDegree = minVal / 111120;
+    let maxValDegree = maxVal / 111120;
+    let queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (ST_Length(geom) >=" + minValDegree + ") AND (ST_Length(geom) <=" + maxValDegree + ")";
 
     console.log("Im on a Length  Lens");
     if (activeQuery.indexOf(queryDB) !=-1){
@@ -717,9 +717,9 @@ function query_args_DecontructorQUERIES (tab ,long, lat, radius, type, minVal, m
   }
 
   else if (type == "Time_Interval"){
-    var minValTime = minVal;  //UNIX TIME
-    var maxValTime = maxVal;  //UNIX TIME
-    var queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + ") OR data_time_end BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" + maxValTime + "))";
+    let minValTime = minVal;  //UNIX TIME
+    let maxValTime = maxVal;  //UNIX TIME
+    let queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + ") OR data_time_end BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" + maxValTime + "))";
 
     console.log("Im on a Time Interval  Lens");
     if (activeQuery.indexOf(queryDB) !=-1){
@@ -737,9 +737,9 @@ function query_args_DecontructorQUERIES (tab ,long, lat, radius, type, minVal, m
     console.log("The active query is:" + activeQuery);
   }
   else if (type == "Time_Duration"){
-    var minValTime = minVal;  //UNIX TIME
-    var maxValTime = maxVal;  //UNIX TIME
-    var queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (extract(epoch from (data_time_end - data_time_start)) BETWEEN  " + minValTime + " AND " +maxValTime + ")";
+    let minValTime = minVal;  //UNIX TIME
+    let maxValTime = maxVal;  //UNIX TIME
+    let queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (extract(epoch from (data_time_end - data_time_start)) BETWEEN  " + minValTime + " AND " +maxValTime + ")";
 
     console.log("Im on a Time Duration  Lens");
     if (activeQuery.indexOf(queryDB) !=-1){
@@ -771,9 +771,9 @@ function query_args_DecontructorQUERIES (tab ,long, lat, radius, type, minVal, m
 
 router.get('/intersect/:firstGeom/:secondGeom', function(req, res) {
 
-  var firsGeom = JSON.parse(req.params.firstGeom);
-  var secondGeom = JSON.parse(req.params.secondGeom);
-  var intersectionVar = intersect.default(firsGeom,secondGeom);
+  let firsGeom = JSON.parse(req.params.firstGeom);
+  let secondGeom = JSON.parse(req.params.secondGeom);
+  let intersectionVar = intersect.default(firsGeom,secondGeom);
   res.send(JSON.stringify(intersectionVar));
 
 
@@ -781,9 +781,9 @@ router.get('/intersect/:firstGeom/:secondGeom', function(req, res) {
 
 router.get('/difference/:firstGeom/:secondGeom', function(req, res) {
 
-  var firsGeom = JSON.parse(req.params.firstGeom);
-  var secondGeom = JSON.parse(req.params.secondGeom);
-  var differenceVar = difference(firsGeom,secondGeom);
+  let firsGeom = JSON.parse(req.params.firstGeom);
+  let secondGeom = JSON.parse(req.params.secondGeom);
+  let differenceVar = difference(firsGeom,secondGeom);
   res.send(JSON.stringify(differenceVar));
 
 
@@ -791,14 +791,14 @@ router.get('/difference/:firstGeom/:secondGeom', function(req, res) {
 
 router.get('/interdif/:firstGeom/:secondGeom', function(req, res) {
 
-  var firstGeom = JSON.parse(req.params.firstGeom);
-  var secondGeom = JSON.parse(req.params.secondGeom);
+  let firstGeom = JSON.parse(req.params.firstGeom);
+  let secondGeom = JSON.parse(req.params.secondGeom);
   if(firstGeom != null && secondGeom != null){
-    var intersectionVar = turf.intersect(firstGeom,secondGeom);
-    var options = {precision: 6, coordinates: 2};
+    let intersectionVar = turf.intersect(firstGeom,secondGeom);
+    let options = {precision: 6, coordinates: 2};
     if(intersectionVar != null){
-      var differenceVar = turf.difference(firstGeom,secondGeom);
-      var list = [truncate.default(cleancoords.default(intersectionVar),options),truncate.default(cleancoords.default(differenceVar),options)];
+      let differenceVar = turf.difference(firstGeom,secondGeom);
+      let list = [truncate.default(cleancoords.default(intersectionVar),options),truncate.default(cleancoords.default(differenceVar),options)];
       res.send(JSON.stringify(list));
     }
     else{
@@ -813,9 +813,9 @@ router.get('/interdif/:firstGeom/:secondGeom', function(req, res) {
 });
 
 router.get('/union/:firstGeom/:secondGeom', function(req, res) {
-  var firsGeom = JSON.parse(req.params.firstGeom);
-  var secondGeom = JSON.parse(req.params.secondGeom);
-  var unionVar = union.default(firsGeom,secondGeom);
+  let firsGeom = JSON.parse(req.params.firstGeom);
+  let secondGeom = JSON.parse(req.params.secondGeom);
+  let unionVar = union.default(firsGeom,secondGeom);
   res.send(JSON.stringify(unionVar));
 
 
@@ -825,7 +825,7 @@ router.get('/union/:firstGeom/:secondGeom', function(req, res) {
 
 //UPLOAD FILES FUNCTIONS
 
-var storage = multer.diskStorage({
+let storage = multer.diskStorage({
   destination: function(req, file, cb) {
       cb(null, './public/data');
    },
@@ -833,9 +833,12 @@ var storage = multer.diskStorage({
       cb(null , file.originalname);
   }
 });
-var upload = multer({storage: storage}).array('track', 2000);
+let upload = multer({storage: storage}).array('track', 2000);
 
 router.post('/fileUpload', (req, res, next) => {
+  const fsExtra = require('fs-extra')
+
+  fsExtra.emptyDirSync('./public/data')
   upload(req,res,function(err) {
     const subprocess = callPython(1,1);
       try {
@@ -936,16 +939,16 @@ function preProcessFiles6(){
   });
 }
 function preProcessFiles7(){
-  var clientPost = new Client(conString); // Setup our Postgres Client
+  let clientPost = new Client(conString); // Setup our Postgres Client
   clientPost.connect(); // connect to the client
-  var queryViewMaxTid = clientPost.query(new Query("SELECT max(tid) FROM track_divided_by_time_30s"), (err, res) => {
+  let queryViewMaxTid = clientPost.query(new Query("SELECT max(tid) FROM track_divided_by_time_30s"), (err, res) => {
     if(err)
       console.log(err);
   });
   queryViewMaxTid.on("end", function (result) {
     console.log("BELLOW IS THE VALUE OF MAX");
 
-    var maxNumber = result.rows[0].max;
+    let maxNumber = result.rows[0].max;
     if(maxNumber == null){
       maxNumber = 0;
     }
@@ -969,9 +972,9 @@ function preProcessFiles7(){
 }
 
 function createDB(){
-  var client = new Client(conString); // Setup our Postgres Client
+  let client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-  var createDB = "CREATE TABLE public.track_divided_by_time_upload(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_upload OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_upload TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_upload USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_upload USING btree(tid)TABLESPACE pg_default;";
+  let createDB = "CREATE TABLE public.track_divided_by_time_upload(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_upload OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_upload TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_upload USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_upload USING btree(tid)TABLESPACE pg_default;";
   client.query(createDB, async function (err, result) {
     if (err) {
       console.log("Database already exists, going to clean it now");
@@ -986,31 +989,31 @@ function createDB(){
 }
 
 function insertToDB() {
-    var numberOfLinesBy2k;
+    let numberOfLinesBy2k;
     const countLinesInFile = require('count-lines-in-file')
     countLinesInFile('./public/data/finalOfALL.txt' , (error,number) => {
 
       console.log("Number of lines bellow");
-      var numberL = parseInt(number);
+      let numberL = parseInt(number);
       console.log(number);
       numberOfLinesBy2k = Math.floor(numberL/4000);
-      var remainder = numberL % 4000;
+      let remainder = numberL % 4000;
       if(remainder > 0){
         numberOfLinesBy2k++;
       }
       console.log("Number of lines by 4k in the file generated");
       console.log(numberOfLinesBy2k);
-      var exec = require('child_process').exec;
-      //var childCountNumberLines = spawn("(get-Content ./public/data/finalOfALL.txt | measure-object -Line).Lines");
+      let exec = require('child_process').exec;
+      //let childCountNumberLines = spawn("(get-Content ./public/data/finalOfALL.txt | measure-object -Line).Lines");
       //childCountNumberLines.stdout.on("data",function(data){
       //exec("wc –l  ./public/data/finalOfALL.txt", function (err, stdout) {
 
-      var lineReader = require('readline').createInterface({
+      let lineReader = require('readline').createInterface({
         input: require('fs').createReadStream('./public/data/finalOfALL.txt')
       });
-      var contLine = 0;
+      let contLine = 0;
 
-      var stringOfRows = "";
+      let stringOfRows = "";
       lineReader.on('line',function (line) {
         if(contLine ==0){
           stringOfRows = "("+line.replace(/\n/g,'')+")";
@@ -1030,11 +1033,11 @@ function insertToDB() {
     });
 
 }
-var ClientEndTimes = 0;
+let ClientEndTimes = 0;
 function insertLines(stringOfRows,numberOfLinesBy2k){
-  var clientPost = new Client(conString); // Setup our Postgres Client
+  let clientPost = new Client(conString); // Setup our Postgres Client
   clientPost.connect(); // connect to the client
-  var queryPost = clientPost.query(new Query("INSERT INTO track_divided_by_time_upload(taxi_id,long,lat,data_time,vel,traj_id,start_long,start_lat,end_long,end_lat,tid) VALUES"+stringOfRows), (err, res) => {
+  let queryPost = clientPost.query(new Query("INSERT INTO track_divided_by_time_upload(taxi_id,long,lat,data_time,vel,traj_id,start_long,start_lat,end_long,end_lat,tid) VALUES"+stringOfRows), (err, res) => {
     if(err)
       console.log(err);
   });
@@ -1052,17 +1055,17 @@ function insertLines(stringOfRows,numberOfLinesBy2k){
     }
   });
 }
-var geomsCalcualted = 0;
+let geomsCalcualted = 0;
 function calculateGeoms(){
-  var queryCreateGeoms1 = new Client(conString); // Setup our Postgres Client
+  let queryCreateGeoms1 = new Client(conString); // Setup our Postgres Client
   queryCreateGeoms1.connect(); // connect to the client
-  var queryCreateGeoms2 = new Client(conString); // Setup our Postgres Client
+  let queryCreateGeoms2 = new Client(conString); // Setup our Postgres Client
   queryCreateGeoms2.connect(); // connect to the client
-  var queryCreateGeoms3 = new Client(conString); // Setup our Postgres Client
+  let queryCreateGeoms3 = new Client(conString); // Setup our Postgres Client
   queryCreateGeoms3.connect(); // connect to the client
-  var geom1 = queryCreateGeoms1.query(new Query("UPDATE track_divided_by_time_upload SET geom = ST_SetSRID(ST_MakePoint(long,lat),4326);"));
-  var geom2 = queryCreateGeoms2.query(new Query("UPDATE track_divided_by_time_upload SET startpointgeom = ST_SetSRID(ST_MakePoint(start_long,start_lat),4326);"));
-  var geom3 = queryCreateGeoms3.query(new Query("UPDATE track_divided_by_time_upload SET endpointgeom = ST_SetSRID(ST_MakePoint(end_long,end_lat),4326);"));
+  let geom1 = queryCreateGeoms1.query(new Query("UPDATE track_divided_by_time_upload SET geom = ST_SetSRID(ST_MakePoint(long,lat),4326);"));
+  let geom2 = queryCreateGeoms2.query(new Query("UPDATE track_divided_by_time_upload SET startpointgeom = ST_SetSRID(ST_MakePoint(start_long,start_lat),4326);"));
+  let geom3 = queryCreateGeoms3.query(new Query("UPDATE track_divided_by_time_upload SET endpointgeom = ST_SetSRID(ST_MakePoint(end_long,end_lat),4326);"));
   geom1.on("end", function(){
     queryCreateGeoms1.end();
     geomsCalcualted++;
@@ -1093,51 +1096,51 @@ function calculateGeoms(){
 }
 
 function unifySubSegsANDDivide(){
-  var clientUnify = new Client(conString); // Setup our Postgres Client
+  let clientUnify = new Client(conString); // Setup our Postgres Client
   clientUnify.connect(); // connect to the client
   console.log("Gonna unify the point by pairs for attribute lenses");
-  var query = clientUnify.query(new Query(" WITH tryingToDivide AS (SELECT tid as idThis, geom as geomThis, data_time as dataTime, lag(tid) over (order by tid asc,data_time asc) as idPrev, lag(geom) over (order by tid asc, data_time asc) as geomPrev FROM track_divided_by_time_upload) UPDATE track_divided_by_time_upload SET linegeom = CASE WHEN idThis = idPrev THEN ST_SetSRID(ST_MakeLine(geomPrev,geomThis),4326) ELSE NULL END FROM tryingToDivide WHERE tid = idThis AND  data_time = dataTime")); // Run our Query
+  let query = clientUnify.query(new Query(" WITH tryingToDivide AS (SELECT tid as idThis, geom as geomThis, data_time as dataTime, lag(tid) over (order by tid asc,data_time asc) as idPrev, lag(geom) over (order by tid asc, data_time asc) as geomPrev FROM track_divided_by_time_upload) UPDATE track_divided_by_time_upload SET linegeom = CASE WHEN idThis = idPrev THEN ST_SetSRID(ST_MakeLine(geomPrev,geomThis),4326) ELSE NULL END FROM tryingToDivide WHERE tid = idThis AND  data_time = dataTime")); // Run our Query
   query.on("end", function (result) {
     console.log("Completed pairs for attribute lenses");
-    var queryUpload = clientUnify.query(new Query("INSERT INTO track_divided_by_time_30s (taxi_id,long,lat,data_time,vel,traj_id,start_long,start_lat,end_long,end_lat ,tid,geom,startpointgeom,endpointgeom,linegeom) SELECT * FROM track_divided_by_time_upload"));
+    let queryUpload = clientUnify.query(new Query("INSERT INTO track_divided_by_time_30s (taxi_id,long,lat,data_time,vel,traj_id,start_long,start_lat,end_long,end_lat ,tid,geom,startpointgeom,endpointgeom,linegeom) SELECT * FROM track_divided_by_time_upload"));
     queryUpload.on("end", function (result) {
       console.log("Tracks ready for attribute lenses");
 
     });
   });
 
-  var clientCreateLines1 = new Client(conString); // Setup our Postgres Client
+  let clientCreateLines1 = new Client(conString); // Setup our Postgres Client
   clientCreateLines1.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 1");
-  var query = clientCreateLines1.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng <= 300)")); // Run our Query
-  query.on("end", function (result) {
+  let query0 = clientCreateLines1.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng <= 300)")); // Run our Query
+  query0.on("end", function (result) {
     clientCreateLines1.end();
     console.log(result);
     console.log("table 1 completed");
   });
-  var clientCreateLines2 = new Client(conString); // Setup our Postgres Client
+  let clientCreateLines2 = new Client(conString); // Setup our Postgres Client
   clientCreateLines2.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 2");
-  var query = clientCreateLines2.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines1 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 300 AND leng <= 700)")); // Run our Query
-  query.on("end", function (result) {
+  let query1 = clientCreateLines2.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines1 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 300 AND leng <= 700)")); // Run our Query
+  query1.on("end", function (result) {
     clientCreateLines2.end();
     console.log(result);
     console.log("table 2 completed");
   });
-  var clientCreateLines3 = new Client(conString); // Setup our Postgres Client
+  let clientCreateLines3 = new Client(conString); // Setup our Postgres Client
   clientCreateLines3.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 3");
-  var query = clientCreateLines3.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines2 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 700 AND leng <= 1500)")); // Run our Query
-  query.on("end", function (result) {
+  let query2 = clientCreateLines3.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines2 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 700 AND leng <= 1500)")); // Run our Query
+  query2.on("end", function (result) {
     clientCreateLines3.end();
     console.log(result);
     console.log("table 3 completed");
   });
-  var clientCreateLines4 = new Client(conString); // Setup our Postgres Client
+  let clientCreateLines4 = new Client(conString); // Setup our Postgres Client
   clientCreateLines4.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 4");
-  var query = clientCreateLines4.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines3 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 1500)")); // Run our Query
-  query.on("end", function (result) {
+  let query3 = clientCreateLines4.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines3 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 1500)")); // Run our Query
+  query3.on("end", function (result) {
 
     clientCreateLines4.end();
     console.log(result);

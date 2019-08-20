@@ -13,9 +13,9 @@ block content
     script.
 
         //Array that will save all the layers
-        var layerArray = [];
+        let layerArray = [];
 
-        var map = L.map('map',{preferCanvas: true,renderer: L.canvas({}), center: [38.736946,-9.142685], zoom: 10,worldCopyJump: true});
+        let map = L.map('map',{preferCanvas: true,renderer: L.canvas({}), center: [38.736946,-9.142685], zoom: 10,worldCopyJump: true});
         map.createPane('lensPane');
         map.createPane('outtterLensPane');
         map.createPane('outtterLensDeletePane');
@@ -37,53 +37,53 @@ block content
         map.getPane('velPane').style.zIndex = 400;
 
         map.getPane('areaPane').style.zIndex = 900;
-        var popup = L.popup();
-        var popup2 = L.popup();
+        let popup = L.popup();
+        let popup2 = L.popup();
 
-        var minValueVel;
-        var maxValueVel;
-        var minValueLength;
-        var maxValueLength;
-        var minValueTime;
-        var maxValueTime;
-        var minValueTimeDuration;
-        var maxValueTimeDuration;
+        let minValueVel;
+        let maxValueVel;
+        let minValueLength;
+        let maxValueLength;
+        let minValueTime;
+        let maxValueTime;
+        let minValueTimeDuration;
+        let maxValueTimeDuration;
 
         //create array with all layers?
 
-        var markerGroup  = L.featureGroup({pane: 'queryLensPane'}).addTo(map);
-        var markerGroup1 = L.featureGroup({pane: 'queryLensPane1'}).addTo(map);
-        var markerGroup2 = L.featureGroup({pane: 'queryLensPane2'}).addTo(map);
-        var markerGroup3 = L.featureGroup({pane: 'queryLensPane3'}).addTo(map);
+        let markerGroup  = L.featureGroup({pane: 'queryLensPane'}).addTo(map);
+        let markerGroup1 = L.featureGroup({pane: 'queryLensPane1'}).addTo(map);
+        let markerGroup2 = L.featureGroup({pane: 'queryLensPane2'}).addTo(map);
+        let markerGroup3 = L.featureGroup({pane: 'queryLensPane3'}).addTo(map);
         
-        var attLenResults = L.featureGroup({pane: 'attLensPane'}).addTo(map);
+        let attLenResults = L.featureGroup({pane: 'attLensPane'}).addTo(map);
 
-        var outterLensesLayer = L.featureGroup({pane: 'outtterLensPane'}).addTo(map);
-        var lensesLayer = L.featureGroup({pane: 'lensPane'}).addTo(map);
-        var areasLayer = L.featureGroup({pane: 'areaPane'}).addTo(map);
+        let outterLensesLayer = L.featureGroup({pane: 'outtterLensPane'}).addTo(map);
+        let lensesLayer = L.featureGroup({pane: 'lensPane'}).addTo(map);
+        let areasLayer = L.featureGroup({pane: 'areaPane'}).addTo(map);
         
 
-        var lensPreCreationLayer = L.layerGroup().addTo(map);
+        let lensPreCreationLayer = L.layerGroup().addTo(map);
         
-        var lastMarkerGroupID = null ;
-        var lastMarkerGroupID1 = null ;
-        var lastMarkerGroupID2 = null ;
-        var lastMarkerGroupID3 = null ;
-        var defaultLayerFlag = true;
+        let lastMarkerGroupID = null ;
+        let lastMarkerGroupID1 = null ;
+        let lastMarkerGroupID2 = null ;
+        let lastMarkerGroupID3 = null ;
+        let defaultLayerFlag = true;
 
-        var createQueryLensesFlag = false;
-        var createAttributeLensesFlag = false;
+        let createQueryLensesFlag = false;
+        let createAttributeLensesFlag = false;
 
-        var moved = false;
-        var lensCanMove = false;
+        let moved = false;
+        let lensCanMove = false;
 
 
-        var attributeFuncVar = "length";
-        var encodingFuncVar = "color";
+        let attributeFunclet = "length";
+        let encodingFunclet = "color";
 
-        var attLensesArray = [];
+        let attLensesArray = [];
         //opacityLensArray
-        var attOPACITYLensesArray = [];
+        let attOPACITYLensesArray = [];
 
 
 
@@ -95,13 +95,12 @@ block content
             maxZoom: 19
         }).addTo(map);
 
-        //var myData = jsonData;
-        var myData = !{JSON.stringify(jsonData)};
-
+        //let myData = jsonData;
+        let myData = !{JSON.stringify(jsonData)};
         // Create variable to hold map element, give initial settings to map
-        var container1 = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-        var container2 = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-        var customControlQ =  L.Control.extend({
+        let container1 = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        let container2 = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        let customControlQ =  L.Control.extend({
             options: {
                 position: 'topleft'
             },
@@ -134,7 +133,7 @@ block content
                 return container1;
             }
         });
-        var customControlA =  L.Control.extend({
+        let customControlA =  L.Control.extend({
             options: {
                 position: 'topleft'
             },
@@ -170,32 +169,34 @@ block content
         map.addControl(new customControlQ());
         map.addControl(new customControlA());
             
-        var container = document.getElementsByClassName("leaflet-zoom-animated");
+        let container = document.getElementsByClassName("leaflet-zoom-animated");
         container[0].onclick = function(e){
                 L.DomEvent.stopPropagation(e);
         }
                 
 
         
-        //var defaultLayer = new L.GeoJSON().addTo(map);
-        var firstStyle = {
+        //let defaultLayer = new L.GeoJSON().addTo(map);
+        let firstStyle = {
             "color": '#43A7DE',
             "opacity": 1,
             "weight": 1.5,
             "interactive": false    
         };
-        var firstStyleATT = {
+        let firstStyleATT = {
             "color": '#43A7DE',
             "opacity": 1,
             "weight": 1.5,
             "pane": "attLensPane"
             
         };
-     
+        let defaultLayer = null;
         // Add JSON to map
-        
-        var defaultLayer = new L.geoJson(myData,firstStyle).addTo(map);
-        map.panTo(defaultLayer.getBounds().getCenter());
+        if(myData.features != null){
+            defaultLayer = new L.geoJson(myData,firstStyle).addTo(map);
+            map.panTo(defaultLayer.getBounds().getCenter());
+        }
+
     
         map.on('zoomend', function() {
             console.log(map.getZoom())
@@ -232,16 +233,16 @@ block content
             }
             lensesLayer.bringToFront();
         });
-        var movedCreateLens = false;
-        var radiusValue = 0;
-        var locationCreation;
-        var createdAlreadyFlag = false;
-        var sizeBellow25k = false;
-        var mapPressForCreation = false;
-        var notClickedLens = false;
-        var clicked = false;
-        var changeRadius = false;
-        var correctSizeVar = false;
+        let movedCreateLens = false;
+        let radiusValue = 0;
+        let locationCreation;
+        let createdAlreadyFlag = false;
+        let sizeBellow25k = false;
+        let mapPressForCreation = false;
+        let notClickedLens = false;
+        let clicked = false;
+        let changeRadius = false;
+        let correctSizelet = false;
         map.on({
             click:function(e){
                 map.removeEventListener('mousemove');
@@ -257,9 +258,9 @@ block content
                 if(createQueryLensesFlag || createAttributeLensesFlag){
                     locationCreation = e.latlng;
 
-                    var from = turf.point([locationCreation.lat, locationCreation.lng]);
-                    var optionsCreateCirc = {units: 'kilometers'};
-                    var circleBeforeCreating;
+                    let from = turf.point([locationCreation.lat, locationCreation.lng]);
+                    let optionsCreateCirc = {units: 'kilometers'};
+                    let circleBeforeCreating;
                     let mapPressForCreation = true;
                     notClickedLens = true;
                     map.on('mousemove', function (event) {
@@ -269,10 +270,10 @@ block content
                             map.dragging.disable();
                             movedCreateLens = true;
 
-                            var to = turf.point([event.latlng.lat, event.latlng.lng]);
+                            let to = turf.point([event.latlng.lat, event.latlng.lng]);
 
 
-                            var distance = turf.distance(from, to, optionsCreateCirc);
+                            let distance = turf.distance(from, to, optionsCreateCirc);
                             radiusValue = distance * 1000;
                             if(radiusValue >= 50){
                                 if(!createdAlreadyFlag){    
@@ -352,13 +353,13 @@ block content
         /////
 
         function queryLensMenu(locationLatLng,radius){
-            var location= locationLatLng;
+            let location= locationLatLng;
             createLens(location.lng, location.lat, radius,"Default",0,0).createLayers();
             
         }
         async function attributeLensMenu(locationLatLng,radius){
             //lensPreCreationLayer.clearLayers();
-            var holder = createALens(locationLatLng, radius,'time','color')
+            let holder = createALens(locationLatLng, radius,'time','color')
             holder = await holder.createAreas();
             
             //holder.createLayers();
@@ -373,7 +374,7 @@ block content
         /////
 
         function createLens(lng, lat, radiusQuery, _type, minVal, maxVal){
-            var lens = { areaQuery : L.circle([lat, lng], {
+            let lens = { areaQuery : L.circle([lat, lng], {
                     color: 'DarkRed',
                     fillColor: 'red',
                     fillOpacity: 0.6,
@@ -511,8 +512,11 @@ block content
                     //lensPreCreationLayer.clearLayers();
                     console.log("Im removing the map now and adding new ones afterwards")
                     if(defaultLayerFlag){
-                        defaultLayerFlag = false;
-                        map.removeLayer(defaultLayer);
+                        if(defaultLayer != null){
+                            defaultLayerFlag = false;
+                            map.removeLayer(defaultLayer);
+                        }
+
                     }
 
                     if(lastMarkerGroupID !=null){
@@ -533,15 +537,15 @@ block content
                     }
 
                         // Create URL
-                    var urlString3 = "query/trajectory_lines/"  + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
-                    var urlString2 = "query/trajectory_lines1/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
-                    var urlString1 = "query/trajectory_lines2/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
-                    var urlString  = "query/trajectory_lines3/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    let urlString3 = "query/trajectory_lines/"  + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    let urlString2 = "query/trajectory_lines1/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    let urlString1 = "query/trajectory_lines2/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
+                    let urlString  = "query/trajectory_lines3/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
                     
 
-                    var thisVar = this;
+                    let thislet = this;
 
-                    var newData = $.ajax({
+                    let newData = $.ajax({
                         url: urlString,
                         type: 'GET',
                         dataType:'json',
@@ -553,14 +557,14 @@ block content
                     }) 
                     $.when(newData).done(function() {
                         if(newData.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup);
                             lastMarkerGroupID = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
                         }
                         lensesLayer.bringToFront();
                     }); 
-                    var newData1 = $.ajax({
+                    let newData1 = $.ajax({
                         url: urlString1,
                         type: 'GET',
                         dataType:'json',
@@ -572,14 +576,14 @@ block content
                     }) 
                     $.when(newData1).done(function() {
                         if(newData1.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup1);
                             lastMarkerGroupID1 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
                         }
                         lensesLayer.bringToFront();
                     });
-                    var newData2 = $.ajax({
+                    let newData2 = $.ajax({
                         url: urlString2,
                         type: 'GET',
                         dataType:'json',
@@ -591,14 +595,14 @@ block content
                     }) 
                     $.when(newData2).done(function() {
                         if(newData2.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup2);
                             lastMarkerGroupID2 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
                         }
                         lensesLayer.bringToFront();
                     });
-                    var newData3 = $.ajax({
+                    let newData3 = $.ajax({
                         url: urlString3,
                         type: 'GET',
                         dataType:'json',
@@ -610,7 +614,7 @@ block content
                     }) 
                     $.when(newData3).done(function() {
                         if(newData3.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup3);
                             lastMarkerGroupID3 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
@@ -640,12 +644,12 @@ block content
                         markerGroup3.removeLayer(lastMarkerGroupID3);
                         lastMarkerGroupID3 = null;
                     }
-                    var urlString3 = "queryRemoval/trajectory_lines/"  + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
-                    var urlString2 = "queryRemoval/trajectory_lines1/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
-                    var urlString1 = "queryRemoval/trajectory_lines2/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
-                    var urlString  = "queryRemoval/trajectory_lines3/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
+                    let urlString3 = "queryRemoval/trajectory_lines/"  + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
+                    let urlString2 = "queryRemoval/trajectory_lines1/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
+                    let urlString1 = "queryRemoval/trajectory_lines2/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
+                    let urlString  = "queryRemoval/trajectory_lines3/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
   
-                    var newData = $.ajax({
+                    let newData = $.ajax({
                         url: urlString,
                         type: 'GET',
                         dataType:'json',
@@ -660,16 +664,16 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup);
-                            var idTracks = tracksToDraw._leaflet_id;
+                            let idTracks = tracksToDraw._leaflet_id;
                             lastMarkerGroupID = tracksToDraw._leaflet_id;
                             
                         }
                         lensesLayer.bringToFront();
                         
                     });
-                    var newData1 = $.ajax({
+                    let newData1 = $.ajax({
                         url: urlString1,
                         type: 'GET',
                         dataType:'json',
@@ -684,14 +688,14 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData1.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup1);
                             lastMarkerGroupID1 = tracksToDraw._leaflet_id;
                             
                         }
                         lensesLayer.bringToFront();
                     });
-                    var newData2 = $.ajax({
+                    let newData2 = $.ajax({
                         url: urlString2,
                         type: 'GET',
                         dataType:'json',
@@ -706,14 +710,14 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData2.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup2);
                             lastMarkerGroupID2 = tracksToDraw._leaflet_id;
                             
                         }
                         lensesLayer.bringToFront();
                     });
-                    var newData3 = $.ajax({
+                    let newData3 = $.ajax({
                         url: urlString3,
                         type: 'GET',
                         dataType:'json',
@@ -728,7 +732,7 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData3.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup3);
                             lastMarkerGroupID3 = tracksToDraw._leaflet_id;
                             
@@ -743,7 +747,7 @@ block content
                 },
                 updateLENS: function(){
                     this.areaQuery.setStyle({color: 'DarkRed',fillColor: 'red',fillOpacity: 0.6});
-                    var thisVar= this;
+                    let thisVar= this;
                     if(lastMarkerGroupID !=null){
                         markerGroup.removeLayer(lastMarkerGroupID);
                         lastMarkerGroupID = null;
@@ -760,16 +764,16 @@ block content
                         markerGroup3.removeLayer(lastMarkerGroupID3);
                         lastMarkerGroupID3 = null;
                     }
-                    var urlString3 = "queryMoved/trajectory_lines/"  + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
+                    let urlString3 = "queryMoved/trajectory_lines/"  + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
                     this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
-                    var urlString2 = "queryMoved/trajectory_lines1/" + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
+                    let urlString2 = "queryMoved/trajectory_lines1/" + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
                     this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
-                    var urlString1 = "queryMoved/trajectory_lines2/" + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
+                    let urlString1 = "queryMoved/trajectory_lines2/" + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
                     this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
-                    var urlString  = "queryMoved/trajectory_lines3/" + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
+                    let urlString  = "queryMoved/trajectory_lines3/" + this.getLngLatOLD()[1] + "/" + this.getLngLatOLD()[0] + "/" + this.getRadiusOLD() + "/" + this.getTypeOLD() + "/" + this.getMinVOLD() + "/" + this.getMaxVOLD()+"/"  + 
                     this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
                     
-                    var newData = $.ajax({
+                    let newData = $.ajax({
                         url: urlString,
                         type: 'GET',
                         dataType:'json',
@@ -784,9 +788,9 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup);
-                            var idTracks = tracksToDraw._leaflet_id;
+                            let idTracks = tracksToDraw._leaflet_id;
                             lastMarkerGroupID = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
                         }
@@ -794,7 +798,7 @@ block content
                         lensesLayer.bringToFront();
                         
                     });
-                    var newData1 = $.ajax({
+                    let newData1 = $.ajax({
                         url: urlString1,
                         type: 'GET',
                         dataType:'json',
@@ -809,14 +813,14 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData1.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup1);
                             lastMarkerGroupID1 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
                         }
                         lensesLayer.bringToFront();
                     });
-                    var newData2 = $.ajax({
+                    let newData2 = $.ajax({
                         url: urlString2,
                         type: 'GET',
                         dataType:'json',
@@ -831,14 +835,14 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData2.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup2);
                             lastMarkerGroupID2 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
                         }
                         lensesLayer.bringToFront();
                     });
-                    var newData3 = $.ajax({
+                    let newData3 = $.ajax({
                         url: urlString3,
                         type: 'GET',
                         dataType:'json',
@@ -853,7 +857,7 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData3.responseJSON.features != null){
-                            var tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
                             tracksToDraw.addTo(markerGroup3);
                             lastMarkerGroupID3 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
@@ -871,15 +875,15 @@ block content
             lens.setBounds(lens.areaQuery.getBounds());
 
             /*CALCULATE THE DISTANCE FROM ONE POINT TO ANOTHER IN PIXELS
-            var northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
-            var southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
-            var numOfPixl = northVar.distanceTo(southVar);*/
+            let northlet = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
+            let southlet = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
+            let numOfPixl = northVar.distanceTo(southVar);*/
             //className: 'outside-Circle'
             
                  
-            var movedPos = false;
-            var movedRadius = false;
-            var movedOthers = false;
+            let movedPos = false;
+            let movedRadius = false;
+            let movedOthers = false;
 
             lens.areaQuery.on({
                 dbclick:function(e){
@@ -893,7 +897,7 @@ block content
                     container2.style.backgroundColor = 'white';
                     outterLensesLayer.clearLayers();
                     clicked = true;
-                    var once = true;
+                    let once = true;
                     map.fitBounds(lens.getBound());
                     map.on('moveend', function(event) {
                         L.DomEvent.stopPropagation(event);
@@ -906,7 +910,7 @@ block content
                             let northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
                             let southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
                             let numOfPixl = northVar.distanceTo(southVar);
-                            var myOutsideCircle =  L.divIcon({className: 'outside-Circle', iconSize: [numOfPixl,numOfPixl], html: 
+                            let myOutsideCircle =  L.divIcon({className: 'outside-Circle', iconSize: [numOfPixl,numOfPixl], html: 
                                 "<button class='myDeleteButton' style='z-index: 1000;position: fixed;margin-top: 2%;margin-left: 12.5%;'><img src='images/trash.png' style='width: 85%; height: 80%;'></button>"+
                                 "<div class='dropdown' style='z-index: 1019; position:fixed;margin-left: 76.5%;margin-top: 2%;'><button class='dropbtn'><img src='images/type.png' style='width: 150%;height: 150%;margin: -25%;''></button><div class='dropdown-content'>" + 
                                 "<button class='dropbtnOpt-default'>Pass by</button>"+
@@ -929,7 +933,7 @@ block content
                       
 
                             console.log(myOutsideCircle.options);
-                            var outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
+                            let outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
                             lens.setOutsideCircle(outsideCircVar);
                   
                             outterLensesLayer.addLayer(lens.outsideCircle);
@@ -987,7 +991,7 @@ block content
 
                                     document.getElementsByClassName('myMoveButton')[0].style.backgroundColor = "#ff8400";
                                 }
-                                var mouseDown = false;
+                                let mouseDown = false;
                                 lens.outsideCircle.on({
                                     dbclick:function(e){
                                         L.DomEvent.stopPropagation(e);
@@ -1065,7 +1069,7 @@ block content
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalVel").style.display="block";
 
-                                            var $sliderIntervalVel = $('#sliderIntervalVel');
+                                            let $sliderIntervalVel = $('#sliderIntervalVel');
                                             $sliderIntervalVel.mousedown( function (e){
                                                 //TODO VELOCITY REMOVING BADLY??
                                                 L.DomEvent.stopPropagation(e);
@@ -1083,7 +1087,7 @@ block content
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalLength").style.display="block";
 
-                                            var $sliderIntervalLength = $('#sliderIntervalLength');
+                                            let $sliderIntervalLength = $('#sliderIntervalLength');
                                             $sliderIntervalLength.mousedown( function (e){
                                                 //TODO VELOCITY REMOVING BADLY??
                                                 L.DomEvent.stopPropagation(e);
@@ -1101,7 +1105,7 @@ block content
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalDuration").style.display="block";
 
-                                            var $sliderIntervalDuration = $('#sliderIntervalDuration');
+                                            let $sliderIntervalDuration = $('#sliderIntervalDuration');
                                             $sliderIntervalDuration.mousedown( function (e){
                                                 //TODO VELOCITY REMOVING BADLY??
                                                 L.DomEvent.stopPropagation(e);
@@ -1119,7 +1123,7 @@ block content
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalTime").style.display="block";
 
-                                            var $sliderIntervalTime = $('#sliderIntervalTime');
+                                            let $sliderIntervalTime = $('#sliderIntervalTime');
                                             $sliderIntervalTime.mousedown( function (e){
                                                 //TODO VELOCITY REMOVING BADLY??
                                                 L.DomEvent.stopPropagation(e);
@@ -1155,9 +1159,9 @@ block content
                                         drag: function (e) {
                                             L.DomEvent.stopPropagation(e);
                                             
-                                            var index = e.value.indexOf(",");  // Gets the first index where a , occours
-                                            var firstPart = e.value.substr(0, index); // Gets the first part
-                                            var secondPart = e.value.substr(index + 1);  // Gets the text part
+                                            let index = e.value.indexOf(",");  // Gets the first index where a , occours
+                                            let firstPart = e.value.substr(0, index); // Gets the first part
+                                            let secondPart = e.value.substr(index + 1);  // Gets the text part
                                             lens.setMinV(firstPart);
                                             lens.setMaxV(secondPart);
                                             console.log(lens.getMinV());
@@ -1191,9 +1195,9 @@ block content
                                         drag: function (e) {
                                             L.DomEvent.stopPropagation(e);
                                             
-                                            var index = e.value.indexOf(",");  // Gets the first index where a , occours
-                                            var firstPart = e.value.substr(0, index); // Gets the first part
-                                            var secondPart = e.value.substr(index + 1);  // Gets the text part
+                                            let index = e.value.indexOf(",");  // Gets the first index where a , occours
+                                            let firstPart = e.value.substr(0, index); // Gets the first part
+                                            let secondPart = e.value.substr(index + 1);  // Gets the text part
                                             lens.setMinV(firstPart);
                                             lens.setMaxV(secondPart);
                                             console.log(lens.getMinV());
@@ -1222,28 +1226,28 @@ block content
                                         handleSize: "+10",
                                         handleShape: "dot",
                                         tooltipFormat: function (e) {
-                                            var delta = e.value;
-                                            var days = Math.floor(delta / 86400);
+                                            let delta = e.value;
+                                            let days = Math.floor(delta / 86400);
                                             delta -= days * 86400;
 
                                             // calculate (and subtract) whole hours
-                                            var hours = Math.floor(delta / 3600) % 24;
+                                            let hours = Math.floor(delta / 3600) % 24;
                                             delta -= hours * 3600;
 
                                             // calculate (and subtract) whole minutes
-                                            var minutes = Math.floor(delta / 60) % 60;
+                                            let minutes = Math.floor(delta / 60) % 60;
                                             delta -= minutes * 60;
 
                                             // what's left is seconds
-                                            var seconds = delta % 60;  // in theory the modulus is not required
+                                            let seconds = delta % 60;  // in theory the modulus is not required
                                             return hours + 'h ' + minutes + 'm ' + seconds + 's';
                                         },
                                         drag: function (e) {
                                             L.DomEvent.stopPropagation(e);
                                             
-                                            var index = e.value.indexOf(",");  // Gets the first index where a , occours
-                                            var firstPart = e.value.substr(0, index); // Gets the first part
-                                            var secondPart = e.value.substr(index + 1);  // Gets the text part
+                                            let index = e.value.indexOf(",");  // Gets the first index where a , occours
+                                            let firstPart = e.value.substr(0, index); // Gets the first part
+                                            let secondPart = e.value.substr(index + 1);  // Gets the text part
                                             lens.setMinV(firstPart);
                                             lens.setMaxV(secondPart);
                                             console.log(lens.getMinV());
@@ -1273,32 +1277,32 @@ block content
                                         handleShape: "dot",
                                         tooltipFormat: function (e) {
                                             // Unixtimestamp
-                                            var unixtimestamp = e.value;
+                                            let unixtimestamp = e.value;
                                             // Convert timestamp to milliseconds
-                                            var date = new Date(unixtimestamp*1000);
+                                            let date = new Date(unixtimestamp*1000);
                                             // Year
-                                            var year = date.getFullYear();
+                                            let year = date.getFullYear();
                                             // Month
-                                            var month = date.getMonth();
+                                            let month = date.getMonth();
                                             // Day
-                                            var day = date.getDate();
+                                            let day = date.getDate();
                                             // Hours
-                                            var hours = date.getHours();
+                                            let hours = date.getHours();
                                             // Minutes
-                                            var minutes = "0" + date.getMinutes();
+                                            let minutes = "0" + date.getMinutes();
                                             // Seconds
-                                            var seconds = "0" + date.getSeconds();
+                                            let seconds = "0" + date.getSeconds();
                                             // Display date time in MM-dd-yyyy h:m:s format
-                                            var convdataTime = month+'-'+day+'-'+year+' '+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+                                            let convdataTime = month+'-'+day+'-'+year+' '+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
                                             
                                             return convdataTime;
                                         },
                                         drag: function (e) {
                                             L.DomEvent.stopPropagation(e);
                                             
-                                            var index = e.value.indexOf(",");  // Gets the first index where a , occours
-                                            var firstPart = e.value.substr(0, index); // Gets the first part
-                                            var secondPart = e.value.substr(index + 1);  // Gets the text part
+                                            let index = e.value.indexOf(",");  // Gets the first index where a , occours
+                                            let firstPart = e.value.substr(0, index); // Gets the first part
+                                            let secondPart = e.value.substr(index + 1);  // Gets the text part
                                             lens.setMinV(firstPart);
                                             lens.setMaxV(secondPart);
                                             console.log(lens.getMinV());
@@ -1335,14 +1339,14 @@ block content
                                         click: function(e){
                                             L.DomEvent.stopPropagation(e);
                                             mapPressForCreation = false;
-                                            correctSizeVar = false;
+                                            correctSizelet = false;
                                         },
                                         mousedown: function (e) {
                                             L.DomEvent.stopPropagation(e);
 
                                             if(changeRadius){    
-                                                var from = turf.point(lens.getLngLat());
-                                                var optionsCreateCirc = {units: 'kilometers'};
+                                                let from = turf.point(lens.getLngLat());
+                                                let optionsCreateCirc = {units: 'kilometers'};
 
                                                 mapPressForCreation = true;
                                                 map.on('mousemove', function (event) {
@@ -1353,16 +1357,16 @@ block content
 
                                                             map.dragging.disable();
 
-                                                            var to = turf.point([event.latlng.lat, event.latlng.lng]);
+                                                            let to = turf.point([event.latlng.lat, event.latlng.lng]);
 
-                                                            var distance = turf.distance(from, to, optionsCreateCirc);
+                                                            let distance = turf.distance(from, to, optionsCreateCirc);
                                                             radiusValue = distance * 1000;
                                                             if (radiusValue >= 50 && radiusValue <= 25000) {
-                                                                correctSizeVar = true;
+                                                                correctSizelet = true;
                                                                 lens.colorSuccess();
                                                                 lens.setRadius(radiusValue);
                                                             } else {
-                                                                correctSizeVar = false;
+                                                                correctSizelet = false;
                                                                 lens.areaQuery.setStyle({fillColor: 'DarkRed',color:'red'});
                                                             }
                                                         }
@@ -1395,7 +1399,7 @@ block content
 
                                                 map.fitBounds(lens.getBound());
                                                 mapPressForCreation = false;
-                                                correctSizeVar = false;
+                                                correctSizelet = false;
                                             }
 
                                         }
@@ -1413,7 +1417,7 @@ block content
                                     document.getElementsByClassName('myRadiusButton')[0].style.backgroundColor = "#ff0000";
 
                                     document.getElementById("sliderRadius").style.display="block";
-                                    var $sliderRadius = $('#sliderRadius');
+                                    let $sliderRadius = $('#sliderRadius');
                                     $sliderRadius.mousedown( function (e){
                                         //TODO VELOCITY REMOVING BADLY??
                                         L.DomEvent.stopPropagation(e);
@@ -1596,7 +1600,7 @@ block content
         }
         
         function createALens(lngLat, radiusQuery, _attribute, _encoding){
-            var lens = { 
+            let lens = { 
                 areaQuery : L.circle([lngLat.lat, lngLat.lng], {
                     color: 'DarkRed',
                     fillColor: 'red',
@@ -1635,7 +1639,7 @@ block content
                     this.intersections.push(obj);
                 },
                 removeIntersection: function (obj){
-                    for(var i = this.intersections.length - 1; i >= 0; i--) {
+                    for(let i = this.intersections.length - 1; i >= 0; i--) {
                         if(this.intersections[i] === obj) {
                             this.intersections.splice(i, 1);
                             return true;
@@ -1647,7 +1651,7 @@ block content
                     this.areas.push(obj);
                 },
                 removeArea: function (obj){
-                    for(var i = this.areas.length - 1; i >= 0; i--) {
+                    for(let i = this.areas.length - 1; i >= 0; i--) {
                         if(this.areas[i] === obj) {
                             this.areas.splice(i, 1);
                             return true;
@@ -1690,12 +1694,12 @@ block content
                     }
                 },
                 removeOpacityLens : function(opacLens){
-                    for(var i = this.opacityLensArray.length - 1; i >= 0; i--) {
+                    for(let i = this.opacityLensArray.length - 1; i >= 0; i--) {
                         if(this.opacityLensArray[i] === opacLens) {
                             this.opacityLensArray.splice(i, 1);
                         }
                     }
-                    for(var j = this.areas.length - 1; j >= 0; j--) {
+                    for(let j = this.areas.length - 1; j >= 0; j--) {
                         this.areas[j].opacityLensArray = Array.from(this.opacityLensArray);
                     }
                 },
@@ -1706,7 +1710,7 @@ block content
                     
                 },
                 updateLayer : function(layer, value){
-                    //var layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
+                    //let layersActive = layersWithin(map, layer, lngLat, pixelsInRadius)
                     //TODO
                     switch(this.att) {
                         case "length":
@@ -1735,16 +1739,16 @@ block content
                     this.overallArea = null;
                     this.intersections.splice(0,this.intersections.length);
                     this.addIntersections();
-                    var radius = this.getRadius()/1000;
-                    var options = {steps: 32,units: 'kilometers'};
-                    var circle = turf.circle([this.getLngLat().lng, this.getLngLat().lat], radius, options);
+                    let radius = this.getRadius()/1000;
+                    let options = {steps: 32,units: 'kilometers'};
+                    let circle = turf.circle([this.getLngLat().lng, this.getLngLat().lat], radius, options);
                     this.overallArea = circle;
-                    var firstArea = creaAttAreas(circle);
+                    let firstArea = creaAttAreas(circle);
                     firstArea.addLens(this);
                     this.addArea(firstArea);
-                    var areaCounnt =1;
-                    var numberOfAreasVisited = 0;
-                    var thisVar = this;
+                    let areaCounnt =1;
+                    let numberOfAreasVisited = 0;
+                    let thislet = this;
                     recursiveArea(thisVar, this.intersections.length - 1, 0);
                     
                    
@@ -1779,9 +1783,9 @@ block content
                             item.updateLayer();
                         }
                     });
-                    var foundMyself = false;
+                    let foundMyself = false;
                     console.log(attLensesArray);
-                    for(var i = 0;i<attLensesArray.length ;i++) {
+                    for(let i = 0;i<attLensesArray.length ;i++) {
                         console.log("I entered the array");
                         console.log(attLensesArray[i]);
                         if(attLensesArray[i] === this) {
@@ -1789,7 +1793,7 @@ block content
                             foundMyself = true;
                         }
                         else if(foundMyself){
-                            for(var j = 0; j < attLensesArray[i].intersections.length; j++) {
+                            for(let j = 0; j < attLensesArray[i].intersections.length; j++) {
                                 if(attLensesArray[i].intersections[j] === this){
                                     if(attORenc){
                                         attLensesArray[i].intersections[j].att = value;
@@ -1811,19 +1815,19 @@ block content
                     
                 },
                 delete: function(){
-                    for(var areaIndex = this.areas.length - 1;areaIndex>=0; areaIndex--){
+                    for(let areaIndex = this.areas.length - 1;areaIndex>=0; areaIndex--){
                         this.areas[areaIndex].delete();  
                     }
                     this.areas.splice(0,this.areas.length);
                     console.log(this.areas.length);
                 },
                 deleteLayers: function(){
-                    for(var areaIndex = this.areas.length - 1;areaIndex>=0; areaIndex--){
+                    for(let areaIndex = this.areas.length - 1;areaIndex>=0; areaIndex--){
                         this.areas[areaIndex].delete();
                     }
                 },
                 removeOpacityArray: function(){
-                    for(var i = attOPACITYLensesArray.length - 1; i >= 0; i--) {
+                    for(let i = attOPACITYLensesArray.length - 1; i >= 0; i--) {
                             if(attOPACITYLensesArray[i] === this) {
                                 attOPACITYLensesArray.splice(i, 1);
                                 console.log(attOPACITYLensesArray);
@@ -1832,7 +1836,7 @@ block content
                     }
                 },
                 removeFromAttLen : function(){
-                    for(var i = attLensesArray.length - 1; i >= 0; i--) {
+                    for(let i = attLensesArray.length - 1; i >= 0; i--) {
                         if(attLensesArray[i] === this) {
                             attLensesArray.splice(i, 1);
                             console.log(attLensesArray);
@@ -1851,7 +1855,7 @@ block content
                         if(attLensesArray[i].removeIntersection(this)) {
                             if(onlyRemoveInter){
                                 for(let areaIndex = 1;areaIndex < attLensesArray[i].areas.length; areaIndex++){
-                                    var flag = attLensesArray[i].areas[areaIndex].removeLens(this);
+                                    let flag = attLensesArray[i].areas[areaIndex].removeLens(this);
                                     console.log(flag);
                                 }
                                 for(let areaIndex = 1;areaIndex < attLensesArray[i].areas.length; areaIndex++){
@@ -1861,7 +1865,7 @@ block content
                                         console.log(attLensesArray[i].areas[0].area);
                                         console.log(attLensesArray[i].areas[areaIndex].area);
                                         console.log("Before union");
-                                        var unionVar = turf.union(attLensesArray[i].areas[0].area, attLensesArray[i].areas[areaIndex].area);
+                                        let unionlet = turf.union(attLensesArray[i].areas[0].area, attLensesArray[i].areas[areaIndex].area);
                                         console.log("After union");
                                         attLensesArray[i].areas[0].setArea(unionVar);
                                         attLensesArray[i].areas[areaIndex].delete();
@@ -1878,7 +1882,7 @@ block content
                                                     console.log(attLensesArray[i].areas[ind].getLensArray());
                                                     console.log(attLensesArray[i].areas[areaIndex].getLensArray());
                                                     console.log("Before union");
-                                                    var unionVar = turf.union(attLensesArray[i].areas[ind].area, attLensesArray[i].areas[areaIndex].area);
+                                                    let unionlet = turf.union(attLensesArray[i].areas[ind].area, attLensesArray[i].areas[areaIndex].area);
                                                     console.log("After union");
                                                     attLensesArray[i].areas[ind].setArea(unionVar);
                                                     attLensesArray[i].areas[areaIndex].delete();
@@ -1915,7 +1919,7 @@ block content
                     container2.style.backgroundColor = 'white';
                     outterLensesLayer.clearLayers();
                     clicked = true;
-                    var once = true;
+                    let once = true;
                     map.fitBounds(lens.getBound());
                     
                     
@@ -1927,8 +1931,8 @@ block content
                             L.DomEvent.stopPropagation(ev);
                             
                                 // code stuff
-                            let northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
-                            let southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
+                            let northlet = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
+                            let southlet = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
                             let numOfPixl = northVar.distanceTo(southVar);
                             let myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [numOfPixl,numOfPixl], html: 
                                 "<button class='myDeleteButton' style='z-index: 1000;position: fixed;margin-top: 2%;margin-left: 12.5%;'><img src='images/trash.png' style='width: 85%; height: 80%;'></button>"+
@@ -2012,7 +2016,7 @@ block content
                                     document.getElementsByClassName('dropdown')[1].style.visibility = "visible";
                                     document.getElementsByClassName('myDeleteButton')[0].style.visibility = "visible";
                                 }
-                                var mouseDown = false;
+                                let mouseDown = false;
                                 lens.outsideCircle.on({
                                     dbclick:function(e){
                                         L.DomEvent.stopPropagation(e);
@@ -2125,15 +2129,15 @@ block content
                                         click: function(e){
                                             L.DomEvent.stopPropagation(e);
                                             mapPressForCreation = false;
-                                            correctSizeVar = false;
+                                            correctSizelet = false;
                                         },
                                         mousedown: function (e) {
                                             L.DomEvent.stopPropagation(e);
 
                                             if(changeRadius){    
-                                                var from = turf.point([lens.getLngLat().lat,lens.getLngLat().lng]);
-                                                var optionsCreateCirc = {units: 'kilometers'};
-                                                var once = true;
+                                                let from = turf.point([lens.getLngLat().lat,lens.getLngLat().lng]);
+                                                let optionsCreateCirc = {units: 'kilometers'};
+                                                let once = true;
                                                 mapPressForCreation = true;
                                                 map.on('mousemove', function (event) {
                                                     if(lens.getRadiusFlag()){
@@ -2157,16 +2161,16 @@ block content
 
                                                             map.dragging.disable();
 
-                                                            var to = turf.point([event.latlng.lat, event.latlng.lng]);
+                                                            let to = turf.point([event.latlng.lat, event.latlng.lng]);
 
-                                                            var distance = turf.distance(from, to, optionsCreateCirc);
+                                                            let distance = turf.distance(from, to, optionsCreateCirc);
                                                             radiusValue = distance * 1000;
                                                             if (radiusValue >= 50 && radiusValue <= 25000) {
-                                                                correctSizeVar = true;
+                                                                correctSizelet = true;
                                                                 lens.colorSuccess();
                                                                 lens.setRadius(radiusValue);
                                                             } else {
-                                                                correctSizeVar = false;
+                                                                correctSizelet = false;
                                                                 lens.areaQuery.setStyle({fillColor: 'DarkRed',color:'red'});
                                                             }
                                                         }
@@ -2214,7 +2218,7 @@ block content
 
                                                 map.fitBounds(lens.getBound());
                                                 mapPressForCreation = false;
-                                                correctSizeVar = false;
+                                                correctSizelet = false;
                                             }
 
                                         }
@@ -2367,10 +2371,10 @@ block content
         }
 
         function creaAttAreas(areaOfQuery){
-            var attLayer = L.featureGroup({pane: 'attLensPane'}).addTo(attLenResults);
+            let attLayer = L.featureGroup({pane: 'attLensPane'}).addTo(attLenResults);
                     
                    
-            var areaObj = {
+            let areaObj = {
                 area:areaOfQuery,
                 lensArray: [],
                 lID:attLayer._leaflet_id,
@@ -2384,7 +2388,7 @@ block content
                     this.lensArray.push(obj);
                 },
                 removeLens: function (obj){
-                    for(var i = this.lensArray.length - 1; i >= 0; i--) {
+                    for(let i = this.lensArray.length - 1; i >= 0; i--) {
                         if(this.lensArray[i] === obj) {
                             this.lensArray.splice(i, 1);
                             return true;
@@ -2422,7 +2426,7 @@ block content
                     let urlString  = "attQueryNEW/trajectory_lines3/" + JSON.stringify(this.area.geometry);
                     
                     
-                    let thisVar = this;
+                    let thislet = this;
                     let newData = $.ajax({
                         url: urlString,
                         type: 'POST',
@@ -2520,7 +2524,7 @@ block content
                     
                 },
                 updateLayer : function(){
-                    var thisVar = this;
+                    let thislet = this;
                     //if(this.getlID() != null){
                     attLenResults.getLayer(this.getlID()).eachLayer(function(oneOfFourATTLayers){
                         oneOfFourATTLayers.eachLayer(function(oneOfSmallLayerContainer){
@@ -2557,21 +2561,21 @@ block content
 
         function velocityAtt(layer, properties, encoding){
              // code block
-            var velAtt = properties.f4;
+            let velAtt = properties.f4;
             switch(encoding){
                 case "color":
                     /*layer.setStyle({opacity:0});
-                    var pointsArray = layer.feature.geometry.coordinates;
+                    let pointsArray = layer.feature.geometry.coordinates;
                     
-                    var velArray =  layer.feature.properties.f5;
+                    let velArray =  layer.feature.properties.f5;
 
-                    var finalArray = [];
+                    let finalArray = [];
                     
-                    for(var i = 0;i < velArray.length;i++ ){
+                    for(let i = 0;i < velArray.length;i++ ){
                         finalArray.push([pointsArray[i][1],pointsArray[i][0],velArray[i]]);    
                     }
                     console.log(pointsArray);
-                    var hotlineLayer = L.hotline(finalArray, {
+                    let hotlineLayer = L.hotline(finalArray, {
                         min: 0,
                         max: 60,
                         palette: {
@@ -2625,39 +2629,39 @@ block content
                     
                 case "brightness":
                     if(velAtt <= 10)          {
-                        var colr = ColorLuminance(layer.options.color,-0.95);
+                        let colr = ColorLuminance(layer.options.color,-0.95);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <= 20)     {
-                        var colr = ColorLuminance(layer.options.color,-0.9);
+                        let colr = ColorLuminance(layer.options.color,-0.9);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <= 30)    {
-                        var colr = ColorLuminance(layer.options.color,-0.8);
+                        let colr = ColorLuminance(layer.options.color,-0.8);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <= 40)    {
-                        var colr = ColorLuminance(layer.options.color,-0.65);
+                        let colr = ColorLuminance(layer.options.color,-0.65);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <= 50)    {
-                        var colr = ColorLuminance(layer.options.color,-0.5);
+                        let colr = ColorLuminance(layer.options.color,-0.5);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <= 60)    {
-                        var colr = ColorLuminance(layer.options.color,-0.35);
+                        let colr = ColorLuminance(layer.options.color,-0.35);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <=  70)   {
-                        var colr = ColorLuminance(layer.options.color,-0.2);
+                        let colr = ColorLuminance(layer.options.color,-0.2);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <=  80)   {
-                        var colr = ColorLuminance(layer.options.color,-0.1);
+                        let colr = ColorLuminance(layer.options.color,-0.1);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <=  90)   {
-                        var colr = ColorLuminance(layer.options.color,-0.05);
+                        let colr = ColorLuminance(layer.options.color,-0.05);
                         layer.setStyle({"color":colr});
                     }
                     else                    console.log("brightness already at 1")
@@ -2709,7 +2713,7 @@ block content
 
         function lengthAtt(layer,properties, encoding){
              // code block
-            var len = properties.f1;
+            let len = properties.f1;
             switch(encoding){
                 case "color":
                     if(len <= 250)          layer.setStyle({color :'#ff3232'}) 
@@ -2725,39 +2729,39 @@ block content
                     break;
                 case "brightness":
                     if(len <= 250)          {
-                        var colr = ColorLuminance(layer.options.color,-0.95);
+                        let colr = ColorLuminance(layer.options.color,-0.95);
                         layer.setStyle({"color":colr});
                     }
                     else if(len <= 500)     {
-                        var colr = ColorLuminance(layer.options.color,-0.9);
+                        let colr = ColorLuminance(layer.options.color,-0.9);
                         layer.setStyle({"color":colr});
                     }
                     else if(len <= 1000)    {
-                        var colr = ColorLuminance(layer.options.color,-0.8);
+                        let colr = ColorLuminance(layer.options.color,-0.8);
                         layer.setStyle({"color":colr});
                     }
                     else if(len <= 2000)    {
-                        var colr = ColorLuminance(layer.options.color,-0.65);
+                        let colr = ColorLuminance(layer.options.color,-0.65);
                         layer.setStyle({"color":colr});
                     }
                     else if(len <= 4000)    {
-                        var colr = ColorLuminance(layer.options.color,-0.5);
+                        let colr = ColorLuminance(layer.options.color,-0.5);
                         layer.setStyle({"color":colr});
                     }
                     else if(len <= 8000)    {
-                        var colr = ColorLuminance(layer.options.color,-0.35);
+                        let colr = ColorLuminance(layer.options.color,-0.35);
                         layer.setStyle({"color":colr});
                     }
                     else if(len <=  16000)   {
-                        var colr = ColorLuminance(layer.options.color,-0.2);
+                        let colr = ColorLuminance(layer.options.color,-0.2);
                         layer.setStyle({"color":colr});
                     }
                     else if(len <=  32000)   {
-                        var colr = ColorLuminance(layer.options.color,-0.1);
+                        let colr = ColorLuminance(layer.options.color,-0.1);
                         layer.setStyle({"color":colr});
                     }
                     else if(len <=  128000)   {
-                        var colr = ColorLuminance(layer.options.color,-0.05);
+                        let colr = ColorLuminance(layer.options.color,-0.05);
                         layer.setStyle({"color":colr});
                     }
                     else                    console.log("brightness already at 1")
@@ -2791,7 +2795,7 @@ block content
         
         function durationAtt(layer, properties, encoding){
              // code block
-            var dur = properties.f2;
+            let dur = properties.f2;
             switch(encoding){
                 case "color":
                     if(dur <= "00:01:00")           layer.setStyle({color :'#FFF8DC'}) 
@@ -2803,23 +2807,23 @@ block content
                     break;
                 case "brightness":
                     if(dur <= "00:01:00")          {
-                        var colr = ColorLuminance(layer.options.color,-0.95);
+                        let colr = ColorLuminance(layer.options.color,-0.95);
                         layer.setStyle({"color":colr});
                     }
                     else if(dur <= "00:02:00")     {
-                        var colr = ColorLuminance(layer.options.color,-0.9);
+                        let colr = ColorLuminance(layer.options.color,-0.9);
                         layer.setStyle({"color":colr});
                     }
                     else if(dur <= "00:05:00")    {
-                        var colr = ColorLuminance(layer.options.color,-0.8);
+                        let colr = ColorLuminance(layer.options.color,-0.8);
                         layer.setStyle({"color":colr});
                     }
                     else if(dur <= "00:10:00")    {
-                        var colr = ColorLuminance(layer.options.color,-0.5);
+                        let colr = ColorLuminance(layer.options.color,-0.5);
                         layer.setStyle({"color":colr});
                     }
                     else if(dur <=  "00:30:00")   {
-                        var colr = ColorLuminance(layer.options.color,-0.2);
+                        let colr = ColorLuminance(layer.options.color,-0.2);
                         layer.setStyle({"color":colr});
                     }
                     else                    console.log("brightness already at 1")
@@ -2847,7 +2851,7 @@ block content
             // 2008-02-02 13:30:44
             // 2008-02-08 17:39:18
             // code block
-            var tim = properties.f3;
+            let tim = properties.f3;
             switch(encoding){
                 case "color":
                     if(tim <= "2008-02-03 13:30:44")            layer.setStyle({color :'#FFF8DC'}) 
@@ -2859,23 +2863,23 @@ block content
                     break;
                 case "brightness":
                     if(tim <= "2008-02-03 13:30:44")          {
-                        var colr = ColorLuminance(layer.options.color,-0.95);
+                        let colr = ColorLuminance(layer.options.color,-0.95);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= "2008-02-04 13:30:44")     {
-                        var colr = ColorLuminance(layer.options.color,-0.9);
+                        let colr = ColorLuminance(layer.options.color,-0.9);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= "2008-02-05 13:30:44")    {
-                        var colr = ColorLuminance(layer.options.color,-0.8);
+                        let colr = ColorLuminance(layer.options.color,-0.8);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= "2008-02-06 13:30:44")    {
-                        var colr = ColorLuminance(layer.options.color,-0.5);
+                        let colr = ColorLuminance(layer.options.color,-0.5);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= "2008-02-07 13:30:44")   {
-                        var colr = ColorLuminance(layer.options.color,-0.2);
+                        let colr = ColorLuminance(layer.options.color,-0.2);
                         layer.setStyle({"color":colr});
                     }
                     else                    console.log("brightness already at 1")
@@ -2908,45 +2912,45 @@ block content
             if(indexI >= 0){
 
                 console.log("Before intersection and difference");
-                //var optionsTruncate = {coordinates: 2};
-                var urlIntersectDifference = "interdif/"  + JSON.stringify(thisVar.areas[0].area) + "/" +  JSON.stringify(thisVar.intersections[indexI].areas[j].area);
+                //let optionsTruncate = {coordinates: 2};
+                let urlIntersectDifference = "interdif/"  + JSON.stringify(thisVar.areas[0].area) + "/" +  JSON.stringify(thisVar.intersections[indexI].areas[j].area);
                 console.log(thisVar.areas[0].area);
-                //var thisVar = this;
-                //var thisAreasZero = this.areas[0];
-                //var oneOfAreasFromIntersection = this.intersections[indexI].areas[j];
-                var interDifPromise = intersectionServer(urlIntersectDifference);
+                //let thislet = this;
+                //let thisAreasZero = this.areas[0];
+                //let oneOfAreasFromIntersection = this.intersections[indexI].areas[j];
+                let interDifPromise = intersectionServer(urlIntersectDifference);
                 interDifPromise.then(function(responseInter) {
                     console.log("After intersection and difference");
-                    //var urlDifference = "difference/"  + JSON.stringify(thisVar.areas[0].area) + "/" +  JSON.stringify(thisVar.intersections[indexI].areas[j].area);
+                    //let urlDifference = "difference/"  + JSON.stringify(thisVar.areas[0].area) + "/" +  JSON.stringify(thisVar.intersections[indexI].areas[j].area);
                     
                     if(responseInter[0] != null){
                         
-                        //var differencePromise =  differenceServer(urlDifference);
+                        //let differencePromise =  differenceServer(urlDifference);
                         //differencePromise.then(function(responseDiff) {
-                        //var difference = turf.difference(turf.truncate(this.areas[0].area, optionsTruncate),turf.truncate(this.intersections[i].areas[j].area, optionsTruncate));
+                        //let difference = turf.difference(turf.truncate(this.areas[0].area, optionsTruncate),turf.truncate(this.intersections[i].areas[j].area, optionsTruncate));
                         console.log("Intersection not null");
-                        //var difference1 = turf.cleanCoords(difference)
-                        //var intersection1 = turf.cleanCoords(intersection)
+                        //let difference1 = turf.cleanCoords(difference)
+                        //let intersection1 = turf.cleanCoords(intersection)
                         //console.log(thisAreasZero);
                         //console.log(responseDiff);
                         //thisAreasZero.setArea(responseDiff);
                         thisVar.areas[0].setArea(responseInter[1]);
 
-                        var lensArrOfArea = thisVar.intersections[indexI].areas[j].getLensArray();
-                        var newArea = creaAttAreas(responseInter[0]);
+                        let lensArrOfArea = thisVar.intersections[indexI].areas[j].getLensArray();
+                        let newArea = creaAttAreas(responseInter[0]);
                         for(k = 0; k < lensArrOfArea.length;k++){
                             newArea.addLens(lensArrOfArea[k]);
                         }
                         newArea.addLens(thisVar);
                         thisVar.addArea(newArea);
-                        /*var color2;
-                        var r = Math.min(Math.max(Math.floor(Math.random() * 255), 55), 200);
-                        var g = Math.min(Math.max(Math.floor(Math.random() * 255), 75), 255);
-                        var b = Math.min(Math.max(Math.floor(Math.random() * 255), 100), 225);
+                        /*let color2;
+                        let r = Math.min(Math.max(Math.floor(Math.random() * 255), 55), 200);
+                        let g = Math.min(Math.max(Math.floor(Math.random() * 255), 75), 255);
+                        let b = Math.min(Math.max(Math.floor(Math.random() * 255), 100), 225);
                         
                         color2= "rgb("+r+" ,"+g+","+ b+")"; 
-                        var randomColor = Math.floor(Math.random()*16777215).toString(16);
-                        var cona = L.geoJson(responseInter[0], {
+                        let randomColor = Math.floor(Math.random()*16777215).toString(16);
+                        let cona = L.geoJson(responseInter[0], {
                             color: '#ff3636',
                             fillColor: color2,
                             fillOpacity:1
@@ -2995,14 +2999,14 @@ block content
         /////
 
         function Unix_timestamp(t){
-            var dt = new Date(t);
-            var stringDate = dt.toUTCString();
-            /*var year = dt.getFullYear();
-            var month = dt.getMonth();
-            var day = dt.getDay();
-            var hour = dt.getHours();
-            var minute = dt.getMinutes();
-            var seconds = dt.getSeconds();*/
+            let dt = new Date(t);
+            let stringDate = dt.toUTCString();
+            /*let year = dt.getFullYear();
+            let month = dt.getMonth();
+            let day = dt.getDay();
+            let hour = dt.getHours();
+            let minute = dt.getMinutes();
+            let seconds = dt.getSeconds();*/
 
             return stringDate;
         }
@@ -3013,7 +3017,7 @@ block content
                 return false; 
             else{ 
             // comapring each element of array 
-                for(var i=0;i<a.length;i++){
+                for(let i=0;i<a.length;i++){
                     if(a[i]!=b[i]) return false; 
                 } 
                 return true; 
@@ -3030,7 +3034,7 @@ block content
             lum = lum || 0;
 
             // convert to decimal and change luminosity
-            var rgb = "#", c, i;
+            let rgb = "#", c, i;
             for (i = 0; i < 3; i++) {
                 c = parseInt(hex.substr(i*2,2), 16);
                 c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
@@ -3095,8 +3099,10 @@ block content
             console.log("Here come the areasd in the array to pass to server")
             console.log(areasArray)
             if(defaultLayerFlag){
-                defaultLayerFlag = false;
-                map.removeLayer(defaultLayer);
+                if (defaultLayer != null) {
+                    defaultLayerFlag = false;
+                    map.removeLayer(defaultLayer);
+                }
             }
 
             if(lastMarkerGroupID !=null){
@@ -3115,7 +3121,7 @@ block content
                 markerGroup3.removeLayer(lastMarkerGroupID3);
                 lastMarkerGroupID3 = null;
             }
-            var object = $.ajax({
+            let object = $.ajax({
                 type: 'POST',
                 url: '/updateBaseLayer/trajectory_lines3',
                 contentType: 'application/json',
@@ -3126,13 +3132,13 @@ block content
             })
             $.when(object).done(function() {
                 if(object.responseJSON.features != null){
-                    var tracksToDraw = L.geoJson(object.responseJSON,firstStyle);
+                    let tracksToDraw = L.geoJson(object.responseJSON,firstStyle);
                     tracksToDraw.addTo(markerGroup);
                     lastMarkerGroupID = tracksToDraw._leaflet_id;
                 }
                 lensesLayer.bringToFront();
             }); 
-            var object1 = $.ajax({
+            let object1 = $.ajax({
                 type: 'POST',
                 url: '/updateBaseLayer/trajectory_lines2',
                 contentType: 'application/json',
@@ -3143,13 +3149,13 @@ block content
             })
             $.when(object1).done(function() {
                 if(object1.responseJSON.features != null){
-                    var tracksToDraw = L.geoJson(object1.responseJSON,firstStyle);
+                    let tracksToDraw = L.geoJson(object1.responseJSON,firstStyle);
                     tracksToDraw.addTo(markerGroup1);
                     lastMarkerGroupID1 = tracksToDraw._leaflet_id;
                 }
                 lensesLayer.bringToFront();
             }); 
-            var object2 = $.ajax({
+            let object2 = $.ajax({
                 type: 'POST',
                 url: '/updateBaseLayer/trajectory_lines1',
                 contentType: 'application/json',
@@ -3160,13 +3166,13 @@ block content
             })
             $.when(object2).done(function() {
                 if(object2.responseJSON.features != null){
-                    var tracksToDraw = L.geoJson(object2.responseJSON,firstStyle);
+                    let tracksToDraw = L.geoJson(object2.responseJSON,firstStyle);
                     tracksToDraw.addTo(markerGroup2);
                     lastMarkerGroupID2 = tracksToDraw._leaflet_id;
                 }
                 lensesLayer.bringToFront();
             }); 
-            var object3 = $.ajax({
+            let object3 = $.ajax({
                 type: 'POST',
                 url: '/updateBaseLayer/trajectory_lines',
                 contentType: 'application/json',
@@ -3177,7 +3183,7 @@ block content
             })
             $.when(object3).done(function() {
                 if(object3.responseJSON.features != null){
-                    var tracksToDraw = L.geoJson(object3.responseJSON3,firstStyle);
+                    let tracksToDraw = L.geoJson(object3.responseJSON3,firstStyle);
                     tracksToDraw.addTo(markerGroup3);
                     lastMarkerGroupID3 = tracksToDraw._leaflet_id;
                 }
@@ -3199,29 +3205,29 @@ block content
                 }
             });
             //Very important line, it disable the page refresh.
-            return false;
+            location.reload();
         });  
 
         /*if(!lens.hasBeenOpacity){
                                     if(lens.intersections.length != 0){
-                                        var middleArray = Array.from(lens.intersections);
+                                        let middleArray = Array.from(lens.intersections);
                                         lens.delete();
                                         lens.updateOthersV2(false);
                                         
                                         
-                                        for(var j = middleArray.length-1; j>=0;j--){
+                                        for(let j = middleArray.length-1; j>=0;j--){
                                             middleArray[j].delete();
                                             middleArray[j].updateOthersV2(false);
                                         }
                                         
                                         
                                         lens.intersections = [];
-                                        var holder = await lens.createAreas();
+                                        let holder = await lens.createAreas();
                                         
-                                        for(var x = 0; x < middleArray.length;x++){
-                                            var otherHolder = await middleArray[x].createAreas();
+                                        for(let x = 0; x < middleArray.length;x++){
+                                            let otherHolder = await middleArray[x].createAreas();
                                         }
-                                        for(var k = 0;k < lens.areas.length;k++){
+                                        for(let k = 0;k < lens.areas.length;k++){
                                             attLenResults.getLayer(lens.areas[k].getlID()).bringToBack()
                                             /*eachLayer(function(oneOfFourATTLayers){
                                                 oneOfFourATTLayers.eachLayer(function(oneOfSmallLayerContainer){
