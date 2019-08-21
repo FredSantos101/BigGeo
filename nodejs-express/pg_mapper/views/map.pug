@@ -78,13 +78,18 @@ block content
         let lensCanMove = false;
 
 
-        let attributeFunclet = "length";
-        let encodingFunclet = "color";
+        let attributeFuncVar = "length";
+        let encodingFuncVar = "color";
 
         let attLensesArray = [];
         //opacityLensArray
         let attOPACITYLensesArray = [];
 
+
+        var minTimeValue = 0;
+        var maxTimeValue = 0;
+        getMinTimeVal()
+        getMaxTimeVal()
 
 
 
@@ -543,7 +548,7 @@ block content
                     let urlString  = "query/trajectory_lines3/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType() + "/" + this.getMinV() + "/" + this.getMaxV();
                     
 
-                    let thislet = this;
+                    let thisVar = this;
 
                     let newData = $.ajax({
                         url: urlString,
@@ -875,8 +880,8 @@ block content
             lens.setBounds(lens.areaQuery.getBounds());
 
             /*CALCULATE THE DISTANCE FROM ONE POINT TO ANOTHER IN PIXELS
-            let northlet = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
-            let southlet = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
+            let northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
+            let southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
             let numOfPixl = northVar.distanceTo(southVar);*/
             //className: 'outside-Circle'
             
@@ -1269,8 +1274,8 @@ block content
                                         sliderType: "range",
                                         radius: "130px",
                                         value: lens.getMinV() + "," + lens.getMaxV(),
-                                        min: 1201959044 , // 2008-02-02 13:30:44
-                                        max: 1202492358 , // 2008-02-08 17:39:18
+                                        min: minTimeValue , // 2008-02-02 13:30:44
+                                        max: maxTimeValue , // 2008-02-08 17:39:18
                                         //lineCap: "round",
                                         width: 5,
                                         handleSize: "+10",
@@ -1293,7 +1298,7 @@ block content
                                             // Seconds
                                             let seconds = "0" + date.getSeconds();
                                             // Display date time in MM-dd-yyyy h:m:s format
-                                            let convdataTime = month+'-'+day+'-'+year+' '+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+                                            let convdataTime = month+'-'+day+'-'+year+' '+hours + ':' + minutes.substr(-2);
                                             
                                             return convdataTime;
                                         },
@@ -1748,7 +1753,7 @@ block content
                     this.addArea(firstArea);
                     let areaCounnt =1;
                     let numberOfAreasVisited = 0;
-                    let thislet = this;
+                    let thisVar = this;
                     recursiveArea(thisVar, this.intersections.length - 1, 0);
                     
                    
@@ -1931,8 +1936,8 @@ block content
                             L.DomEvent.stopPropagation(ev);
                             
                                 // code stuff
-                            let northlet = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
-                            let southlet = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
+                            let northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
+                            let southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
                             let numOfPixl = northVar.distanceTo(southVar);
                             let myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [numOfPixl,numOfPixl], html: 
                                 "<button class='myDeleteButton' style='z-index: 1000;position: fixed;margin-top: 2%;margin-left: 12.5%;'><img src='images/trash.png' style='width: 85%; height: 80%;'></button>"+
@@ -2426,7 +2431,7 @@ block content
                     let urlString  = "attQueryNEW/trajectory_lines3/" + JSON.stringify(this.area.geometry);
                     
                     
-                    let thislet = this;
+                    let thisVar = this;
                     let newData = $.ajax({
                         url: urlString,
                         type: 'POST',
@@ -2524,7 +2529,7 @@ block content
                     
                 },
                 updateLayer : function(){
-                    let thislet = this;
+                    let thisVar = this;
                     //if(this.getlID() != null){
                     attLenResults.getLayer(this.getlID()).eachLayer(function(oneOfFourATTLayers){
                         oneOfFourATTLayers.eachLayer(function(oneOfSmallLayerContainer){
@@ -2779,16 +2784,16 @@ block content
                     else                    console.log("Opcacity already at 1")
                     break;
                 case "width":
-                if(len <= 250)              layer.setStyle({"weight": 0.1});
-                    else if(len <= 500)     layer.setStyle({"weight": 0.5});
-                    else if(len <= 1000)    layer.setStyle({"weight": 1});
-                    else if(len <= 2000)    layer.setStyle({"weight": 1.5});
-                    else if(len <= 4000)    layer.setStyle({"weight": 2});
-                    else if(len <= 8000)    layer.setStyle({"weight": 2.5});
-                    else if(len <= 16000)   layer.setStyle({"weight": 3.5});
-                    else if(len <= 32000)   layer.setStyle({"weight": 5});
-                    else if(len <= 128000)  layer.setStyle({"weight": 6.5});
-                    else                    layer.setStyle({"weight": 8});
+                if(len <= 250)              layer.setStyle({"weight": 1});
+                    else if(len <= 500)     layer.setStyle({"weight": 1.5});
+                    else if(len <= 1000)    layer.setStyle({"weight": 2});
+                    else if(len <= 2000)    layer.setStyle({"weight": 2.5});
+                    else if(len <= 4000)    layer.setStyle({"weight": 3});
+                    else if(len <= 8000)    layer.setStyle({"weight": 3.5});
+                    else if(len <= 16000)   layer.setStyle({"weight": 4});
+                    else if(len <= 32000)   layer.setStyle({"weight": 4.5});
+                    else if(len <= 128000)  layer.setStyle({"weight": 5});
+                    else                    layer.setStyle({"weight": 6});
                     break;
             }
         }
@@ -2798,12 +2803,12 @@ block content
             let dur = properties.f2;
             switch(encoding){
                 case "color":
-                    if(dur <= "00:01:00")           layer.setStyle({color :'#FFF8DC'}) 
-                    else if(dur <= "00:02:00")      layer.setStyle({color :'#FFE4C4'}) 
-                    else if(dur <= "00:05:00")      layer.setStyle({color :'#F5DEB3'})
-                    else if(dur <= "00:010:00")     layer.setStyle({color :'#DAA520'}) 
-                    else if(dur <=  "00:30:00")     layer.setStyle({color :'#D2691E'}) 
-                    else                            layer.setStyle({color :'#A52A2A'}) 
+                    if(dur <= "00:01:00")           layer.setStyle({color :'#ff3232'})
+                    else if(dur <= "00:02:00")      layer.setStyle({color :'#fcb42f'})
+                    else if(dur <= "00:05:00")      layer.setStyle({color :'#fcd62f'})
+                    else if(dur <= "00:010:00")     layer.setStyle({color :'#fcf528'})
+                    else if(dur <=  "00:30:00")     layer.setStyle({color :'#b9fc28'})
+                    else                            layer.setStyle({color :'#00ff00'})
                     break;
                 case "brightness":
                     if(dur <= "00:01:00")          {
@@ -2837,12 +2842,12 @@ block content
                     else                            console.log("Opcacity already at 1")
                     break;
                 case "width":
-                    if(dur <= "00:01:00")           layer.setStyle({"weight": 0.2});
-                    else if(dur <= "00:02:00")      layer.setStyle({"weight": 0.8});
-                    else if(dur <= "00:05:00")      layer.setStyle({"weight": 1.5});
-                    else if(dur <= "00:10:00")      layer.setStyle({"weight": 2.5});
-                    else if(dur <=  "00:30:00")     layer.setStyle({"weight": 3.5});
-                    else                            layer.setStyle({"weight": 5});
+                    if(dur <= "00:01:00")           layer.setStyle({"weight": 1});
+                    else if(dur <= "00:02:00")      layer.setStyle({"weight": 2});
+                    else if(dur <= "00:05:00")      layer.setStyle({"weight": 3});
+                    else if(dur <= "00:10:00")      layer.setStyle({"weight": 4});
+                    else if(dur <=  "00:30:00")     layer.setStyle({"weight": 5});
+                    else                            layer.setStyle({"weight": 6});
                     break;
             }
         }
@@ -2854,12 +2859,12 @@ block content
             let tim = properties.f3;
             switch(encoding){
                 case "color":
-                    if(tim <= "2008-02-03 13:30:44")            layer.setStyle({color :'#FFF8DC'}) 
-                    else if(tim <= "2008-02-04 13:30:44")       layer.setStyle({color :'#FFE4C4'}) 
-                    else if(tim <= "2008-02-05 13:30:44")       layer.setStyle({color :'#F5DEB3'})
-                    else if(tim <= "2008-02-06 13:30:44")       layer.setStyle({color :'#DAA520'}) 
-                    else if(tim <=  "2008-02-07 13:30:44")      layer.setStyle({color :'#D2691E'}) 
-                    else                                        layer.setStyle({color :'#A52A2A'}) 
+                    if(tim <= "2008-02-03 13:30:44")            layer.setStyle({color :'#ff3232'})
+                    else if(tim <= "2008-02-04 13:30:44")       layer.setStyle({color :'#fcb42f'})
+                    else if(tim <= "2008-02-05 13:30:44")       layer.setStyle({color :'#fcd62f'})
+                    else if(tim <= "2008-02-06 13:30:44")       layer.setStyle({color :'#fcf528'})
+                    else if(tim <=  "2008-02-07 13:30:44")      layer.setStyle({color :'#b9fc28'})
+                    else                                        layer.setStyle({color :'#00ff00'})
                     break;
                 case "brightness":
                     if(tim <= "2008-02-03 13:30:44")          {
@@ -2893,12 +2898,12 @@ block content
                     else                                        console.log("Opcacity already at 1")
                     break;
                 case "width":
-                    if(tim <= "2008-02-03 13:30:44")            layer.setStyle({"weight": 0.2});
-                    else if(tim <= "2008-02-04 13:30:44")       layer.setStyle({"weight": 0.8});
-                    else if(tim <= "2008-02-05 13:30:44")       layer.setStyle({"weight": 1.5});
-                    else if(tim <= "2008-02-06 13:30:44")       layer.setStyle({"weight": 2.5});
-                    else if(tim <= "2008-02-07 13:30:44")       layer.setStyle({"weight": 3.5});
-                    else                                        layer.setStyle({"weight": 5});
+                    if(tim <= "2008-02-03 13:30:44")            layer.setStyle({"weight": 1});
+                    else if(tim <= "2008-02-04 13:30:44")       layer.setStyle({"weight": 2});
+                    else if(tim <= "2008-02-05 13:30:44")       layer.setStyle({"weight": 3});
+                    else if(tim <= "2008-02-06 13:30:44")       layer.setStyle({"weight": 4});
+                    else if(tim <= "2008-02-07 13:30:44")       layer.setStyle({"weight": 5});
+                    else                                        layer.setStyle({"weight": 6});
                     break;
             }
         }
@@ -2915,7 +2920,7 @@ block content
                 //let optionsTruncate = {coordinates: 2};
                 let urlIntersectDifference = "interdif/"  + JSON.stringify(thisVar.areas[0].area) + "/" +  JSON.stringify(thisVar.intersections[indexI].areas[j].area);
                 console.log(thisVar.areas[0].area);
-                //let thislet = this;
+                //let thisVar = this;
                 //let thisAreasZero = this.areas[0];
                 //let oneOfAreasFromIntersection = this.intersections[indexI].areas[j];
                 let interDifPromise = intersectionServer(urlIntersectDifference);
@@ -2997,7 +3002,7 @@ block content
         /////
         ///// support
         /////
-
+        
         function Unix_timestamp(t){
             let dt = new Date(t);
             let stringDate = dt.toUTCString();
@@ -3202,11 +3207,49 @@ block content
 
                 success: function(response) {
                     console.log(response);
+
                 }
+
             });
-            //Very important line, it disable the page refresh.
-            location.reload();
-        });  
+
+            return false
+        });
+
+        function getMinTimeVal() {
+            let urlString = "/minTimeVarValue";
+
+
+            let newData = $.ajax({
+                url: urlString,
+                type: 'GET',
+                success: console.log("Minimum data value fetched"),
+                error: function (xhr) {
+                    alert(xhr.statusText)
+                }
+
+            })
+            $.when(newData).done(function () {
+                console.log(newData)
+            });
+        }
+
+        function getMaxTimeVal() {
+            let urlString = "/maxTimeVarValue";
+
+
+            let newData = $.ajax({
+                url: urlString,
+                type: 'GET',
+                success: console.log("Maximum data value fetched"),
+                error: function (xhr) {
+                    alert(xhr.statusText)
+                }
+
+            })
+            $.when(newData).done(function () {
+                console.log(newData)
+            });
+        }
 
         /*if(!lens.hasBeenOpacity){
                                     if(lens.intersections.length != 0){

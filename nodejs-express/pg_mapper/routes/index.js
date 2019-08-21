@@ -821,6 +821,134 @@ router.get('/union/:firstGeom/:secondGeom', function(req, res) {
 
 });
 
+router.get('/minTimeVarValue', function(req, res) {
+  let dataNewMin = Date.now()
+  let numberOfConnects = 0;
+  let client = new Client(conString); // Setup our Postgres Client
+  client.connect(); // connect to the client
+
+  let query = client.query(new Query("SELECT min(data_time_end) FROM trajectory_lines")); // Run our Query
+  let query1 = client.query(new Query("SELECT min(data_time_end) FROM trajectory_lines1")); // Run our Query
+  let query2 = client.query(new Query("SELECT min(data_time_end) FROM trajectory_lines2")); // Run our Query
+  let query3 = client.query(new Query("SELECT min(data_time_end) FROM trajectory_lines3")); // Run our Query
+
+
+  query.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects++
+    if(dataNewMin > result){
+      dataNewMin = result
+    }
+    if(numberOfConnects == 4){
+      console.log(dataNewMin)
+      client.end();
+      res.send(dataNewMin)
+    }
+
+  });
+  query1.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects++
+    if(dataNewMin > result){
+      dataNewMin = result
+    }
+    if(numberOfConnects == 4){
+      console.log(dataNewMin)
+      client.end();
+      res.send(dataNewMin)
+    }
+
+  });
+  query2.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects++
+    if(dataNewMin > result){
+      dataNewMin = result
+    }
+    if(numberOfConnects == 4){
+      console.log(dataNewMin)
+      client.end();
+      res.send(dataNewMin)
+    }
+
+  });
+  query3.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects++
+    if(dataNewMin > result){
+      dataNewMin = result
+    }
+    if(numberOfConnects == 4){
+      console.log(dataNewMin)
+      client.end();
+      res.send(dataNewMin)
+    }
+
+  });
+
+});
+
+router.get('/maxTimeVarValue', function(req, res) {
+  let client = new Client(conString); // Setup our Postgres Client
+  let numberOfConnects = 0;
+  client.connect(); // connect to the client
+  let dataNewMax = 0
+  let query = client.query(new Query("SELECT max(data_time_end) FROM trajectory_lines")); // Run our Query
+  let query1 = client.query(new Query("SELECT max(data_time_end) FROM trajectory_lines1")); // Run our Query
+  let query2 = client.query(new Query("SELECT max(data_time_end) FROM trajectory_lines2")); // Run our Query
+  let query3 = client.query(new Query("SELECT max(data_time_end) FROM trajectory_lines3")); // Run our Query
+
+  query.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects++
+    if(dataNewMax < result){
+      dataNewMax = result
+    }
+    if(numberOfConnects == 4){
+      client.end();
+      res.send(dataNewMax)
+    }
+
+  });
+  query1.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects++
+    if(dataNewMax < result){
+      dataNewMax = result
+    }
+    if(numberOfConnects == 4){
+      client.end();
+      res.send(dataNewMax)
+    }
+
+  });
+  query2.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects++
+    if(dataNewMax < result){
+      dataNewMax = result
+    }
+    if(numberOfConnects == 4){
+      client.end();
+      res.send(dataNewMax)
+    }
+
+  });
+  query3.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects++
+    if(dataNewMax < result){
+      dataNewMax = result
+    }
+    if(numberOfConnects == 4){
+      client.end();
+      res.send(dataNewMax)
+    }
+
+  });
+
+});
+
 
 
 //UPLOAD FILES FUNCTIONS
@@ -833,7 +961,7 @@ let storage = multer.diskStorage({
       cb(null , file.originalname);
   }
 });
-let upload = multer({storage: storage}).array('track', 2000);
+let upload = multer({storage: storage}).array('track', 1000);
 
 router.post('/fileUpload', (req, res, next) => {
   const fsExtra = require('fs-extra')
