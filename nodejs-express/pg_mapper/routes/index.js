@@ -221,7 +221,7 @@ function startMap(req, res){
     });
 }
 
-router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(req, res) {
+router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(req, res) {
 
 
   //Radius in meters to degrees
@@ -231,7 +231,58 @@ router.get('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function(
 
   let client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-  let query = client.query(new Query(query_args_ContructorQUERIES(req.params.tab, req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
+  
+  var queryToCreate = query_args_ContructorQUERIES(req.params.tab, req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue)
+  let data = req.body;
+  let stDiffs = "geom";
+  let queryOfDiff = "";
+  let queryOfRest = "";
+  if (activeQuery.length == 0){
+    queryOfDiff = " WHERE ";
+    queryOfRest = " WHERE ";
+  }
+  
+  for(let i = 0;i<data.areasArray.length;i++){
+    stDiffs = "ST_Difference("+stDiffs+",ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))"
+    if(queryOfDiff == " WHERE " && queryOfRest == " WHERE "){
+      queryOfDiff = queryOfDiff + "(ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+      queryOfRest = queryOfRest + "NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+    }
+    else{
+      if(i == 0){  
+        queryOfDiff = queryOfDiff + " AND (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+        queryOfRest = queryOfRest + " AND NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
+      
+      }
+      else{
+        queryOfDiff = queryOfDiff + " OR ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+        queryOfRest = queryOfRest + " AND ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
+      
+      }
+      
+    }
+  }
+  queryOfDiff = queryOfDiff + ")";
+  queryOfRest = queryOfRest + ")";
+  let firstSelect = "SELECT " +  stDiffs + " AS geom FROM " + req.params.tab; 
+  let secondSelect = "SELECT geom AS geom FROM " + req.params.tab; 
+  
+  let firstPart = ""
+  let secondPart = " LIMIT 5000000) 	As kb) As fc";
+  if (data.areasArray.length == 0){
+    firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" + secondSelect + activeQuery + ") As lg";
+  
+  }
+  else{
+    firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" +firstSelect + activeQuery + queryOfDiff + " UNION ALL " + secondSelect + activeQuery + queryOfRest + ") As lg";
+  
+  }
+  console.log(firstPart);
+
+  let query = client.query(new Query(firstPart + secondPart)); // Run our Query
+  
+
+  
   query.on("row", function (row, result) {
       result.addRow(row);
   });
@@ -331,11 +382,13 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
 
 });
 
-router.get('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:longNEW/:latNEW/:radiusNEW/:typeNEW/:minValueNEW/:maxValueNEW', function(req, res) {
-
+router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:longNEW/:latNEW/:radiusNEW/:typeNEW/:minValueNEW/:maxValueNEW', function(req, res) {
+  let data = req.body;
   //Radius in meters to degrees
   let radiusDegrees = (req.params.radius/ 111120).toFixed(8);
   let radiusDegreesNEW = (req.params.radiusNEW/ 111120).toFixed(8);
+
+
 
   let client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
@@ -344,7 +397,52 @@ router.get('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:longN
   let deleteOldPos = query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue);
   let newQuery = query_args_ContructorQUERIES(req.params.tab,req.params.longNEW, req.params.latNEW, radiusDegreesNEW, req.params.typeNEW, req.params.minValueNEW, req.params.maxValueNEW);
 
-  let query = client.query(new Query(newQuery)); // Run our Query
+  let stDiffs = "geom";
+  let queryOfDiff = "";
+  let queryOfRest = "";
+  if (activeQuery.length == 0){
+    queryOfDiff = " WHERE ";
+    queryOfRest = " WHERE ";
+  }
+  
+  for(let i = 0;i<data.areasArray.length;i++){
+    stDiffs = "ST_Difference("+stDiffs+",ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))"
+    if(queryOfDiff == " WHERE " && queryOfRest == " WHERE "){
+      queryOfDiff = queryOfDiff + "(ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+      queryOfRest = queryOfRest + "NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+    }
+    else{
+      if(i == 0){  
+        queryOfDiff = queryOfDiff + " AND (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+        queryOfRest = queryOfRest + " AND NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
+      
+      }
+      else{
+        queryOfDiff = queryOfDiff + " OR ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+        queryOfRest = queryOfRest + " AND ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
+      
+      }
+      
+    }
+  }
+  queryOfDiff = queryOfDiff + ")";
+  queryOfRest = queryOfRest + ")";
+  let firstSelect = "SELECT " +  stDiffs + " AS geom FROM " + req.params.tab; 
+  let secondSelect = "SELECT geom AS geom FROM " + req.params.tab; 
+  
+  let firstPart = ""
+  let secondPart = " LIMIT 5000000) 	As kb) As fc";
+  if (data.areasArray.length == 0){
+    firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" + secondSelect + activeQuery + ") As lg";
+  
+  }
+  else{
+    firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" +firstSelect + activeQuery + queryOfDiff + " UNION ALL " + secondSelect + activeQuery + queryOfRest + ") As lg";
+  
+  }
+  console.log(firstPart);
+
+  let query = client.query(new Query(firstPart + secondPart)); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
   });
@@ -835,53 +933,62 @@ router.get('/minTimeVarValue', function(req, res) {
 
   query.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
-    numberOfConnects = numberOfConnects++
-    if(dataNewMin > result){
-      dataNewMin = result
+    console.log(result)
+    numberOfConnects = numberOfConnects + 1
+    if(dataNewMin > result.rows[0].min){
+      dataNewMin = result.rows[0].min
     }
     if(numberOfConnects == 4){
+      console.log("Here  is the min")
       console.log(dataNewMin)
       client.end();
-      res.send(dataNewMin)
+      res.status(200).send((dataNewMin).toString());
     }
 
   });
   query1.on("end", function (result) {
+    console.log(result)
     //let data = require('../public/data/geoJSON.json')
-    numberOfConnects = numberOfConnects++
-    if(dataNewMin > result){
-      dataNewMin = result
+    numberOfConnects = numberOfConnects + 1
+    if(dataNewMin > result.rows[0].min){
+      dataNewMin = result.rows[0].min
     }
     if(numberOfConnects == 4){
+      console.log("Here  is the min")
       console.log(dataNewMin)
+      
       client.end();
-      res.send(dataNewMin)
+      res.status(200).send((dataNewMin).toString());
     }
 
   });
   query2.on("end", function (result) {
+    console.log(result)
     //let data = require('../public/data/geoJSON.json')
-    numberOfConnects = numberOfConnects++
-    if(dataNewMin > result){
-      dataNewMin = result
+    numberOfConnects = numberOfConnects + 1
+    if(dataNewMin > result.rows[0].min){
+      dataNewMin = result.rows[0].min
     }
     if(numberOfConnects == 4){
+      console.log("Here  is the min")
       console.log(dataNewMin)
       client.end();
-      res.send(dataNewMin)
+      res.status(200).send((dataNewMin).toString());
     }
 
   });
   query3.on("end", function (result) {
+    console.log(result)
     //let data = require('../public/data/geoJSON.json')
-    numberOfConnects = numberOfConnects++
-    if(dataNewMin > result){
-      dataNewMin = result
+    numberOfConnects = numberOfConnects + 1
+    if(dataNewMin > result.rows[0].min){
+      dataNewMin = result.rows[0].min
     }
     if(numberOfConnects == 4){
+      console.log("Here  is the min")
       console.log(dataNewMin)
       client.end();
-      res.send(dataNewMin)
+      res.status(200).send((dataNewMin).toString());
     }
 
   });
@@ -900,49 +1007,57 @@ router.get('/maxTimeVarValue', function(req, res) {
 
   query.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
-    numberOfConnects = numberOfConnects++
-    if(dataNewMax < result){
-      dataNewMax = result
+    numberOfConnects = numberOfConnects + 1
+    if(dataNewMax < result.rows[0].max){
+      dataNewMax = result.rows[0].max
     }
     if(numberOfConnects == 4){
+      console.log("Here  is the max")
+      console.log(dataNewMax)
       client.end();
-      res.send(dataNewMax)
+      res.status(200).send((dataNewMax).toString());
     }
 
   });
   query1.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
-    numberOfConnects = numberOfConnects++
-    if(dataNewMax < result){
-      dataNewMax = result
+    numberOfConnects = numberOfConnects + 1
+    if(dataNewMax < result.rows[0].max){
+      dataNewMax = result.rows[0].max
     }
     if(numberOfConnects == 4){
+      console.log("Here  is the max")
+      console.log(dataNewMax)
       client.end();
-      res.send(dataNewMax)
+      res.status(200).send((dataNewMax).toString());
     }
 
   });
   query2.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
-    numberOfConnects = numberOfConnects++
-    if(dataNewMax < result){
-      dataNewMax = result
+    numberOfConnects = numberOfConnects + 1
+    if(dataNewMax < result.rows[0].max){
+      dataNewMax = result.rows[0].max
     }
     if(numberOfConnects == 4){
+      console.log("Here  is the max")
+      console.log(dataNewMax)
       client.end();
-      res.send(dataNewMax)
+      res.status(200).send((dataNewMax).toString());
     }
 
   });
   query3.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
-    numberOfConnects = numberOfConnects++
-    if(dataNewMax < result){
-      dataNewMax = result
+    numberOfConnects = numberOfConnects + 1
+    if(dataNewMax < result.rows[0].max){
+      dataNewMax = result.rows[0].max
     }
     if(numberOfConnects == 4){
+      console.log("Here  is the max")
+      console.log(dataNewMax)
       client.end();
-      res.send(dataNewMax)
+      res.status(200).send((dataNewMax).toString());
     }
 
   });

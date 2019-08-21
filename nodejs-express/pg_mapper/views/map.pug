@@ -247,7 +247,7 @@ block content
         let notClickedLens = false;
         let clicked = false;
         let changeRadius = false;
-        let correctSizelet = false;
+        let correctSizeVar = false;
         map.on({
             click:function(e){
                 map.removeEventListener('mousemove');
@@ -516,6 +516,12 @@ block content
                 createLayers: function(){
                     //lensPreCreationLayer.clearLayers();
                     console.log("Im removing the map now and adding new ones afterwards")
+                    
+                    let areasArray = [];
+                    attOPACITYLensesArray.forEach(function(lensInOpacArray){
+                        areasArray.push(lensInOpacArray.overallArea.geometry);
+                    })
+                    
                     if(defaultLayerFlag){
                         if(defaultLayer != null){
                             defaultLayerFlag = false;
@@ -552,8 +558,9 @@ block content
 
                     let newData = $.ajax({
                         url: urlString,
-                        type: 'GET',
-                        dataType:'json',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({areasArray}),
                         success: console.log("Data successfully loaded!"),
                         error: function (xhr) {
                             alert(xhr.statusText)
@@ -571,8 +578,9 @@ block content
                     }); 
                     let newData1 = $.ajax({
                         url: urlString1,
-                        type: 'GET',
-                        dataType:'json',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({areasArray}),
                         success: console.log("Data successfully loaded!"),
                         error: function (xhr) {
                             alert(xhr.statusText)
@@ -590,8 +598,9 @@ block content
                     });
                     let newData2 = $.ajax({
                         url: urlString2,
-                        type: 'GET',
-                        dataType:'json',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({areasArray}),
                         success: console.log("Data successfully loaded!"),
                         error: function (xhr) {
                             alert(xhr.statusText)
@@ -609,8 +618,9 @@ block content
                     });
                     let newData3 = $.ajax({
                         url: urlString3,
-                        type: 'GET',
-                        dataType:'json',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({areasArray}),
                         success: console.log("Data successfully loaded!"),
                         error: function (xhr) {
                             alert(xhr.statusText)
@@ -753,6 +763,10 @@ block content
                 updateLENS: function(){
                     this.areaQuery.setStyle({color: 'DarkRed',fillColor: 'red',fillOpacity: 0.6});
                     let thisVar= this;
+                    let areasArray = [];
+                    attOPACITYLensesArray.forEach(function(lensInOpacArray){
+                        areasArray.push(lensInOpacArray.overallArea.geometry);
+                    })
                     if(lastMarkerGroupID !=null){
                         markerGroup.removeLayer(lastMarkerGroupID);
                         lastMarkerGroupID = null;
@@ -780,13 +794,13 @@ block content
                     
                     let newData = $.ajax({
                         url: urlString,
-                        type: 'GET',
-                        dataType:'json',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({areasArray}),
                         success: console.log("1 successfully loaded!"),
                         error: function (xhr) {
                             alert(xhr.statusText)
                         }
-                        
                     })
                     $.when(newData).done(function() {
                         
@@ -805,8 +819,9 @@ block content
                     });
                     let newData1 = $.ajax({
                         url: urlString1,
-                        type: 'GET',
-                        dataType:'json',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({areasArray}),
                         success: console.log("2 successfully loaded!"),
                         error: function (xhr) {
                             alert(xhr.statusText)
@@ -827,8 +842,9 @@ block content
                     });
                     let newData2 = $.ajax({
                         url: urlString2,
-                        type: 'GET',
-                        dataType:'json',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({areasArray}),
                         success: console.log("3 successfully loaded!"),
                         error: function (xhr) {
                             alert(xhr.statusText)
@@ -849,8 +865,9 @@ block content
                     });
                     let newData3 = $.ajax({
                         url: urlString3,
-                        type: 'GET',
-                        dataType:'json',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({areasArray}),
                         success: console.log("4 successfully loaded!"),
                         error: function (xhr) {
                             alert(xhr.statusText)
@@ -1344,7 +1361,7 @@ block content
                                         click: function(e){
                                             L.DomEvent.stopPropagation(e);
                                             mapPressForCreation = false;
-                                            correctSizelet = false;
+                                            correctSizeVar = false;
                                         },
                                         mousedown: function (e) {
                                             L.DomEvent.stopPropagation(e);
@@ -1367,11 +1384,11 @@ block content
                                                             let distance = turf.distance(from, to, optionsCreateCirc);
                                                             radiusValue = distance * 1000;
                                                             if (radiusValue >= 50 && radiusValue <= 25000) {
-                                                                correctSizelet = true;
+                                                                correctSizeVar = true;
                                                                 lens.colorSuccess();
                                                                 lens.setRadius(radiusValue);
                                                             } else {
-                                                                correctSizelet = false;
+                                                                correctSizeVar = false;
                                                                 lens.areaQuery.setStyle({fillColor: 'DarkRed',color:'red'});
                                                             }
                                                         }
@@ -1404,7 +1421,7 @@ block content
 
                                                 map.fitBounds(lens.getBound());
                                                 mapPressForCreation = false;
-                                                correctSizelet = false;
+                                                correctSizeVar = false;
                                             }
 
                                         }
@@ -1870,7 +1887,7 @@ block content
                                         console.log(attLensesArray[i].areas[0].area);
                                         console.log(attLensesArray[i].areas[areaIndex].area);
                                         console.log("Before union");
-                                        let unionlet = turf.union(attLensesArray[i].areas[0].area, attLensesArray[i].areas[areaIndex].area);
+                                        let unionVar = turf.union(attLensesArray[i].areas[0].area, attLensesArray[i].areas[areaIndex].area);
                                         console.log("After union");
                                         attLensesArray[i].areas[0].setArea(unionVar);
                                         attLensesArray[i].areas[areaIndex].delete();
@@ -1887,7 +1904,7 @@ block content
                                                     console.log(attLensesArray[i].areas[ind].getLensArray());
                                                     console.log(attLensesArray[i].areas[areaIndex].getLensArray());
                                                     console.log("Before union");
-                                                    let unionlet = turf.union(attLensesArray[i].areas[ind].area, attLensesArray[i].areas[areaIndex].area);
+                                                    let unionVar = turf.union(attLensesArray[i].areas[ind].area, attLensesArray[i].areas[areaIndex].area);
                                                     console.log("After union");
                                                     attLensesArray[i].areas[ind].setArea(unionVar);
                                                     attLensesArray[i].areas[areaIndex].delete();
@@ -2134,7 +2151,7 @@ block content
                                         click: function(e){
                                             L.DomEvent.stopPropagation(e);
                                             mapPressForCreation = false;
-                                            correctSizelet = false;
+                                            correctSizeVar = false;
                                         },
                                         mousedown: function (e) {
                                             L.DomEvent.stopPropagation(e);
@@ -2171,11 +2188,11 @@ block content
                                                             let distance = turf.distance(from, to, optionsCreateCirc);
                                                             radiusValue = distance * 1000;
                                                             if (radiusValue >= 50 && radiusValue <= 25000) {
-                                                                correctSizelet = true;
+                                                                correctSizeVar = true;
                                                                 lens.colorSuccess();
                                                                 lens.setRadius(radiusValue);
                                                             } else {
-                                                                correctSizelet = false;
+                                                                correctSizeVar = false;
                                                                 lens.areaQuery.setStyle({fillColor: 'DarkRed',color:'red'});
                                                             }
                                                         }
@@ -2223,7 +2240,7 @@ block content
 
                                                 map.fitBounds(lens.getBound());
                                                 mapPressForCreation = false;
-                                                correctSizelet = false;
+                                                correctSizeVar = false;
                                             }
 
                                         }
@@ -2856,54 +2873,84 @@ block content
             // 2008-02-02 13:30:44
             // 2008-02-08 17:39:18
             // code block
-            let tim = properties.f3;
+            let tim = new Date(properties.f3)/1000;
+
+            var diffIntervals = (maxTimeValue - minTimeValue)/10
             switch(encoding){
                 case "color":
-                    if(tim <= "2008-02-03 13:30:44")            layer.setStyle({color :'#ff3232'})
-                    else if(tim <= "2008-02-04 13:30:44")       layer.setStyle({color :'#fcb42f'})
-                    else if(tim <= "2008-02-05 13:30:44")       layer.setStyle({color :'#fcd62f'})
-                    else if(tim <= "2008-02-06 13:30:44")       layer.setStyle({color :'#fcf528'})
-                    else if(tim <=  "2008-02-07 13:30:44")      layer.setStyle({color :'#b9fc28'})
-                    else                                        layer.setStyle({color :'#00ff00'})
+                    if(tim <= minTimeValue + diffIntervals)              layer.setStyle({color :'#ff3232'})
+                    else if(tim <= minTimeValue + 2*diffIntervals)       layer.setStyle({color :'#ff6928'})
+                    else if(tim <= minTimeValue + 3*diffIntervals)       layer.setStyle({color :'#fcb42f'})
+                    else if(tim <= minTimeValue + 4*diffIntervals)       layer.setStyle({color :'#fcce28'})
+                    else if(tim <= minTimeValue + 5*diffIntervals)       layer.setStyle({color :'#fcd62f'})
+                    else if(tim <= minTimeValue + 6*diffIntervals)       layer.setStyle({color :'#fcf528'})
+                    else if(tim <= minTimeValue + 7*diffIntervals)       layer.setStyle({color :'#d5fc28'})
+                    else if(tim <= minTimeValue + 8*diffIntervals)       layer.setStyle({color :'#b9fc28'})
+                    else if(tim <= minTimeValue + 9*diffIntervals)       layer.setStyle({color :'#80fc28'})
+                else                                                     layer.setStyle({color :'#00ff00'})
                     break;
                 case "brightness":
-                    if(tim <= "2008-02-03 13:30:44")          {
+                    if(tim <= minTimeValue + diffIntervals)          {
                         let colr = ColorLuminance(layer.options.color,-0.95);
                         layer.setStyle({"color":colr});
                     }
-                    else if(tim <= "2008-02-04 13:30:44")     {
-                        let colr = ColorLuminance(layer.options.color,-0.9);
+                    else if(tim <= minTimeValue + 2*diffIntervals)     {
+                        let colr = ColorLuminance(layer.options.color,-0.85);
                         layer.setStyle({"color":colr});
                     }
-                    else if(tim <= "2008-02-05 13:30:44")    {
-                        let colr = ColorLuminance(layer.options.color,-0.8);
+                    else if(tim <= minTimeValue + 3*diffIntervals)    {
+                        let colr = ColorLuminance(layer.options.color,-0.75);
                         layer.setStyle({"color":colr});
                     }
-                    else if(tim <= "2008-02-06 13:30:44")    {
+                    else if(tim <= minTimeValue + 4*diffIntervals)   {
+                        let colr = ColorLuminance(layer.options.color,-0.65);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(tim <= minTimeValue + 5*diffIntervals)   {
                         let colr = ColorLuminance(layer.options.color,-0.5);
                         layer.setStyle({"color":colr});
                     }
-                    else if(tim <= "2008-02-07 13:30:44")   {
+                    else if(tim <= minTimeValue + 6*diffIntervals)     {
+                        let colr = ColorLuminance(layer.options.color,-0.4);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(tim <= minTimeValue + 7*diffIntervals)    {
+                        let colr = ColorLuminance(layer.options.color,-0.3);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(tim <= minTimeValue + 8*diffIntervals)   {
                         let colr = ColorLuminance(layer.options.color,-0.2);
+                        layer.setStyle({"color":colr});
+                    }
+                    else if(tim <= minTimeValue + 9*diffIntervals)   {
+                        let colr = ColorLuminance(layer.options.color,-0.1);
                         layer.setStyle({"color":colr});
                     }
                     else                    console.log("brightness already at 1")
                     break;
                 case "opacity":
-                    if(tim <= "2008-02-03 13:30:44")            layer.setStyle({opacity:0.05});
-                    else if(tim <= "2008-02-04 13:30:44")       layer.setStyle({opacity:0.15}); 
-                    else if(tim <= "2008-02-05 13:30:44")       layer.setStyle({opacity:0.3});
-                    else if(tim <= "2008-02-06 13:30:44")       layer.setStyle({opacity:0.55});
-                    else if(tim <= "2008-02-07 13:30:44")       layer.setStyle({opacity:0.8});
+                    if(tim <= minTimeValue + diffIntervals)              layer.setStyle({opacity:0.1});
+                    else if(tim <= minTimeValue + 2*diffIntervals)       layer.setStyle({opacity:0.2}); 
+                    else if(tim <= minTimeValue + 3*diffIntervals)       layer.setStyle({opacity:0.3}); 
+                    else if(tim <= minTimeValue + 4*diffIntervals)       layer.setStyle({opacity:0.4}); 
+                    else if(tim <= minTimeValue + 5*diffIntervals)       layer.setStyle({opacity:0.5}); 
+                    else if(tim <= minTimeValue + 6*diffIntervals)       layer.setStyle({opacity:0.6}); 
+                    else if(tim <= minTimeValue + 7*diffIntervals)       layer.setStyle({opacity:0.70}); 
+                    else if(tim <= minTimeValue + 8*diffIntervals)       layer.setStyle({opacity:0.80}); 
+                    else if(tim <= minTimeValue + 9*diffIntervals)       layer.setStyle({opacity:0.90}); 
                     else                                        console.log("Opcacity already at 1")
                     break;
                 case "width":
-                    if(tim <= "2008-02-03 13:30:44")            layer.setStyle({"weight": 1});
-                    else if(tim <= "2008-02-04 13:30:44")       layer.setStyle({"weight": 2});
-                    else if(tim <= "2008-02-05 13:30:44")       layer.setStyle({"weight": 3});
-                    else if(tim <= "2008-02-06 13:30:44")       layer.setStyle({"weight": 4});
-                    else if(tim <= "2008-02-07 13:30:44")       layer.setStyle({"weight": 5});
-                    else                                        layer.setStyle({"weight": 6});
+                    if(tim <= minTimeValue + diffIntervals)              layer.setStyle({"weight":1});
+                    else if(tim <= minTimeValue + 2*diffIntervals)       layer.setStyle({"weight":1.5});
+                    else if(tim <= minTimeValue + 3*diffIntervals)       layer.setStyle({"weight":2});
+                    else if(tim <= minTimeValue + 4*diffIntervals)       layer.setStyle({"weight":2.5});
+                    else if(tim <= minTimeValue + 5*diffIntervals)       layer.setStyle({"weight":3});
+                    else if(tim <= minTimeValue + 6*diffIntervals)       layer.setStyle({"weight":3.5});
+                    else if(tim <= minTimeValue + 7*diffIntervals)       layer.setStyle({"weight":4});
+                    else if(tim <= minTimeValue + 8*diffIntervals)       layer.setStyle({"weight":4.5});
+                    else if(tim <= minTimeValue + 9*diffIntervals)       layer.setStyle({"weight":5});
+                    else                                                 layer.setStyle({"weight":5.5});
                     break;
             }
         }
@@ -3216,11 +3263,11 @@ block content
         });
 
         function getMinTimeVal() {
-            let urlString = "/minTimeVarValue";
+            let urlStringmin = "/minTimeVarValue";
 
 
             let newData = $.ajax({
-                url: urlString,
+                url: urlStringmin,
                 type: 'GET',
                 success: console.log("Minimum data value fetched"),
                 error: function (xhr) {
@@ -3229,16 +3276,18 @@ block content
 
             })
             $.when(newData).done(function () {
-                console.log(newData)
+                minTimeValue = new Date(newData.responseText)/1000
+                console.log("Here is min")
+                console.log(minTimeValue)
             });
         }
 
         function getMaxTimeVal() {
-            let urlString = "/maxTimeVarValue";
+            let urlStringmax = "/maxTimeVarValue";
 
 
             let newData = $.ajax({
-                url: urlString,
+                url: urlStringmax,
                 type: 'GET',
                 success: console.log("Maximum data value fetched"),
                 error: function (xhr) {
@@ -3247,7 +3296,10 @@ block content
 
             })
             $.when(newData).done(function () {
-                console.log(newData)
+                
+                maxTimeValue = new Date(newData.responseText)/1000
+                console.log("Here is max")
+                console.log(maxTimeValue)
             });
         }
 
