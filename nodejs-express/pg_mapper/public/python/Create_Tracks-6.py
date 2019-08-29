@@ -2,7 +2,7 @@ import glob,os
 from tracktotrip import Track, Segment, Point
 from datetime import datetime, timedelta
 
-os.chdir("./public/data")
+os.chdir("./public/data/mods")
 #os.chdir("../data")
 read_files = glob.glob("delete1Point.txt")
 

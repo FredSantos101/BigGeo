@@ -1,7 +1,7 @@
 import glob,os
 import datetime
 
-os.chdir("public/data")
+os.chdir("public/data/mods")
 read_files = glob.glob("remove_Stop_Points.txt")
 
 timeThreshold = datetime.timedelta(minutes=7, seconds=0)

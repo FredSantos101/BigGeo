@@ -2,7 +2,7 @@ import glob,os
 import sys
 
 print(sys.argv[1])
-os.chdir("./public/data")
+os.chdir("./public/data/mods")
 #os.chdir("../data")
 contador = 0
 with open("finalOfALL.txt", "w") as outfile:

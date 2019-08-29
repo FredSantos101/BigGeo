@@ -212,7 +212,7 @@ function startMap(req, res){
                 jsonData: data // Pass data to the View
             });
             clientFetchFirst.end();
-            
+
         });
       })
 
@@ -231,7 +231,7 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
 
   let client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
-  
+
   var queryToCreate = query_args_ContructorQUERIES(req.params.tab, req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue)
   let data = req.body;
   let stDiffs = "geom";
@@ -241,7 +241,7 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
     queryOfDiff = " WHERE ";
     queryOfRest = " WHERE ";
   }
-  
+
   for(let i = 0;i<data.areasArray.length;i++){
     stDiffs = "ST_Difference("+stDiffs+",ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))"
     if(queryOfDiff == " WHERE " && queryOfRest == " WHERE "){
@@ -249,40 +249,40 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
       queryOfRest = queryOfRest + "NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
     }
     else{
-      if(i == 0){  
+      if(i == 0){
         queryOfDiff = queryOfDiff + " AND (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
-        queryOfRest = queryOfRest + " AND NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
-      
+        queryOfRest = queryOfRest + " AND NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+
       }
       else{
         queryOfDiff = queryOfDiff + " OR ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
-        queryOfRest = queryOfRest + " AND ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
-      
+        queryOfRest = queryOfRest + " AND ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+
       }
-      
+
     }
   }
   queryOfDiff = queryOfDiff + ")";
   queryOfRest = queryOfRest + ")";
-  let firstSelect = "SELECT " +  stDiffs + " AS geom FROM " + req.params.tab; 
-  let secondSelect = "SELECT geom AS geom FROM " + req.params.tab; 
-  
+  let firstSelect = "SELECT " +  stDiffs + " AS geom FROM " + req.params.tab;
+  let secondSelect = "SELECT geom AS geom FROM " + req.params.tab;
+
   let firstPart = ""
   let secondPart = " LIMIT 5000000) 	As kb) As fc";
   if (data.areasArray.length == 0){
     firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" + secondSelect + activeQuery + ") As lg";
-  
+
   }
   else{
     firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" +firstSelect + activeQuery + queryOfDiff + " UNION ALL " + secondSelect + activeQuery + queryOfRest + ") As lg";
-  
+
   }
   console.log(firstPart);
 
   let query = client.query(new Query(firstPart + secondPart)); // Run our Query
-  
 
-  
+
+
   query.on("row", function (row, result) {
       result.addRow(row);
   });
@@ -404,7 +404,7 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
     queryOfDiff = " WHERE ";
     queryOfRest = " WHERE ";
   }
-  
+
   for(let i = 0;i<data.areasArray.length;i++){
     stDiffs = "ST_Difference("+stDiffs+",ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))"
     if(queryOfDiff == " WHERE " && queryOfRest == " WHERE "){
@@ -412,33 +412,33 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
       queryOfRest = queryOfRest + "NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
     }
     else{
-      if(i == 0){  
+      if(i == 0){
         queryOfDiff = queryOfDiff + " AND (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
-        queryOfRest = queryOfRest + " AND NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
-      
+        queryOfRest = queryOfRest + " AND NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+
       }
       else{
         queryOfDiff = queryOfDiff + " OR ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
-        queryOfRest = queryOfRest + " AND ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
-      
+        queryOfRest = queryOfRest + " AND ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+
       }
-      
+
     }
   }
   queryOfDiff = queryOfDiff + ")";
   queryOfRest = queryOfRest + ")";
-  let firstSelect = "SELECT " +  stDiffs + " AS geom FROM " + req.params.tab; 
-  let secondSelect = "SELECT geom AS geom FROM " + req.params.tab; 
-  
+  let firstSelect = "SELECT " +  stDiffs + " AS geom FROM " + req.params.tab;
+  let secondSelect = "SELECT geom AS geom FROM " + req.params.tab;
+
   let firstPart = ""
   let secondPart = " LIMIT 5000000) 	As kb) As fc";
   if (data.areasArray.length == 0){
     firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" + secondSelect + activeQuery + ") As lg";
-  
+
   }
   else{
     firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" +firstSelect + activeQuery + queryOfDiff + " UNION ALL " + secondSelect + activeQuery + queryOfRest + ") As lg";
-  
+
   }
   console.log(firstPart);
 
@@ -606,16 +606,16 @@ function query_args_ContructorATTQUERIESCUTOpacLens (tab,geomGeoJson,array){
   //SELECT tid, array_agg(vel ORDER BY tid, data_time) as velPerPoint, ST_MakeLine(array_agg(linegeom ORDER BY tid,data_time)) AS linegeom
 
   let stDiffs2 = "intersectionCut.linegeom";
-  
+
   for(let j = 0;j<array.areasArrayIntersections.length;j++){
     stDiffs2 = "ST_Difference("+stDiffs2+",ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(array.areasArrayIntersections[j]) + "'),4326))"
-    
+
   }
   console.log(stDiffs2);
-  
-  let withsPart ="WITH trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + ")," + 
-  " trajLine_Intersect as (SELECT * FROM trajectoryLine WHERE ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AND ST_Intersects(trajectoryLine.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)))," + 
-  " intersectionCut as (  SELECT ST_Intersection(trajLine_Intersect.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) as linegeom, trajLine_Intersect.length as length, trajLine_Intersect.veloc_avg as veloc_avg, trajLine_Intersect.duration, trajLine_Intersect.data_time_End  FROM trajLine_Intersect )" + 
+
+  let withsPart ="WITH trajectoryLine as (SELECT * FROM " + tab + " " + activeQuery + ")," +
+  " trajLine_Intersect as (SELECT * FROM trajectoryLine WHERE ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) AND ST_Intersects(trajectoryLine.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)))," +
+  " intersectionCut as (  SELECT ST_Intersection(trajLine_Intersect.geom,ST_SetSRID(ST_GeomFromGeoJSON('" + geomGeoJson + "'),4326)) as linegeom, trajLine_Intersect.length as length, trajLine_Intersect.veloc_avg as veloc_avg, trajLine_Intersect.duration, trajLine_Intersect.data_time_End  FROM trajLine_Intersect )" +
   " SELECT " +  stDiffs2 +  " as linegeom, intersectionCut.length as length, intersectionCut.veloc_avg as veloc_avg, intersectionCut.duration, intersectionCut.data_time_End  FROM intersectionCut";
   let firstPart = "SELECT row_to_json(fk) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(k)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(mg.linegeom)::json As geometry, row_to_json((mg.length,mg.duration,mg.data_time_End,mg.veloc_avg)) As properties FROM (" + withsPart + ") As mg";
   let secondPart = " LIMIT 5000000) 	As k) As fk";
@@ -633,7 +633,7 @@ router.post('/updateBaseLayer/:tab', (req, res, next) => {
     queryOfDiff = " WHERE ";
     queryOfRest = " WHERE ";
   }
-  
+
   for(let i = 0;i<data.areasArray.length;i++){
     stDiffs = "ST_Difference("+stDiffs+",ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))"
     if(queryOfDiff == " WHERE " && queryOfRest == " WHERE "){
@@ -641,40 +641,40 @@ router.post('/updateBaseLayer/:tab', (req, res, next) => {
       queryOfRest = queryOfRest + "NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
     }
     else{
-      if(i == 0){  
+      if(i == 0){
         queryOfDiff = queryOfDiff + " AND (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
-        queryOfRest = queryOfRest + " AND NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
-      
+        queryOfRest = queryOfRest + " AND NOT (ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+
       }
       else{
         queryOfDiff = queryOfDiff + " OR ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
-        queryOfRest = queryOfRest + " AND ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";  
-      
+        queryOfRest = queryOfRest + " AND ST_Intersects(geom,ST_SetSRID(ST_GeomFromGeoJSON('" + JSON.stringify(data.areasArray[i]) + "'),4326))";
+
       }
-      
+
     }
   }
   queryOfDiff = queryOfDiff + ")";
   queryOfRest = queryOfRest + ")";
-  let firstSelect = "SELECT " +  stDiffs + " AS geom FROM " + req.params.tab; 
-  let secondSelect = "SELECT geom AS geom FROM " + req.params.tab; 
-  
+  let firstSelect = "SELECT " +  stDiffs + " AS geom FROM " + req.params.tab;
+  let secondSelect = "SELECT geom AS geom FROM " + req.params.tab;
+
   let firstPart = ""
   let secondPart = " LIMIT 5000000) 	As kb) As fc";
   if (data.areasArray.length == 0){
     firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" + secondSelect + activeQuery + ") As lg";
-  
+
   }
   else{
     firstPart = "SELECT row_to_json(fc) FROM (SELECT 'FeatureCollection' As type, array_to_json(array_agg(kb)) As features FROM (SELECT 'Feature' As type, ST_AsGeoJSON(lg.geom)::json As geometry FROM (" +firstSelect + activeQuery + queryOfDiff + " UNION ALL " + secondSelect + activeQuery + queryOfRest + ") As lg";
-  
+
   }
   console.log(firstPart);
   let client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
 
   //DELETE OLD QUERY OF THE LENS
-  
+
   let newQuery = firstPart + secondPart;
 
   let query = client.query(new Query(newQuery)); // Run our Query
@@ -935,14 +935,17 @@ router.get('/minTimeVarValue', function(req, res) {
     //let data = require('../public/data/geoJSON.json')
     console.log(result)
     numberOfConnects = numberOfConnects + 1
-    if(dataNewMin > result.rows[0].min){
+
+    if(dataNewMin > result.rows[0].min && result.rows[0].min != null){
       dataNewMin = result.rows[0].min
     }
     if(numberOfConnects == 4){
       console.log("Here  is the min")
       console.log(dataNewMin)
       client.end();
-      res.status(200).send((dataNewMin).toString());
+      if(dataNewMin != null){
+        res.status(200).send((dataNewMin).toString());
+      }
     }
 
   });
@@ -950,15 +953,17 @@ router.get('/minTimeVarValue', function(req, res) {
     console.log(result)
     //let data = require('../public/data/geoJSON.json')
     numberOfConnects = numberOfConnects + 1
-    if(dataNewMin > result.rows[0].min){
+    if(dataNewMin > result.rows[0].min && result.rows[0].min != null){
       dataNewMin = result.rows[0].min
     }
     if(numberOfConnects == 4){
       console.log("Here  is the min")
       console.log(dataNewMin)
-      
+
       client.end();
-      res.status(200).send((dataNewMin).toString());
+      if(dataNewMin != null){
+        res.status(200).send((dataNewMin).toString());
+      }
     }
 
   });
@@ -966,14 +971,16 @@ router.get('/minTimeVarValue', function(req, res) {
     console.log(result)
     //let data = require('../public/data/geoJSON.json')
     numberOfConnects = numberOfConnects + 1
-    if(dataNewMin > result.rows[0].min){
+    if(dataNewMin > result.rows[0].min && result.rows[0].min != null){
       dataNewMin = result.rows[0].min
     }
     if(numberOfConnects == 4){
       console.log("Here  is the min")
       console.log(dataNewMin)
       client.end();
-      res.status(200).send((dataNewMin).toString());
+      if(dataNewMin != null){
+        res.status(200).send((dataNewMin).toString());
+      }
     }
 
   });
@@ -981,14 +988,16 @@ router.get('/minTimeVarValue', function(req, res) {
     console.log(result)
     //let data = require('../public/data/geoJSON.json')
     numberOfConnects = numberOfConnects + 1
-    if(dataNewMin > result.rows[0].min){
+    if(dataNewMin > result.rows[0].min && result.rows[0].min != null){
       dataNewMin = result.rows[0].min
     }
     if(numberOfConnects == 4){
       console.log("Here  is the min")
       console.log(dataNewMin)
       client.end();
-      res.status(200).send((dataNewMin).toString());
+      if(dataNewMin != null){
+        res.status(200).send((dataNewMin).toString());
+      }
     }
 
   });
@@ -1008,56 +1017,64 @@ router.get('/maxTimeVarValue', function(req, res) {
   query.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
     numberOfConnects = numberOfConnects + 1
-    if(dataNewMax < result.rows[0].max){
+    if(dataNewMax < result.rows[0].max && result.rows[0].max != null){
       dataNewMax = result.rows[0].max
     }
     if(numberOfConnects == 4){
       console.log("Here  is the max")
       console.log(dataNewMax)
       client.end();
-      res.status(200).send((dataNewMax).toString());
+      if(dataNewMax != null){
+        res.status(200).send((dataNewMax).toString());
+      }
     }
 
   });
   query1.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
     numberOfConnects = numberOfConnects + 1
-    if(dataNewMax < result.rows[0].max){
+    if(dataNewMax < result.rows[0].max && result.rows[0].max != null){
       dataNewMax = result.rows[0].max
     }
     if(numberOfConnects == 4){
       console.log("Here  is the max")
       console.log(dataNewMax)
       client.end();
-      res.status(200).send((dataNewMax).toString());
+      if(dataNewMax != null){
+        res.status(200).send((dataNewMax).toString());
+      }
     }
 
   });
   query2.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
     numberOfConnects = numberOfConnects + 1
-    if(dataNewMax < result.rows[0].max){
+    if(dataNewMax < result.rows[0].max && result.rows[0].max != null){
       dataNewMax = result.rows[0].max
     }
     if(numberOfConnects == 4){
       console.log("Here  is the max")
       console.log(dataNewMax)
       client.end();
-      res.status(200).send((dataNewMax).toString());
+      if(dataNewMax != null){
+        res.status(200).send((dataNewMax).toString());
+      }
     }
 
   });
   query3.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
     numberOfConnects = numberOfConnects + 1
-    if(dataNewMax < result.rows[0].max){
+    if(dataNewMax < result.rows[0].max && result.rows[0].max != null){
       dataNewMax = result.rows[0].max
     }
     if(numberOfConnects == 4){
       console.log("Here  is the max")
       console.log(dataNewMax)
       client.end();
-      res.status(200).send((dataNewMax).toString());
+      if(dataNewMax != null){
+        res.status(200).send((dataNewMax).toString());
+      }
     }
 
   });
@@ -1082,34 +1099,59 @@ router.post('/fileUpload', (req, res, next) => {
   const fsExtra = require('fs-extra')
 
   fsExtra.emptyDirSync('./public/data')
+  fsExtra.mkdirSync('./public/data/mods');
   upload(req,res,function(err) {
-    const subprocess = callPython(1,1);
-      try {
+    const subprocess = callPython(8,1);
+    try {
 
-        console.log("Files have been uploaded");
-        console.log("Starting the parsing, joining different file formats as one");
-        //const pyProg = spawn('python', ['./public/python/joinTracks-1.py']);
+      console.log("Files have been uploaded");
+      console.log("Starting the parsing, joining different file formats as one");
+      //const pyProg = spawn('python', ['./public/python/joinTracks-1.py']);
 
-      } catch(err) {
-            console.log(err);
-            res.send(400);
-      }
-      // print output of script
-      subprocess.stdout.on('data', (data) => {
-        console.log("Files have been parsed");
-      });
-      subprocess.stderr.on('data', (data) => {
-        console.log(`error:${data}`);
-      });
-      subprocess.stderr.on('close', (data) => {
-        console.log("Dividing the trajectories");
-        preProcessFiles2();
-      });
+    } catch(err) {
+          console.log(err);
+          res.send(400);
+    }
+    // print output of script
+    subprocess.stdout.on('data', (data) => {
+      console.log("Preprocess GPX");
+    });
+    subprocess.stderr.on('data', (data) => {
+      console.log(`error:${data}`);
+    });
+    subprocess.stderr.on('close', (data) => {
+      console.log("Parsing the new GPX");
+      preProcessFiles1();
+    });
+  })
 
-
-  });
 
 });
+
+function preProcessFiles1(){
+  const subprocess = callPython(1,1);
+    try {
+
+      console.log("Files have been uploaded");
+      console.log("Starting the parsing, joining different file formats as one");
+      //const pyProg = spawn('python', ['./public/python/joinTracks-1.py']);
+
+    } catch(err) {
+          console.log(err);
+          res.send(400);
+    }
+    // print output of script
+    subprocess.stdout.on('data', (data) => {
+      console.log("Files have been parsed");
+    });
+    subprocess.stderr.on('data', (data) => {
+      console.log(`error:${data}`);
+    });
+    subprocess.stderr.on('close', (data) => {
+      console.log("Dividing the trajectories");
+      preProcessFiles2();
+    });
+}
 
 function preProcessFiles2(){
   const subprocess2 = callPython(2,1);
@@ -1234,7 +1276,7 @@ function createDB(){
 function insertToDB() {
     let numberOfLinesBy2k;
     const countLinesInFile = require('count-lines-in-file')
-    countLinesInFile('./public/data/finalOfALL.txt' , (error,number) => {
+    countLinesInFile('./public/data/mods/finalOfALL.txt' , (error,number) => {
 
       console.log("Number of lines bellow");
       let numberL = parseInt(number);
@@ -1252,7 +1294,7 @@ function insertToDB() {
       //exec("wc –l  ./public/data/finalOfALL.txt", function (err, stdout) {
 
       let lineReader = require('readline').createInterface({
-        input: require('fs').createReadStream('./public/data/finalOfALL.txt')
+        input: require('fs').createReadStream('./public/data/mods/finalOfALL.txt')
       });
       let contLine = 0;
 
@@ -1415,6 +1457,9 @@ function callPython(number,tidNumber){
   else if (number == 7)
     if (isWindows) return spawn('python',["-u",'./public/python/txtJoinPosition-7.py', tidNumber]);
     else return spawn('python3',["-u",'./public/python/txtJoinPosition-7.py', tidNumber]);
+  else if (number == 8)
+    if (isWindows) return spawn('python',["-u",'./public/Preprocessing/UnderstandMySteps.py']);
+    else return spawn('python3',["-u",'./public/Preprocessing/UnderstandMySteps.py',"./public/data"]);
   else
     console.log("something is wrong, the number is wrong :S");
 }

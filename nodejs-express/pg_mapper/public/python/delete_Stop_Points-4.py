@@ -2,7 +2,7 @@ import glob,os
 import datetime
 from datetime import datetime, timedelta
 
-os.chdir("public/data")
+os.chdir("public/data/mods")
 read_files = glob.glob("remove_Same_Time_Points.txt")
 
 
