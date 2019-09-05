@@ -64,7 +64,7 @@ with open("Tracks-to-Trips-ft-BigGeo.txt", "w") as outfile:
                     trip = Track(name=cont, segments=[trajs])
                     trajs = Segment([])
                     trajs = Segment([Point(lati, longi, tstamp)])
-                    trip.to_trip(True, 'extrapolate', 50, False, 5, 5, True, 10.0, 20)
+                    trip.to_trip(False, 'extrapolate', 50, False, 5, 5, False, 10.0, 20)
                     #now we need to print the results
                     #print(len(trip.segments))
                     #for ind in range(len(trip.segments)-1):
@@ -84,7 +84,7 @@ with open("Tracks-to-Trips-ft-BigGeo.txt", "w") as outfile:
                 line = infile.readline()
             cont += 1
             trip = Track(name="last", segments=[trajs])
-            trip.to_trip(True,'extrapolate', 20, False, 5, 5, True, 10.0, 20)
+            trip.to_trip(False,'extrapolate', 20, False, 5, 5, False, 10.0, 20)
             print("LAST SEGMENT OF TRAJECTORY")
             for indPoint in range(len(trip.segments[0].points)):
 

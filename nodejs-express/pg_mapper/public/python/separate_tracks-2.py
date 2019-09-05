@@ -4,7 +4,7 @@ from datetime import datetime, date, time, timedelta
 os.chdir("public/data/mods")
 read_files = glob.glob("final.txt")
 
-timeThreshold = timedelta(minutes=1, seconds=0)
+timeThreshold = timedelta(minutes=10, seconds=0)
 timeThreshold1 = timedelta(minutes=0, seconds=0)
 print( timeThreshold)
 contFile = 1
