@@ -413,15 +413,17 @@ def parse_folder(addr, real):
     max_t = datetime.datetime.min
 
     for file in files:
-        if '.gpx' not in file or file == 'final.gpx' or file == 'avg.gpx' or os.path.getsize(os.path.join(addr,file)) == 0:
-            continue
-
+        if('.GPX' not in file):
+            if '.gpx' not in file or file == 'final.gpx' or file == 'avg.gpx' or os.path.getsize(os.path.join(addr,file)) == 0:
+                continue
+        print("Doing " + file)
         txt_files.write('mod_' + file + '\n')
 
-        print("Doing " + file)
+
         file_name = os.path.join(addr, file)
         f = codecs.open(file_name, 'r', 'utf-8')
         gpx = gpxpy.parse(f)
+
         if(gpx != None):
             f.close()
 
@@ -449,6 +451,7 @@ def parse_folder(addr, real):
 
             gpx.remove_elevation()
             try:
+                print("I am trying now")
                 raw += [deepcopy(gpx)]
             except:
                 print("There was an exception, ignoring this file")
@@ -458,10 +461,16 @@ def parse_folder(addr, real):
                 print(dur)
                 leng = gpx.length_3d()
                 print(leng)
-                if(dur != None and dur != 0):
+                gpxSegment0 = gpx.tracks[0].segments[0].points
+                if(len(gpxSegment0) < 2):
+                    if(len(gpx.tracks[0].segments) >= 2):
+                        gpxSegment0 = gpx.tracks[0].segments[1].points
+                if(dur != None and dur != 0 and len(gpxSegment0) >= 2):
 
-                    t1 = gpx.tracks[0].segments[0].points[0].time
-                    t2 = gpx.tracks[0].segments[0].points[1].time
+                    t1 = gpxSegment0[0].time
+
+                    t2 = gpxSegment0[1].time
+
                     time = (t2-t1).seconds
 
                     eps = (leng/dur) * time
@@ -469,15 +478,16 @@ def parse_folder(addr, real):
                     gpx_track = gpxpy.gpx.GPXTrack()
 
                     for s in gpx.tracks[0].segments:
-                        s.simplify3()
+                        if(len(s.points) >= 2):
+                            s.simplify3()
 
-                        if real:
-                            s.points = interpolate_distance(s.points, 20)
-                            s.simplify(min(20,round(eps+1)))
+                            if real:
+                                s.points = interpolate_distance(s.points, 20)
+                                s.simplify(min(20,round(eps+1)))
 
-                        # Create first segment in our GPX track:
-                        s.extensions= {'total': 1, 'times': set(times)}
-                        gpx_track.segments.append(s)
+                            # Create first segment in our GPX track:
+                            s.extensions= {'total': 1, 'times': set(times)}
+                            gpx_track.segments.append(s)
 
                     transform_track(gpx_track)
                     gpx_track.extensions = {'original': True}
@@ -601,14 +611,13 @@ def main(addr, complete=False, real=True):
     print("Imports done. Imported", len(gpxs))
 
     #seg_set = merge(gpxs)
-    print("Merge set")
     #avg, max_count, min_count = set_to_gpx(seg_set, singles)
     #create_singles(singles, addr, max_count, min_count, min_t, max_t)
     #print("Singles created")
-    file = open(os.path.join(addr, 'avg.gpx'), 'w')
+    #file = open(os.path.join(addr, 'avg.gpx'), 'w')
     #file.write(avg.to_xml())
 
-    file.close()
+    #file.close()
     print("completed")
     """if complete:
         final_gpx = complete_file(raw_gpxs, avg)
