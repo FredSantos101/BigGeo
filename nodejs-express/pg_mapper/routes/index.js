@@ -1093,7 +1093,7 @@ let storage = multer.diskStorage({
       cb(null , file.originalname);
   }
 });
-let upload = multer({storage: storage}).array('track', 1000);
+let upload = multer({storage: storage}).array('track', 1500);
 
 router.post('/fileUpload', (req, res, next) => {
   const fsExtra = require('fs-extra')

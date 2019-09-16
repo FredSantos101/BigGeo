@@ -1089,6 +1089,7 @@ block content
                                     if(lens.getType() == "Vel_avg") {
 
                                         if(document.getElementById("sliderIntervalVel").style.display=='none'){
+                                            lens.areaQuery.setStyle({fillOpacity: 0.6})
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalVel").style.display="block";
 
@@ -1102,11 +1103,13 @@ block content
                                         }
                                         else {
                                             document.getElementById("sliderIntervalVel").style.display="none";
+                                            lens.areaQuery.setStyle({fillOpacity: 0.0})
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
                                         }
                                     }
                                     else if(lens.getType() == "Length") {
                                         if(document.getElementById("sliderIntervalLength").style.display=='none'){
+                                            lens.areaQuery.setStyle({fillOpacity: 0.6})
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalLength").style.display="block";
 
@@ -1120,11 +1123,13 @@ block content
                                         }
                                         else {
                                             document.getElementById("sliderIntervalLength").style.display="none";
+                                            lens.areaQuery.setStyle({fillOpacity: 0.0})
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
                                         }
                                     }
                                     else if(lens.getType() == "Time_Duration") {
                                         if(document.getElementById("sliderIntervalDuration").style.display=='none'){
+                                            lens.areaQuery.setStyle({fillOpacity: 0.6})
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalDuration").style.display="block";
 
@@ -1138,11 +1143,13 @@ block content
                                         }
                                         else {
                                             document.getElementById("sliderIntervalDuration").style.display="none";
+                                            lens.areaQuery.setStyle({fillOpacity: 0.0})
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
                                         }
                                     }
                                     else if(lens.getType() == "Time_Interval") {
                                         if(document.getElementById("sliderIntervalTime").style.display=='none'){
+                                            lens.areaQuery.setStyle({fillOpacity: 0.6})
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                                             document.getElementById("sliderIntervalTime").style.display="block";
 
@@ -1156,6 +1163,7 @@ block content
                                         }
                                         else {
                                             document.getElementById("sliderIntervalTime").style.display="none";
+                                            lens.areaQuery.setStyle({fillOpacity: 0.0})
                                             document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
                                         }
                                     }
@@ -1588,12 +1596,12 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-time')[0].style.backgroundColor = "#ff1144";
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.backgroundColor = "buttonface";
                                 document.getElementsByClassName('dropbtnOpt-velocity')[0].style.backgroundColor = "buttonface";
-                                lens.setMinV(1201959044);
-                                lens.setMaxV(1202492358);
+                                lens.setMinV(minTimeValue);
+                                lens.setMaxV(maxTimeValue);
                                 lens.updateLENS();
                                 lens.setTypeOLD("Time_Interval");
-                                lens.setMinVOLD(1201959044);
-                                lens.setMaxVOLD(1202492358);
+                                lens.setMinVOLD(minTimeValue);
+                                lens.setMaxVOLD(maxTimeValue);
                             });
                             $('.dropbtnOpt-duration').click(function (e) {
                                 L.DomEvent.stopPropagation(e);
@@ -2789,50 +2797,50 @@ block content
             let len = properties.f1;
             switch(encoding){
                 case "color":
-                    if(len <= 250)          layer.setStyle({color :'#ff3232'}) 
-                    else if(len <= 500)     layer.setStyle({color :'#ff6928'})
-                    else if(len <= 1000)    layer.setStyle({color :'#fcb42f'}) 
-                    else if(len <= 2000)    layer.setStyle({color :'#fcce28'})
-                    else if(len <= 4000)    layer.setStyle({color :'#fcd62f'}) 
-                    else if(len <= 8000)    layer.setStyle({color :'#fcf528'}) 
-                    else if(len <= 16000)   layer.setStyle({color :'#d5fc28'})
-                    else if(len <= 32000)   layer.setStyle({color :'#b9fc28'})
-                    else if (len <= 128000) layer.setStyle({color :'#80fc28'})
+                    if(len <= 1000)          layer.setStyle({color :'#ff3232'}) 
+                    else if(len <= 4000)     layer.setStyle({color :'#ff6928'})
+                    else if(len <= 7000)    layer.setStyle({color :'#fcb42f'}) 
+                    else if(len <= 10000)    layer.setStyle({color :'#fcce28'})
+                    else if(len <= 15000)    layer.setStyle({color :'#fcd62f'}) 
+                    else if(len <= 20000)    layer.setStyle({color :'#fcf528'}) 
+                    else if(len <= 35000)   layer.setStyle({color :'#d5fc28'})
+                    else if(len <= 60000)   layer.setStyle({color :'#b9fc28'})
+                    else if (len <= 100000) layer.setStyle({color :'#80fc28'})
                     else                    layer.setStyle({color :'#00ff00'})
                     break;
                 case "brightness":
-                    if(len <= 250)          {
+                    if(len <= 1000)          {
                         let colr = ColorLuminance(layer.options.color,-0.95);
                         layer.setStyle({"color":colr});
                     }
-                    else if(len <= 500)     {
+                  else if(len <= 4000)     {
                         let colr = ColorLuminance(layer.options.color,-0.8);
                         layer.setStyle({"color":colr});
                     }
-                    else if(len <= 1000)    {
+                  else if(len <= 7000)    {
                         let colr = ColorLuminance(layer.options.color,-0.6);
                         layer.setStyle({"color":colr});
                     }
-                    else if(len <= 2000)    {
+                  else if(len <= 10000)    {
                         let colr = ColorLuminance(layer.options.color,-0.4);
                         layer.setStyle({"color":colr});
                     }
-                    else if(len <= 4000)    {
+                  else if(len <= 20000)    {
                         let colr = ColorLuminance(layer.options.color,-0.2);
                         layer.setStyle({"color":colr});
                     }
-                    else if(len <= 8000)    {
+                  else if(len <= 30000)    {
                         console.log("brightness already at 1")
                     }
-                    else if(len <=  16000)   {
+                  else if(len <=  50000)   {
                         let colr = ColorLuminance(layer.options.color,+0.2);
                         layer.setStyle({"color":colr});
                     }
-                    else if(len <=  32000)   {
+                  else if(len <=  75000)   {
                         let colr = ColorLuminance(layer.options.color,+0.4);
                         layer.setStyle({"color":colr});
                     }
-                    else if(len <=  128000)   {
+                  else if(len <=  100000)   {
                         let colr = ColorLuminance(layer.options.color,+0.6);
                         layer.setStyle({"color":colr});
                     }
@@ -2842,29 +2850,29 @@ block content
                     }                   
                     break;
                 case "opacity":
-                    if(len <= 250)          layer.setStyle({opacity:0.05});
-                    else if(len <= 500)     layer.setStyle({opacity:0.10});
-                    else if(len <= 1000)    layer.setStyle({opacity:0.20}); 
-                    else if(len <= 2000)    layer.setStyle({opacity:0.35});
-                    else if(len <= 4000)    layer.setStyle({opacity:0.5});
-                    else if(len <= 8000)    layer.setStyle({opacity:0.65});
-                    else if(len <= 16000)   layer.setStyle({opacity:0.8});
-                    else if(len <= 32000)   layer.setStyle({opacity:0.9});
-                    else if(len <= 128000)  layer.setStyle({opacity:0.95});
+                    if(len <= 1000)          layer.setStyle({opacity:0.05});
+                  else if(len <= 4000)     layer.setStyle({opacity:0.10});
+                  else if(len <= 7000)    layer.setStyle({opacity:0.20}); 
+                  else if(len <= 10000)    layer.setStyle({opacity:0.35});
+                  else if(len <= 20000)    layer.setStyle({opacity:0.5});
+                  else if(len <= 30000)    layer.setStyle({opacity:0.65});
+                  else if(len <= 50000)   layer.setStyle({opacity:0.8});
+                  else if(len <= 75000)   layer.setStyle({opacity:0.9});
+                  else if(len <= 100000)  layer.setStyle({opacity:0.95});
                     else                    console.log("Opcacity already at 1")
                     break;
                 case "width":
-                if(len <= 250)              layer.setStyle({"weight": 1});
-                    else if(len <= 500)     layer.setStyle({"weight": 1.4});
-                    else if(len <= 1000)    layer.setStyle({"weight": 1.8});
-                    else if(len <= 2000)    layer.setStyle({"weight": 2.2});
-                    else if(len <= 4000)    layer.setStyle({"weight": 2.6});
-                    else if(len <= 8000)    layer.setStyle({"weight": 3});
-                    else if(len <= 16000)   layer.setStyle({"weight": 3.4});
-                    else if(len <= 32000)   layer.setStyle({"weight": 3.8});
-                    else if(len <= 128000)  layer.setStyle({"weight": 4.2});
-                    else                    layer.setStyle({"weight": 4.6});
-                    break;
+                  if(len <= 1000)              layer.setStyle({"weight": 1});
+                  else if(len <= 4000)     layer.setStyle({"weight": 1.4});
+                  else if(len <= 7000)    layer.setStyle({"weight": 1.8});
+                  else if(len <= 10000)    layer.setStyle({"weight": 2.2});
+                  else if(len <= 20000)    layer.setStyle({"weight": 2.6});
+                  else if(len <= 30000)    layer.setStyle({"weight": 3});
+                  else if(len <= 50000)   layer.setStyle({"weight": 3.4});
+                  else if(len <= 75000)   layer.setStyle({"weight": 3.8});
+                  else if(len <= 100000)  layer.setStyle({"weight": 4.2});
+                  else                    layer.setStyle({"weight": 4.6});
+                  break;
             }
         }
         
