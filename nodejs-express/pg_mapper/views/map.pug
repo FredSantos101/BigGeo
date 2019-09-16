@@ -1,21 +1,75 @@
 extends layout
 block content
-   
-    <div style="position: absolute; bottom: 1%;">
-        <label for="track">Choose the files you want to upload (must be in gpx format):</label>
-        <form id='myform' action="/fileUpload" method="post" enctype="multipart/form-data">
-            <input type="file" name="track" multiple />
-            <button> Submit </button>
-        </form>
+    
+    <div id="sidebar" class="sidebar collapsed">
+        <!-- Nav tabs -->
+        <div class="sidebar-tabs">
+            <ul role="tablist">
+                <li><a href="#home" role="tab"  >BG<i class="fa fa-bars"></i></a></li>
+                <li     class="disabled"><a role="tab"  >----<i class="fa fa-bars"></i></a></li>
+                <li class = "not-tabZoom"><a id="zoomBut" role="tab" class="zoomBut"><img src="images/zoomIcon.png" alt="" style="wdith:100%; height:100%"/><i class="fa fa-info"></i></a></li>
+                <div ></div>
+                <div >----</div>
+                <div ></div>
+                <li class = "not-tabFilter"><a id="filterLensBut" role="tab" class="filterLensBut"><img src="images/636051.svg" alt="" style="wdith:100%; height:100%"/><i class="fa fa-info"></i></a></li>
+                <li class = "not-tabAttr"><a id="attributeLensBut" role="tab" class="attributeLensBut"><img src="images/queryAtt.png" alt="" style="wdith:100%; height:100%"/><i class="fa fa-info"></i></a></li>
+                <div >----</div>
+            </ul>
+
+            <ul role="tablist">
+                <li><a href="#upload" role="tab" ><img src="images/uploadIcon.png" alt="" style="wdith:100%; height:100%"/><i class="fa fa-user"></i></a></li>
+                <li     class="disabled"><a role="tab"  >----<i class="fa fa-bars"></i></a></li>
+                <li><a href="#settings" role="tab"><img src="images/settings.png" alt="" style="wdith:100%; height:100%"/><i class="fa fa-gear"></i></a></li>
+            </ul>
+        </div>
+        <!-- Tab panes -->
+        <div class="sidebar-content">
+            <div class="sidebar-pane" id="home">
+                <h1 class="sidebar-header">
+                    sidebar-v2
+                    <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                </h1>
+
+                <p>Welcome to BigGeo</a>.</p>
+                <p>This is an interactive application for big trajectory data visualization</a>.</p>
+
+                <p class="lorem">Here you can create lenses to filter the trajectories you pretend and after you can analyse their attributes through visual encodings on each trajectory. Our goal was to study and develop an effecive way of visualizing and interacting with big trajectory dataset. </p>
+                <p class="lorem">Developped by master's student Frederico Santos and supervised by prof. Daniel Gonçalves From Instituto Superior Tecnico, Portugal. </p>
+
+            </div>
+            <div class="sidebar-pane" id="upload">
+                <h1 class="sidebar-header">Upload trajectories<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+                <h1 class="sidebar-header">
+                    sidebar-v2
+                    <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                </h1>
+                <p>Here you can upload your own trajectories</a>.</p>
+                <div style="position: absolute; bottom: 1%;">
+                    <label for="track">Choose the files you want to upload (must be in gpx format):</label>
+                    <form id='myform' action="/fileUpload" method="post" enctype="multipart/form-data">
+                        <input type="file" name="track" multiple />
+                        <button> Submit </button>
+                    </form>
+                </div>
+            </div>
+            <div class="sidebar-pane" id="settings">
+                <h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+            </div>
+        </div>
     </div>
-    #map
+    <div id="map" class="sidebar-map"></div>
+    
+    
     
     script.
-
+      
         //Array that will save all the layers
         let layerArray = [];
 
-        let map = L.map('map',{preferCanvas: true,renderer: L.canvas({}), center: [38.736946,-9.142685], zoom: 10,worldCopyJump: true});
+        let map = L.map('map',{zoomControl : true,preferCanvas: true,renderer: L.canvas({}), center: [38.736946,-9.142685], zoom: 6,worldCopyJump: true});
+        let zoomControlVar = map.zoomControl;
+        map.zoomControl.remove();
+        //$(window).on("resize", function () { $("#map").height($(window).height()); map.invalidateSize(); }).trigger("resize");
         map.createPane('lensPane');
         map.createPane('outtterLensPane');
         map.createPane('outtterLensDeletePane');
@@ -100,10 +154,14 @@ block content
             maxZoom: 19
         }).addTo(map);
 
+
+        var sidebar = L.control.sidebar('sidebar').addTo(map);
+
+
         //let myData = jsonData;
         let myData = !{JSON.stringify(jsonData)};
         // Create variable to hold map element, give initial settings to map
-        let container1 = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        /*let container1 = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
         let container2 = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
         let customControlQ =  L.Control.extend({
             options: {
@@ -177,7 +235,7 @@ block content
         let container = document.getElementsByClassName("leaflet-zoom-animated");
         container[0].onclick = function(e){
                 L.DomEvent.stopPropagation(e);
-        }
+        }*/
                 
 
         
@@ -3750,6 +3808,49 @@ block content
             });
         }
 
+        $('.filterLensBut').click(function (e) {
+            console.log(createQueryLensesFlag);
+            createQueryLensesFlag = !createQueryLensesFlag;
+            if(createQueryLensesFlag)
+                document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#0074d9"
+            else
+                document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
+            createAttributeLensesFlag = false;
+            tabZoom = false;
+            zoomControlVar.remove()
+            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+            
+        });
+        $('.attributeLensBut').click(function (e) {
+            console.log(createAttributeLensesFlag);
+            createQueryLensesFlag = false;
+            tabZoom = false;
+            zoomControlVar.remove()
+            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
+            createAttributeLensesFlag = !createAttributeLensesFlag;
+            if(createAttributeLensesFlag)
+                document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#0074d9"
+            else
+                document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+        });
+        let tabZoom = false;
+        $('.zoomBut').click(function (e) {
+            tabZoom = !tabZoom;
+            map.zoomControl.getContainer().style.visible = false;
+            if(tabZoom){
+                
+                zoomControlVar.addTo(map)
+                document.getElementsByClassName("not-tabZoom")[0].style.backgroundColor ="#0074d9"}
+            else{
+                
+                zoomControlVar.remove()
+                document.getElementsByClassName("not-tabZoom")[0].style.backgroundColor ="white"}
+            createQueryLensesFlag = false;
+            createAttributeLensesFlag = false;
+            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
+            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+            
+        });
         /*if(!lens.hasBeenOpacity){
                                     if(lens.intersections.length != 0){
                                         let middleArray = Array.from(lens.intersections);
