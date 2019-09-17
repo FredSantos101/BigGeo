@@ -19,9 +19,8 @@ import MyDict
 from pathlib import Path
 
 print("YOOOOOOOOOO")
-
-data_folder = ".\public\data"
-
+data_folder = "./public/data"
+print(data_folder)
 SimCollection = collections.namedtuple('SimCollection',\
                                        ('indexes', 'ratio', 'names'))
 
@@ -403,6 +402,7 @@ def parse_folder(addr, real):
     Creates .txt file in addr with names of files
     Returns a list with gpxpy.GPX instances smoothed and simplified
     '''
+    
     files = os.listdir(addr)
     gpxs = []
     raw = []

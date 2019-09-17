@@ -43,12 +43,17 @@ block content
                     sidebar-v2
                     <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
                 </h1>
-                <p>Here you can upload your own trajectories</a>.</p>
-                <div style="position: absolute; bottom: 1%;">
+                <p>Here you can upload your own trajectories. You can select up to 1500 .gpx files at a time and simply drag them into the uplaod zone. At the end the page will be refreshed so your session will be lost</a>.</p>
+                <form id='myform' action="/fileUpload" method="POST" enctype="multipart/form-data">
+                    <input type="file" name = "track" multiple>
+                    <p>Drag your files here or click in this area.</p>
+                    <button type="submit">Upload</button>
+                    </form>
+                //<div style="position: absolute; bottom: 1%;">
                     <label for="track">Choose the files you want to upload (must be in gpx format):</label>
                     <form id='myform' action="/fileUpload" method="post" enctype="multipart/form-data">
                         <input type="file" name="track" multiple />
-                        <button> Submit </button>
+                        <button id = "submitButt"> Submit </button>
                     </form>
                 </div>
             </div>
@@ -244,15 +249,60 @@ block content
             "color": '#43A7DE',
             "opacity": 1,
             "weight": 1.5,
-            "interactive": false    
+            "interactive": false,
+            "smoothFactor": 3.5   
+        };
+        let firstStyle1 = {
+            "color": '#43A7DE',
+            "opacity": 1,
+            "weight": 1.5,
+            "interactive": false ,
+            "smoothFactor": 4.5    
+        };
+        let firstStyle2 = {
+            "color": '#43A7DE',
+            "opacity": 1,
+            "weight": 1.5,
+            "interactive": false,
+            "smoothFactor": 5.5     
+        };let firstStyle3 = {
+            "color": '#43A7DE',
+            "opacity": 1,
+            "weight": 1.5,
+            "interactive": false,
+            "smoothFactor": 6.5     
         };
         let firstStyleATT = {
             "color": '#43A7DE',
             "opacity": 1,
             "weight": 1.5,
             "pane": "attLensPane",
-            "interactive": false
-
+            "interactive": false,
+            "smoothFactor": 3.5
+        };
+        let firstStyleATT1 = {
+            "color": '#43A7DE',
+            "opacity": 1,
+            "weight": 1.5,
+            "pane": "attLensPane",
+            "interactive": false,
+            "smoothFactor": 4.5
+        };
+        let firstStyleATT2 = {
+            "color": '#43A7DE',
+            "opacity": 1,
+            "weight": 1.5,
+            "pane": "attLensPane",
+            "interactive": false,
+            "smoothFactor": 5.5
+        };
+        let firstStyleATT3 = {
+            "color": '#43A7DE',
+            "opacity": 1,
+            "weight": 1.5,
+            "pane": "attLensPane",
+            "interactive": false,
+            "smoothFactor": 6.5
         };
         let defaultLayer = null;
         // Add JSON to map
@@ -264,7 +314,7 @@ block content
     
         map.on('zoomend', function() {
             console.log(map.getZoom())
-            if (map.getZoom() >= 19){
+            if (map.getZoom() >= 13){
                     markerGroup3.addTo(map);
             }
             else {
@@ -273,7 +323,7 @@ block content
                 } else {
                     console.log("MarkerGroup3 not active");
                 }
-                if (map.getZoom() >= 17){
+                if (map.getZoom() >= 10){
                     markerGroup2.addTo(map);
                 }
                 else {
@@ -282,7 +332,7 @@ block content
                     } else {
                         console.log("MarkerGroup2 not active");
                     }
-                    if (map.getZoom() >= 15){
+                    if (map.getZoom() >= 5){
                         markerGroup1.addTo(map);
                     }
                     else {
@@ -385,8 +435,10 @@ block content
                     onMapClick(locationCreation, radiusValue);
                     createQueryLensesFlag = false;
                     createAttributeLensesFlag = false;
-                    container1.style.backgroundColor = 'white'; 
-                    container2.style.backgroundColor = 'white';
+                    document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
+                    document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+                    /*container1.style.backgroundColor = 'white'; 
+                    container2.style.backgroundColor = 'white';*/
                 }
                 createdAlreadyFlag = false;
                 movedCreateLens = false;
@@ -400,9 +452,11 @@ block content
             console.log(radiusValue);
             if(createQueryLensesFlag){   
                 queryLensMenu(location,radiusValue);
+                document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
             }
             else if(createAttributeLensesFlag){
                 attributeLensMenu(location,radiusValue);
+                document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
             }
         }
 
@@ -648,7 +702,7 @@ block content
                     }) 
                     $.when(newData1).done(function() {
                         if(newData1.responseJSON.features != null){
-                            let tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle1);
                             tracksToDraw.addTo(markerGroup1);
                             lastMarkerGroupID1 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
@@ -668,7 +722,7 @@ block content
                     }) 
                     $.when(newData2).done(function() {
                         if(newData2.responseJSON.features != null){
-                            let tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle2);
                             tracksToDraw.addTo(markerGroup2);
                             lastMarkerGroupID2 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
@@ -688,7 +742,7 @@ block content
                     }) 
                     $.when(newData3).done(function() {
                         if(newData3.responseJSON.features != null){
-                            let tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle3);
                             tracksToDraw.addTo(markerGroup3);
                             lastMarkerGroupID3 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
@@ -762,7 +816,7 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData1.responseJSON.features != null){
-                            let tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle1);
                             tracksToDraw.addTo(markerGroup1);
                             lastMarkerGroupID1 = tracksToDraw._leaflet_id;
                             
@@ -784,7 +838,7 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData2.responseJSON.features != null){
-                            let tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle2);
                             tracksToDraw.addTo(markerGroup2);
                             lastMarkerGroupID2 = tracksToDraw._leaflet_id;
                             
@@ -806,7 +860,7 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData3.responseJSON.features != null){
-                            let tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle3);
                             tracksToDraw.addTo(markerGroup3);
                             lastMarkerGroupID3 = tracksToDraw._leaflet_id;
                             
@@ -892,7 +946,7 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData1.responseJSON.features != null){
-                            let tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle1);
                             tracksToDraw.addTo(markerGroup1);
                             lastMarkerGroupID1 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
@@ -915,7 +969,7 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData2.responseJSON.features != null){
-                            let tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle2);
                             tracksToDraw.addTo(markerGroup2);
                             lastMarkerGroupID2 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
@@ -938,7 +992,7 @@ block content
                         console.log("Im removing the map now and adding new ones afterwards")
                         
                         if(newData3.responseJSON.features != null){
-                            let tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle);
+                            let tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle3);
                             tracksToDraw.addTo(markerGroup3);
                             lastMarkerGroupID3 = tracksToDraw._leaflet_id;
                             thisVar.colorSuccess();
@@ -974,8 +1028,10 @@ block content
                     L.DomEvent.stopPropagation(event1);
                     createQueryLensesFlag = false;
                     createAttributeLensesFlag = false;
-                    container1.style.backgroundColor = 'white'; 
-                    container2.style.backgroundColor = 'white';
+                    /*container1.style.backgroundColor = 'white'; 
+                    container2.style.backgroundColor = 'white';*/
+                    document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
+                    document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
                     outterLensesLayer.clearLayers();
                     clicked = true;
                     let once = true;
@@ -1088,8 +1144,10 @@ block content
                                         map.on('mousemove', function (e) {
                                             createQueryLensesFlag = false;
                                             createAttributeLensesFlag = false;
-                                            container1.style.backgroundColor = 'white'; 
-                                            container2.style.backgroundColor = 'white';
+                                            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
+                                            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+                                            /*container1.style.backgroundColor = 'white'; 
+                                            container2.style.backgroundColor = 'white';*/
                                             L.DomEvent.stopPropagation(e);
                                             console.log(lensCanMove);
                                             console.log(mouseDown);
@@ -2011,8 +2069,10 @@ block content
                     L.DomEvent.stopPropagation(clickEven);
                     createQueryLensesFlag = false;
                     createAttributeLensesFlag = false;
-                    container1.style.backgroundColor = 'white'; 
-                    container2.style.backgroundColor = 'white';
+                    document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
+                    document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+                    /*container1.style.backgroundColor = 'white'; 
+                    container2.style.backgroundColor = 'white';*/
                     outterLensesLayer.clearLayers();
                     clicked = true;
                     let once = true;
@@ -2136,8 +2196,10 @@ block content
                                             document.getElementsByClassName('myMoveButton')[0].style.visibility = "hidden";
                                             createQueryLensesFlag = false;
                                             createAttributeLensesFlag = false;
-                                            container1.style.backgroundColor = 'white'; 
-                                            container2.style.backgroundColor = 'white';
+                                            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
+                                            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+                                            /*container1.style.backgroundColor = 'white'; 
+                                            container2.style.backgroundColor = 'white';*/
                                             L.DomEvent.stopPropagation(e);
                                             if(lensCanMove && mouseDown){
                                                 
@@ -2601,7 +2663,7 @@ block content
                     $.when(newData1).done(function() {
                         if(newData1.responseJSON.features != null){
                             newData1.responseJSON.features.forEach(function(item, index, array) {
-                                let tracksToDraw = L.geoJson(item,firstStyleATT);
+                                let tracksToDraw = L.geoJson(item,firstStyleATT1);
                                 thisVar.getLensArray().forEach(function(lens,index,array){
                                     lens.updateLayer(tracksToDraw,item.properties);
                                 });
@@ -2624,7 +2686,7 @@ block content
                     $.when(newData2).done(function() {
                         if(newData2.responseJSON.features != null){
                             newData2.responseJSON.features.forEach(function(item, index, array) {
-                                let tracksToDraw = L.geoJson(item,firstStyleATT);
+                                let tracksToDraw = L.geoJson(item,firstStyleATT2);
                                 thisVar.getLensArray().forEach(function(lens,index,array){
                                     lens.updateLayer(tracksToDraw,item.properties); 
                                 });
@@ -2647,7 +2709,7 @@ block content
                     $.when(newData3).done(function() {
                         if(newData3.responseJSON.features != null){
                             newData3.responseJSON.features.forEach(function(item, index, array) {
-                                let tracksToDraw = L.geoJson(item,firstStyleATT);
+                                let tracksToDraw = L.geoJson(item,firstStyleATT3);
                                 thisVar.getLensArray().forEach(function(lens,index,array){
                                     lens.updateLayer(tracksToDraw,item.properties); 
                                 });
@@ -2662,7 +2724,19 @@ block content
                 updateLayer : function(){
                     let thisVar = this;
                     //if(this.getlID() != null){
+                    let contador = 0
+                    var styleOfThis
                     attLenResults.getLayer(this.getlID()).eachLayer(function(oneOfFourATTLayers){
+
+                        if(contador == 0)
+                            styleOfThis = firstStyleATT;
+                        else if(contador == 0)
+                            styleOfThis = firstStyleATT1;
+                        else if(contador == 0)
+                            styleOfThis = firstStyleATT2;
+                        else
+                            styleOfThis = firstStyleATT3;
+
                         oneOfFourATTLayers.eachLayer(function(oneOfSmallLayerContainer){
                             oneOfSmallLayerContainer.eachLayer(function(oneOfSmallLayers) {
                                 oneOfSmallLayers.setStyle(firstStyleATT);
@@ -3851,34 +3925,9 @@ block content
             document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
             
         });
-        /*if(!lens.hasBeenOpacity){
-                                    if(lens.intersections.length != 0){
-                                        let middleArray = Array.from(lens.intersections);
-                                        lens.delete();
-                                        lens.updateOthersV2(false);
-                                        
-                                        
-                                        for(let j = middleArray.length-1; j>=0;j--){
-                                            middleArray[j].delete();
-                                            middleArray[j].updateOthersV2(false);
-                                        }
-                                        
-                                        
-                                        lens.intersections = [];
-                                        let holder = await lens.createAreas();
-                                        
-                                        for(let x = 0; x < middleArray.length;x++){
-                                            let otherHolder = await middleArray[x].createAreas();
-                                        }
-                                        for(let k = 0;k < lens.areas.length;k++){
-                                            attLenResults.getLayer(lens.areas[k].getlID()).bringToBack()
-                                            /*eachLayer(function(oneOfFourATTLayers){
-                                                oneOfFourATTLayers.eachLayer(function(oneOfSmallLayerContainer){
-                                                    oneOfSmallLayerContainer.eachLayer(function(oneOfSmallLayers) {
-                                                        oneOfSmallLayers.bringToBack();
-                                                    })
-                                                })
-                                            })*/
-                                         
 
-        
+        $(document).ready(function(){
+        $('form input').change(function () {
+            $('form p').text(this.files.length + " file(s) selected");
+        });
+        });

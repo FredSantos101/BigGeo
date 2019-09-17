@@ -117,6 +117,10 @@ router.get('/data', function (req, res) {
 /* GET the map page */
 let timeB4draw = Math.floor( new Date().getTime()/1000);
 router.get('/map', function(req, res) {
+  mapFirst(res)
+});
+
+function mapFirst(res){
   let client0 = new Client(conString0); // Setup our Postgres Client
   client0.connect(); // connect to the client
   console.log("Connected to template_postgis");
@@ -130,17 +134,16 @@ router.get('/map', function(req, res) {
 
         client0.end(); // close the connection
         console.log("Disconnected from template_postgis");
-        startMap(req, res);
+        startMap( res);
       });
     }
     else{
-      startMap(req, res);
+      startMap( res);
     }
-
   }); // create user's db
-});
+}
 
-function startMap(req, res){
+function startMap( res){
   let client = new Client(conString); // Setup our Postgres Client
   let client1 = new Client(conString);
   let client2 = new Client(conString);
@@ -1097,7 +1100,6 @@ let upload = multer({storage: storage}).array('track', 1500);
 
 router.post('/fileUpload', (req, res, next) => {
   const fsExtra = require('fs-extra')
-
   fsExtra.emptyDirSync('./public/data')
   fsExtra.mkdirSync('./public/data/mods');
   upload(req,res,function(err) {
@@ -1114,21 +1116,23 @@ router.post('/fileUpload', (req, res, next) => {
     }
     // print output of script
     subprocess.stdout.on('data', (data) => {
-      console.log("Preprocess GPX");
+      //console.log("Preprocess GPX");
     });
     subprocess.stderr.on('data', (data) => {
       console.log(`error:${data}`);
     });
     subprocess.stderr.on('close', (data) => {
       console.log("Parsing the new GPX");
-      preProcessFiles1();
+      
+      preProcessFiles1(req,res);
     });
   })
 
 
 });
 
-function preProcessFiles1(){
+function preProcessFiles1(req,res){
+  
   const subprocess = callPython(1,1);
     try {
 
@@ -1142,91 +1146,93 @@ function preProcessFiles1(){
     }
     // print output of script
     subprocess.stdout.on('data', (data) => {
-      console.log("Files have been parsed");
+      //console.log("Files have been parsed");
     });
     subprocess.stderr.on('data', (data) => {
       console.log(`error:${data}`);
     });
     subprocess.stderr.on('close', (data) => {
       console.log("Dividing the trajectories");
-      preProcessFiles2();
+      preProcessFiles2(req,res);
     });
 }
 
-function preProcessFiles2(){
+function preProcessFiles2(req,res){
   const subprocess2 = callPython(2,1);
   // print output of script
   subprocess2.stdout.on('data', (data) => {
-    console.log("Tracks have been divided");
+    //console.log("Tracks have been divided");
   });
   subprocess2.stderr.on('data', (data) => {
     console.log(`error:${data}`);
   });
   subprocess2.stderr.on('close', () => {
     console.log("Deleting trajectories with the same time");
-    preProcessFiles3();
+    preProcessFiles3(req,res);
   });
 }
-function preProcessFiles3(){
+function preProcessFiles3(req,res){
   const subprocess3 = callPython(3,1);
   // print output of script
   subprocess3.stdout.on('data', (data) => {
-    console.log("Points with the same time deleted");
+    //console.log("Points with the same time deleted");
   });
   subprocess3.stderr.on('data', (data) => {
     console.log(`error:${data}`);
   });
   subprocess3.stderr.on('close', () => {
     console.log("Deleting stop points");
-    preProcessFiles4();
+    preProcessFiles4(req,res);
   });
 }
-function preProcessFiles4(){
+function preProcessFiles4(req,res){
   const subprocess4 = callPython(4,1);
   // print output of script
   subprocess4.stdout.on('data', (data) => {
-    console.log("Stop points deleted");
+    //console.log("Stop points deleted");
   });
   subprocess4.stderr.on('data', (data) => {
     console.log(`error:${data}`);
   });
   subprocess4.stderr.on('close', () => {
     console.log("Deleting trajectories with only 1 point");
-    preProcessFiles5();
+    preProcessFiles5(req,res);
   });
 }
-function preProcessFiles5(){
+function preProcessFiles5(req,res){
+  
   const subprocess5 = callPython(5,1);
   // print output of script
   subprocess5.stdout.on('data', (data) => {
-    console.log("Trajectories with only 1 point deleted");
+    //console.log("Trajectories with only 1 point deleted");
   });
   subprocess5.stderr.on('data', (data) => {
     console.log(`error:${data}`);
   });
   subprocess5.stderr.on('close', () => {
     console.log("Creating tracks");
-    preProcessFiles6();
+    preProcessFiles6(req,res);
   });
 }
-function preProcessFiles6(){
+function preProcessFiles6(req,res){
   const subprocess6 = callPython(6,1);
   // print output of script
   subprocess6.stdout.on('data', (data) => {
-    console.log("Creating tracks");
+    //console.log("Creating tracks");
   });
   subprocess6.stderr.on('data', (data) => {
     console.log(`error:${data}`);
   });
   subprocess6.stderr.on('close', () => {
     console.log("Going to place the unique ID");
-    preProcessFiles7();
+    preProcessFiles7(req,res);
   });
 }
-function preProcessFiles7(){
+function preProcessFiles7(req,res){
+  
   let clientPost = new Client(conString); // Setup our Postgres Client
   clientPost.connect(); // connect to the client
-  let queryViewMaxTid = clientPost.query(new Query("SELECT max(tid) FROM track_divided_by_time_30s"), (err, res) => {
+  let queryViewMaxTid = clientPost.query(new Query("SELECT max(tid) FROM track_divided_by_time_30s"), (err) => {
     if(err)
       console.log(err);
   });
@@ -1251,29 +1257,33 @@ function preProcessFiles7(){
     });
     subprocess7.stderr.on('close', () => {
       console.log("Going to upload to the DB");
-      createDB();
+      
+      createDB(req,res);
     });
   });
 }
 
-function createDB(){
+function createDB(req,res){
+  
   let client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
   let createDB = "CREATE TABLE public.track_divided_by_time_upload(taxi_id integer,long double precision,lat double precision,data_time timestamp without time zone,vel double precision,traj_id integer,start_long double precision,start_lat double precision,end_long double precision,end_lat double precision,tid integer,geom geometry(Point,4326),startpointgeom geometry(Point,4326),endpointgeom geometry(Point,4326),linegeom geometry(LineString,4326)) WITH (OIDS = FALSE)TABLESPACE pg_default;ALTER TABLE public.track_divided_by_time_upload OWNER to postgres;GRANT ALL ON TABLE public.track_divided_by_time_upload TO postgres; CREATE INDEX IF NOT EXISTS linegeom_trackdivUpload ON public.track_divided_by_time_upload USING gist (linegeom) TABLESPACE pg_default; CREATE INDEX IF NOT EXISTS tid_indexUpload ON public.track_divided_by_time_upload USING btree(tid)TABLESPACE pg_default;";
-  client.query(createDB, async function (err, result) {
+  client.query(createDB, async function (err) {
     if (err) {
       console.log("Database already exists, going to clean it now");
       await client.query(new Query("DELETE FROM track_divided_by_time_upload")).on("end",function(){client.end()
-        insertToDB();});
+        insertToDB(req,res);});
     }
     else{
       client.end();
-      insertToDB();
+      
+      insertToDB(req,res);
     }
   });
 }
 
-function insertToDB() {
+function insertToDB(req,res) {
+    
     let numberOfLinesBy2k;
     const countLinesInFile = require('count-lines-in-file')
     countLinesInFile('./public/data/mods/finalOfALL.txt' , (error,number) => {
@@ -1308,18 +1318,18 @@ function insertToDB() {
         }
         contLine ++;
         if (contLine == 4000){
-          insertLines(stringOfRows,numberOfLinesBy2k);
+          insertLines(stringOfRows,numberOfLinesBy2k,req);
           contLine = 0;
           stringOfRows = "";
         }
       }).on('close', function(){
-        insertLines(stringOfRows,numberOfLinesBy2k);
+        insertLines(stringOfRows,numberOfLinesBy2k,res,req);
       })
     });
 
 }
 let ClientEndTimes = 0;
-function insertLines(stringOfRows,numberOfLinesBy2k){
+function insertLines(stringOfRows,numberOfLinesBy2k,res,req){
   let clientPost = new Client(conString); // Setup our Postgres Client
   clientPost.connect(); // connect to the client
   let queryPost = clientPost.query(new Query("INSERT INTO track_divided_by_time_upload(taxi_id,long,lat,data_time,vel,traj_id,start_long,start_lat,end_long,end_lat,tid) VALUES"+stringOfRows), (err, res) => {
@@ -1336,12 +1346,12 @@ function insertLines(stringOfRows,numberOfLinesBy2k){
 
       ClientEndTimes=0;
       console.log("Will now calculate the geoms");
-      calculateGeoms();
+      calculateGeoms(req,res);
     }
   });
 }
 let geomsCalcualted = 0;
-function calculateGeoms(){
+function calculateGeoms(req,res){
   let queryCreateGeoms1 = new Client(conString); // Setup our Postgres Client
   queryCreateGeoms1.connect(); // connect to the client
   let queryCreateGeoms2 = new Client(conString); // Setup our Postgres Client
@@ -1357,7 +1367,7 @@ function calculateGeoms(){
     console.log("Main Geom query completed")
     if(geomsCalcualted == 3){
       geomsCalcualted = 0;
-      unifySubSegsANDDivide();
+      unifySubSegsANDDivide(req,res);
     }
   });
   geom2.on("end", function(){
@@ -1366,7 +1376,7 @@ function calculateGeoms(){
     console.log("Start Geom query completed")
     if(geomsCalcualted == 3){
       geomsCalcualted = 0;
-      unifySubSegsANDDivide();
+      unifySubSegsANDDivide(req,res);
     }
   });
   geom3.on("end", function(){
@@ -1375,12 +1385,12 @@ function calculateGeoms(){
     console.log("End Geom query completed")
     if(geomsCalcualted == 3){
       geomsCalcualted = 0;
-      unifySubSegsANDDivide();
+      unifySubSegsANDDivide(req,res);
     }
   });
 }
-
-function unifySubSegsANDDivide(){
+let resultForRefresh
+function unifySubSegsANDDivide(req,res){
   let clientUnify = new Client(conString); // Setup our Postgres Client
   clientUnify.connect(); // connect to the client
   console.log("Gonna unify the point by pairs for attribute lenses");
@@ -1393,73 +1403,91 @@ function unifySubSegsANDDivide(){
 
     });
   });
-
   let clientCreateLines1 = new Client(conString); // Setup our Postgres Client
   clientCreateLines1.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 1");
-  let query0 = clientCreateLines1.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng <= 300)")); // Run our Query
+  let query0 = clientCreateLines1.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng <= 500)")); // Run our Query
   query0.on("end", function (result) {
     clientCreateLines1.end();
-    console.log(result);
     console.log("table 1 completed");
+    console.log(res)
+    res.redirect(getFormattedUrl(req));
   });
   let clientCreateLines2 = new Client(conString); // Setup our Postgres Client
   clientCreateLines2.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 2");
-  let query1 = clientCreateLines2.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines1 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 300 AND leng <= 700)")); // Run our Query
+  let query1 = clientCreateLines2.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines1 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 300 AND leng <= 1000)")); // Run our Query
   query1.on("end", function (result) {
     clientCreateLines2.end();
-    console.log(result);
     console.log("table 2 completed");
+    console.log(res)
+   
+    res.redirect(getFormattedUrl(req));
   });
   let clientCreateLines3 = new Client(conString); // Setup our Postgres Client
   clientCreateLines3.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 3");
-  let query2 = clientCreateLines3.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines2 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 700 AND leng <= 1500)")); // Run our Query
+  let query2 = clientCreateLines3.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines2 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 700 AND leng <= 2500)")); // Run our Query
   query2.on("end", function (result) {
     clientCreateLines3.end();
-    console.log(result);
     console.log("table 3 completed");
+    res.redirect(getFormattedUrl(req));
   });
   let clientCreateLines4 = new Client(conString); // Setup our Postgres Client
   clientCreateLines4.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 4");
-  let query3 = clientCreateLines4.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines3 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 1500)")); // Run our Query
+  let query3 = clientCreateLines4.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines3 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 2500)")); // Run our Query
   query3.on("end", function (result) {
 
     clientCreateLines4.end();
-    console.log(result);
     console.log("table 4 completed");
+    res.redirect(getFormattedUrl(req));
   });
-
 }
 
 function callPython(number,tidNumber){
-  console.log("Gonna call the script now");
-  if(number == 1)
+  console.log("Gonna call the script now")
+  if(number == 1){
     if (isWindows) return spawn('python',["-u",'./public/python/joinTracks-1.py']);
     else return spawn('python3',["-u",'./public/python/joinTracks-1.py']);
-  else if (number == 2)
+  }
+  else if (number == 2){
     if (isWindows) return spawn('python',["-u",'./public/python/separate_tracks-2.py']);
     else return spawn('python3',["-u",'./public/python/separate_tracks-2.py']);
-  else if (number == 3)
+  }
+  else if (number == 3){
     if (isWindows) return spawn('python',["-u",'./public/python/delete_Same_time_Points-3.py']);
     else return spawn('python3',["-u",'./public/python/delete_Same_time_Points-3.py']);
-  else if (number == 4)
+  }
+  else if (number == 4){
     if (isWindows) return spawn('python',["-u",'./public/python/delete_Stop_Points-4.py']);
     else return spawn('python3',["-u",'./public/python/delete_Stop_Points-4.py']);
-  else if (number == 5)
+  }
+  else if (number == 5){
     if (isWindows) return spawn('python',["-u",'./public/python/delete1Point-5.py']);
     else return spawn('python3',["-u",'./public/python/delete1Point-5.py']);
-  else if (number == 6)
+  }
+  else if (number == 6){
     if (isWindows) return spawn('python',["-u",'./public/python/Create_Tracks-6.py']);
     else return spawn('python3',["-u",'./public/python/Create_Tracks-6.py']);
-  else if (number == 7)
+  }
+  else if (number == 7){
     if (isWindows) return spawn('python',["-u",'./public/python/txtJoinPosition-7.py', tidNumber]);
     else return spawn('python3',["-u",'./public/python/txtJoinPosition-7.py', tidNumber]);
-  else if (number == 8)
+  }
+  else if (number == 8){
     if (isWindows) return spawn('python',["-u",'./public/Preprocessing/UnderstandMySteps.py']);
     else return spawn('python3',["-u",'./public/Preprocessing/UnderstandMySteps.py',"./public/data"]);
-  else
-    console.log("something is wrong, the number is wrong :S");
+  }
+  else{
+    console.log("something is wrong, the number is wrong ")
+  }
+}
+var url = require('url');
+
+function getFormattedUrl(req) {
+    return url.format({
+        protocol: req.protocol,
+        host: req.get('host')
+    });
 }

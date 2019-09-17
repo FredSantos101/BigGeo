@@ -18,12 +18,15 @@ with open("final.txt", "w") as outfile:
                 thisDoc = minidom.parse(f)
 
                 points1 = thisDoc.getElementsByTagName('trkpt')
-                for point1 in points1:
-                    lon = point1.attributes['lon'].value
-                    lat = point1.attributes['lat'].value
-                    time = point1.getElementsByTagName('time')[0].firstChild.nodeValue.replace('T', ' ')
 
-                    outfile.write(str(idTrack) + "," + time.replace('Z', '') + "," + lon + "," + lat + "\n")
+                cont = 0
+                for point1 in points1:
+                    if(cont % 2 == 0):
+                        lon = point1.attributes['lon'].value
+                        lat = point1.attributes['lat'].value
+                        time = point1.getElementsByTagName('time')[0].firstChild.nodeValue.replace('T', ' ')
+                        outfile.write(str(idTrack) + "," + time.replace('Z', '') + "," + lon + "," + lat + "\n")
+                    cont += 1
         idTrack = idTrack + 1
 
     for g in read_filesXML:
@@ -32,11 +35,15 @@ with open("final.txt", "w") as outfile:
             thisDoc = minidom.parse(g)
 
             points2 = thisDoc.getElementsByTagName('trkpt')
+
+            cont = 0
             for point2 in points2:
-                lon = point2.attributes['lon'].value
-                lat = point2.attributes['lat'].value
-                time = point2.getElementsByTagName('time')[0].firstChild.nodeValue.replace('T', ' ')
-                outfile.write(str(idTrack) + "," + time.replace('Z', '') + "," + lon + "," + lat + "\n")
+                if(cont % 2 == 0):
+                    lon = point2.attributes['lon'].value
+                    lat = point2.attributes['lat'].value
+                    time = point2.getElementsByTagName('time')[0].firstChild.nodeValue.replace('T', ' ')
+                    outfile.write(str(idTrack) + "," + time.replace('Z', '') + "," + lon + "," + lat + "\n")
+                cont += 1
         idTrack = idTrack + 1
 
     for h in read_filesGPX:
