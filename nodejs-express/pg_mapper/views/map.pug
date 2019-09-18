@@ -1,9 +1,9 @@
 extends layout
 block content
     
-    <div id="sidebar" class="sidebar collapsed">
+    <div id="sidebar" class="sidebar collapsed" style="color:white">
         <!-- Nav tabs -->
-        <div class="sidebar-tabs">
+        <div class="sidebar-tabs" style="background-color:  #8babb9cc">
             <ul role="tablist">
                 <li><a href="#home" role="tab"  >BG<i class="fa fa-bars"></i></a></li>
                 <li     class="disabled"><a role="tab"  >----<i class="fa fa-bars"></i></a></li>
@@ -23,8 +23,8 @@ block content
             </ul>
         </div>
         <!-- Tab panes -->
-        <div class="sidebar-content">
-            <div class="sidebar-pane" id="home">
+        <div class="sidebar-content" style="background-color:  rgb(65, 65, 65)">
+            <div class="sidebar-pane" id="home" >
                 <h1 class="sidebar-header">
                     sidebar-v2
                     <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
@@ -37,28 +37,76 @@ block content
                 <p class="lorem">Developped by master's student Frederico Santos and supervised by prof. Daniel Gonçalves From Instituto Superior Tecnico, Portugal. </p>
 
             </div>
-            <div class="sidebar-pane" id="upload">
+            <div class="sidebar-pane" id="upload" >
                 <h1 class="sidebar-header">Upload trajectories<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
-                <h1 class="sidebar-header">
-                    sidebar-v2
-                    <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
-                </h1>
+                <p></a></p>
+                
                 <p>Here you can upload your own trajectories. You can select up to 1500 .gpx files at a time and simply drag them into the uplaod zone. At the end the page will be refreshed so your session will be lost</a>.</p>
                 <form id='myform' action="/fileUpload" method="POST" enctype="multipart/form-data">
                     <input type="file" name = "track" multiple>
                     <p>Drag your files here or click in this area.</p>
                     <button type="submit">Upload</button>
                     </form>
+
+                <div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar stripes animated reverse slower">
+                        <span class="progress-bar-inner"></span>
+                        </div>
+                    </div>
+                    </div>
                 //<div style="position: absolute; bottom: 1%;">
                     <label for="track">Choose the files you want to upload (must be in gpx format):</label>
                     <form id='myform' action="/fileUpload" method="post" enctype="multipart/form-data">
                         <input type="file" name="track" multiple />
                         <button id = "submitButt"> Submit </button>
                     </form>
-                </div>
+                //</div>
             </div>
-            <div class="sidebar-pane" id="settings">
-                <h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+            <div class="sidebar-pane" id="settings" >
+                <h1 class="sidebar-header">Setting<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+                <div id="biggerContainerMenu">
+                    <h1 style="font-size: 150%">Map style</h1>
+                    <h1 style="font-size: 80%">Select whichever map you prefer:</h1>
+                    <div id="smallContainerMenu">
+                        <label class="control control--radio">
+                        <input type="radio" class="firstMap" name="radio" checked="checked" />CartoDB DarkMatter (no labels)
+                        <div class="control__indicator"></div>
+                        </label>
+                        <label class="control control--radio">
+                        <input type="radio" class="secMap" name="radio"/>CartoDB DarkMatter 
+                        <div class="control__indicator"></div>
+                        </label>
+                        <label class="control control--radio">
+                        <input type="radio" class="trdMap" name="radio" />Hydda Full
+                        <div class="control__indicator"></div>
+                        </label>
+                        <label class="control control--radio">
+                        <input type="radio" class="fourMap" name="radio" />CartoDB Voyager
+                        <div class="control__indicator"></div>
+                        </label>
+                        <label class="control control--radio">
+                        <input type="radio" class="fiveMap" name="radio"/>CartoDB Voyager (no labels)
+                        <div class="control__indicator"></div>
+                        </label>
+                    </div>
+                </div> 
+                <h1 style="font-size: 150%">---------------------</h1>
+                <div id="biggerContainerMenu">
+                    <h1 style="font-size: 150%">Intervals</h1>
+                    <h1 style="font-size: 80%">The first opThe intervals are smaller when the are several trajectories with the same attribute values and bigger when there are less trajectories.</h1>
+                    <div id="smallContainerMenu">
+                        <label class="control control--radio">
+                        <input type="radio" class="" name="radio2" checked="checked"/>Equal sized intervals
+                        <div class="control__indicator"></div>
+                        </label>
+                        <label class="control control--radio">
+                        <input type="radio" class="" name="radio2"/>Different sized intervals
+                        <div class="control__indicator"></div>
+                        </label>
+                    </div>
+                </div> 
+            </div>   
             </div>
         </div>
     </div>
@@ -151,14 +199,41 @@ block content
         getMaxTimeVal()
 
 
-
-        //ALL black and dark grey
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+        //Change basemaps
+        /*var layer = L.esri.basemapLayer('Topographic').addTo(map);
+        var layerLabels;*/
+        
+        var Hydda_Full = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: 'Tiles courtesy of <a href="http://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        var CartoDB_Voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd',
             maxZoom: 19
-        }).addTo(map);
+        });
 
+        var CartoDB_VoyagerNoLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        });
+
+        //ALL black and dark grey
+        var blackNoLabel = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        })
+
+        var CartoDB_DarkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        });
+
+        blackNoLabel.addTo(map);
+        var activeMap =blackNoLabel;
 
         var sidebar = L.control.sidebar('sidebar').addTo(map);
 
@@ -435,8 +510,8 @@ block content
                     onMapClick(locationCreation, radiusValue);
                     createQueryLensesFlag = false;
                     createAttributeLensesFlag = false;
-                    document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
-                    document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+                    document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
+                    document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
                     /*container1.style.backgroundColor = 'white'; 
                     container2.style.backgroundColor = 'white';*/
                 }
@@ -452,11 +527,11 @@ block content
             console.log(radiusValue);
             if(createQueryLensesFlag){   
                 queryLensMenu(location,radiusValue);
-                document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
+                document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
             }
             else if(createAttributeLensesFlag){
                 attributeLensMenu(location,radiusValue);
-                document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+                document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
             }
         }
 
@@ -1030,8 +1105,8 @@ block content
                     createAttributeLensesFlag = false;
                     /*container1.style.backgroundColor = 'white'; 
                     container2.style.backgroundColor = 'white';*/
-                    document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
-                    document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+                    document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
+                    document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
                     outterLensesLayer.clearLayers();
                     clicked = true;
                     let once = true;
@@ -1144,8 +1219,8 @@ block content
                                         map.on('mousemove', function (e) {
                                             createQueryLensesFlag = false;
                                             createAttributeLensesFlag = false;
-                                            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
-                                            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+                                            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
+                                            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
                                             /*container1.style.backgroundColor = 'white'; 
                                             container2.style.backgroundColor = 'white';*/
                                             L.DomEvent.stopPropagation(e);
@@ -2069,8 +2144,8 @@ block content
                     L.DomEvent.stopPropagation(clickEven);
                     createQueryLensesFlag = false;
                     createAttributeLensesFlag = false;
-                    document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
-                    document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+                    document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
+                    document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
                     /*container1.style.backgroundColor = 'white'; 
                     container2.style.backgroundColor = 'white';*/
                     outterLensesLayer.clearLayers();
@@ -2196,8 +2271,8 @@ block content
                                             document.getElementsByClassName('myMoveButton')[0].style.visibility = "hidden";
                                             createQueryLensesFlag = false;
                                             createAttributeLensesFlag = false;
-                                            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
-                                            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+                                            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
+                                            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
                                             /*container1.style.backgroundColor = 'white'; 
                                             container2.style.backgroundColor = 'white';*/
                                             L.DomEvent.stopPropagation(e);
@@ -3837,8 +3912,7 @@ block content
                 }
 
             });
-
-            return false
+            return 
         });
 
         function getMinTimeVal() {
@@ -3888,11 +3962,11 @@ block content
             if(createQueryLensesFlag)
                 document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#0074d9"
             else
-                document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
+                document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
             createAttributeLensesFlag = false;
             tabZoom = false;
             zoomControlVar.remove()
-            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
             
         });
         $('.attributeLensBut').click(function (e) {
@@ -3900,12 +3974,12 @@ block content
             createQueryLensesFlag = false;
             tabZoom = false;
             zoomControlVar.remove()
-            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
+            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
             createAttributeLensesFlag = !createAttributeLensesFlag;
             if(createAttributeLensesFlag)
                 document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#0074d9"
             else
-                document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+                document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
         });
         let tabZoom = false;
         $('.zoomBut').click(function (e) {
@@ -3918,11 +3992,11 @@ block content
             else{
                 
                 zoomControlVar.remove()
-                document.getElementsByClassName("not-tabZoom")[0].style.backgroundColor ="white"}
+                document.getElementsByClassName("not-tabZoom")[0].style.backgroundColor ="#14599100"}
             createQueryLensesFlag = false;
             createAttributeLensesFlag = false;
-            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="white"
-            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="white"
+            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
+            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
             
         });
 
@@ -3931,3 +4005,38 @@ block content
             $('form p').text(this.files.length + " file(s) selected");
         });
         });
+
+        $('.firstMap').click(function (e) {
+           map.removeLayer(activeMap);
+           blackNoLabel.addTo(map);
+           activeMap = blackNoLabel;
+        }); 
+        $('.secMap').click(function (e) {
+           map.removeLayer(activeMap);
+           CartoDB_DarkMatter.addTo(map);
+           activeMap = CartoDB_DarkMatter;
+        }); 
+        $('.trdMap').click(function (e) {
+           map.removeLayer(activeMap);
+           Hydda_Full.addTo(map);
+           activeMap = Hydda_Full;
+        }); 
+        $('.fourMap').click(function (e) {
+           map.removeLayer(activeMap);
+           CartoDB_Voyager.addTo(map);
+           activeMap = CartoDB_Voyager;
+        }); 
+        $('.fiveMap').click(function (e) {
+           map.removeLayer(activeMap);
+           CartoDB_VoyagerNoLabels.addTo(map);
+           activeMap = CartoDB_VoyagerNoLabels;
+        });  
+        /*document
+            .querySelector('#basemaps')
+            .addEventListener('change', function (e) {
+            var basemap = e.target.value;
+            setBasemap(basemap);
+            });
+        */
+
+        

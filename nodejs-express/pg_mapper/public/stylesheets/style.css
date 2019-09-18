@@ -426,14 +426,14 @@ form{
   margin-left: -200px;
   width: 395px;
   height: 200px;
-  border: 4px dashed #2e2e2e;
+  border: 4px dashed #a8a8a8;
 }
 form p{
   width: 100%;
   height: 100%;
   text-align: center;
   line-height: 170px;
-  color: #2e2e2e;
+  color: #a8a8a8;
   font-family: Arial;
 }
 form input{
@@ -467,4 +467,292 @@ form button:active{
   border:0;
 }
 
+#basemaps-wrapper {
+  position: absolute;
+  top: 12%;
+  right: 10px;
+  z-index: 400;
+  background: white;
+  padding: 15px;
+}
 
+#smallContainerMenu {
+  color: #FFFFFF;
+  font-size: 125%;
+  width: 95%;
+  top:0px;
+  left:0px;
+  margin-top: 0px;
+  margin-left: 0px;
+  background-color:   rgba(90, 90, 90);
+  border-radius:4%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#biggerContainerMenu {
+  color: #FFFFFF;
+  width: 100%;
+  top:0px;
+  left:0px;
+  margin-top: 0px;
+  margin-left: 0px;
+  background-color:  rgb(65, 65, 65);
+}
+
+
+$color--white = #FFFFFF
+$color--black = #000000
+$color--light-grey = #E6E6E6
+$color--grey = #CCCCCC
+$color--dark-grey = #7B7B7B
+$color--primary = #2AA1C0
+$color--secondary = #0E647D
+
+html, body
+  height 100%
+
+body
+  background $color--light-grey
+  font-family 'Source Sans Pro', sans-serif
+
+.container
+  width 100%
+  height 100%
+  display flex
+  flex-wrap wrap
+  justify-content center
+  align-items center
+
+h1
+  font-family 'Alegreya Sans', sans-serif
+  font-weight 300
+  margin-top 0
+
+// Box to contain form controls
+.control-group
+  display inline-block
+  vertical-align top
+  background $color--white
+  text-align left
+  box-shadow 0 1px 2px rgba(0, 0, 0, 0.1)
+  padding 30px
+  width 200px
+  height 210px
+  margin 10px
+
+// Basic control styles
+.control
+  display block
+  position relative
+  padding-left 30px
+  margin-bottom 15px
+  cursor pointer
+  
+  // Hide default browser input
+  input
+    position absolute
+    z-index -1
+    opacity 0
+    
+
+// Custom control
+.control__indicator
+  position absolute
+  top 0px
+  left 0
+  height 16px
+  width 16px
+  background #fff
+  border 1px solid #ccc
+  
+  .control--checkbox &
+    border-radius 3px
+  
+  .control--radio &
+    border-radius 50% // Makes radio buttons circlular
+  
+  // Hover and focus
+  .control:hover input:not([disabled]) ~ &,
+  .control input:focus ~ &
+    border-color: #666
+  
+  // Checked
+  .control input:checked ~ &
+    background #fff
+
+  // Hover when checked
+  /*
+  .control:hover input:not([disabled]):checked ~ &,
+  .control input:checked:focus ~ &
+    border-color: #666
+    */
+  
+  // Hide default browser input
+  .control input:disabled ~ &
+    background $color--light-grey
+    opacity 0.6
+    pointer-events none
+
+  &:after
+    content ''
+    position absolute
+    display none // Hide check
+
+    .control input:checked ~ &
+      display block // Show check
+ 
+    // Checkbox tick
+    .control--checkbox &
+      left 5px
+      top 0px
+      width 5px
+      height 12px
+      border solid #34bb92
+      border-width 0 2px 2px 0
+      transform rotate(45deg)
+    
+    // Disabled tick colour
+    .control--checkbox input:disabled ~ &
+      border-color $color--dark-grey
+
+    // Radio button inner circle
+    .control--radio &
+      left 5px
+      top 5px
+      height 6px
+      width 6px
+      border-radius 50%
+      background #34bb92
+
+    // Disabled circle colour
+    .control--radio input:disabled ~ &
+      background $color--dark-grey
+      
+.select
+  position relative
+  display inline-block
+  margin-bottom 15px
+  width 100%
+
+  select
+    display inline-block
+    width 100%
+    cursor pointer
+    padding 10px 15px
+    outline 0
+    border 0
+    border-radius 0
+    background $color--light-grey
+    color $color--dark-grey
+    appearance none
+    -webkit-appearance none
+    -moz-appearance none
+    
+    &::-ms-expand
+      display none
+    
+    &:hover,
+    &:focus
+      color $color--black
+      background $color--grey
+  
+    &:disabled
+      opacity 0.5
+      pointer-events none
+      
+.select__arrow
+  position absolute
+  top 16px
+  right 15px
+  width 0
+  height 0
+  pointer-events none
+  border-style solid
+  border-width 8px 5px 0 5px
+  border-color $color--dark-grey transparent transparent transparent
+  
+  .select select:hover ~ &
+  .select select:focus ~ &
+    border-top-color $color--black
+  
+  .select select:disabled ~ &
+    border-top-color $color--grey
+
+
+    body, html {
+      height: 100%;
+      background: #0e0e15;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    
+    @keyframes animate-stripes {
+        0% {
+            background-position: 0 0;
+        }
+    
+        100% {
+            background-position: 60px 0;
+        }
+    }
+    
+    @keyframes auto-progress {
+      0% {
+        width: 0%;
+      }
+    
+      100% {
+        width: 100%;
+      }
+    }
+    
+    .progress-bar {
+        background-color: #1a1a1a;
+        height: 7.5%;
+        width: 95%;
+        margin: 50px auto;
+        margin-top: 133%;
+        border-radius: 5px;
+        box-shadow: 0 1px 5px #000 inset, 0 1px 0 #444;
+    }
+    
+    .stripes {
+        background-size: 30px 30px;
+        background-image: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, .15) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, .15) 50%,
+            rgba(255, 255, 255, .15) 75%,
+            transparent 75%,
+            transparent
+        );
+    }
+    
+    .stripes.animated {
+      animation: animate-stripes 0.6s linear infinite;
+    }
+    
+    .stripes.animated.slower {
+      animation-duration: 1.25s;
+    }
+    
+    .stripes.reverse {
+      animation-direction: reverse;
+    }
+    
+    .progress-bar-inner {
+      display: block;
+      height: 45px;
+      width: 0%;
+      background-color: #34c2e3;
+      border-radius: 3px;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset;
+      position: relative;
+      animation: auto-progress 10s infinite linear;
+    }
+    
+    

@@ -195,8 +195,8 @@ function startMap( res){
         clientFetchFirst = new Client(conString); // Setup our Postgres Client
         clientFetchFirst.connect(); // connect to the client
         console.log("Fetching on database");
-        let query = clientFetchFirst.query(new Query(drawTracksMap)); // Run our Query
-        query.on("row", function (row, result) {
+        let queryFinal = clientFetchFirst.query(new Query(drawTracksMap)); // Run our Query
+        queryFinal.on("row", function (row, result) {
             result.addRow(row);
         });
 
@@ -204,7 +204,7 @@ function startMap( res){
         let timeafterGet = timefetch-timeB4draw;
 
         // Pass the result to the map page
-        query.on("end", function (result) {
+        queryFinal.on("end", function (result) {
             console.log(result)
             console.log("Passing data to frontend");
             //let data = require('../public/data/geoJSON.json')
@@ -1391,11 +1391,16 @@ function calculateGeoms(req,res){
 }
 let resultForRefresh
 function unifySubSegsANDDivide(req,res){
+  let cont = 0
   let clientUnify = new Client(conString); // Setup our Postgres Client
   clientUnify.connect(); // connect to the client
   console.log("Gonna unify the point by pairs for attribute lenses");
   let query = clientUnify.query(new Query(" WITH tryingToDivide AS (SELECT tid as idThis, geom as geomThis, data_time as dataTime, lag(tid) over (order by tid asc,data_time asc) as idPrev, lag(geom) over (order by tid asc, data_time asc) as geomPrev FROM track_divided_by_time_upload) UPDATE track_divided_by_time_upload SET linegeom = CASE WHEN idThis = idPrev THEN ST_SetSRID(ST_MakeLine(geomPrev,geomThis),4326) ELSE NULL END FROM tryingToDivide WHERE tid = idThis AND  data_time = dataTime")); // Run our Query
   query.on("end", function (result) {
+    cont += 1
+    if(cont == 5){
+      console.log(cont)
+      startMap(res)}
     console.log("Completed pairs for attribute lenses");
     let queryUpload = clientUnify.query(new Query("INSERT INTO track_divided_by_time_30s (taxi_id,long,lat,data_time,vel,traj_id,start_long,start_lat,end_long,end_lat ,tid,geom,startpointgeom,endpointgeom,linegeom) SELECT * FROM track_divided_by_time_upload"));
     queryUpload.on("end", function (result) {
@@ -1408,40 +1413,51 @@ function unifySubSegsANDDivide(req,res){
   console.log("Gonna unify and upload them to table 1");
   let query0 = clientCreateLines1.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng <= 500)")); // Run our Query
   query0.on("end", function (result) {
+    cont += 1
+    if(cont == 5){
+      console.log(cont)
+      startMap(res)}
     clientCreateLines1.end();
     console.log("table 1 completed");
-    console.log(res)
-    res.redirect(getFormattedUrl(req));
   });
   let clientCreateLines2 = new Client(conString); // Setup our Postgres Client
   clientCreateLines2.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 2");
   let query1 = clientCreateLines2.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines1 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 300 AND leng <= 1000)")); // Run our Query
   query1.on("end", function (result) {
+    cont += 1
+    if(cont == 5){
+      console.log(cont)
+      startMap(res)}
     clientCreateLines2.end();
     console.log("table 2 completed");
-    console.log(res)
-   
-    res.redirect(getFormattedUrl(req));
+
   });
   let clientCreateLines3 = new Client(conString); // Setup our Postgres Client
   clientCreateLines3.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 3");
   let query2 = clientCreateLines3.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines2 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 700 AND leng <= 2500)")); // Run our Query
   query2.on("end", function (result) {
+    cont += 1
+    if(cont == 5){
+      console.log(cont)
+      startMap(res)}
     clientCreateLines3.end();
     console.log("table 3 completed");
-    res.redirect(getFormattedUrl(req));
+    
   });
   let clientCreateLines4 = new Client(conString); // Setup our Postgres Client
   clientCreateLines4.connect(); // connect to the client
   console.log("Gonna unify and upload them to table 4");
   let query3 = clientCreateLines4.query(new Query("WITH multis AS ( SELECT tid, min(data_time) AS time_start, max(data_time) as time_end, ST_MakeLine(array_agg(geom ORDER BY tid,data_time)) AS mylines, min(startpointgeom) AS sPGeom, min(endpointgeom) AS ePGeom, AVG(vel) AS veloc_avg, array_agg(vel) as velo FROM track_divided_by_time_upload GROUP BY tid) INSERT INTO trajectory_lines3 (SELECT tid,geom,time_start,time_end, sPGeom, ePGeom, veloc_avg,duration,leng,velo FROM  (SELECT tid, (ST_Dump(mylines)).geom,time_start, time_end, sPGeom, ePGeom, veloc_avg, (time_end - time_start) as duration,ST_Length(ST_Transform((ST_Dump(mylines)).geom,3857)) as leng , velo FROM multis) as l WHERE leng > 2500)")); // Run our Query
   query3.on("end", function (result) {
-
+    cont += 1
+    if(cont == 5){
+      console.log(cont)
+      startMap(res)}
     clientCreateLines4.end();
     console.log("table 4 completed");
-    res.redirect(getFormattedUrl(req));
+    
   });
 }
 
