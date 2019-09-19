@@ -11,13 +11,18 @@ const turf = require("turf");
 const multer  = require('multer')   //Use to pass files from client to server using connect-busboy
 const {spawn} = require('child_process')
 const os =  require('os')
+const path = require('path');
+
+var app = express();
 
 /* PostgreSQL and PostGIS module and connection setup */
 const { Client, Query } = require('pg')
 
 let isWindows = (os.platform() === 'win32');
 
-
+//root of server 
+var appDir = path.dirname(require.main.filename);
+console.log(appDir);
 //Create db script
 let databaseCreation = "template_postgis";
 // Setup connection
@@ -200,6 +205,52 @@ function startMap( res){
             result.addRow(row);
         });
 
+        let clientCSV = new Client(conString);
+        clientCSV.connect();
+        let newPath
+        console.log(appDir);
+
+        newPath =replaceGlobally(appDir,"bin","public")
+        
+        
+        let newPathVelocity = newPath + "/activeCSV/velocity.csv"
+        let newPathLength = newPath + "/activeCSV/length.csv"
+        let newPathDuration = newPath + "/activeCSV/duration.csv"
+        let newPathTime = newPath + "/activeCSV/time.csv"
+        
+        let contador = 0
+        let queryVelCSV = clientCSV.query(new Query("COPY (SELECT g.veloc_avg FROM trajectory_lines3 AS g ORDER BY g.veloc_avg ASC) TO '"+ newPathVelocity + "' DELIMITER ';' CSV HEADER"))
+        queryVelCSV.on("end", function (result) {
+          console.log("Velocity csv ended")
+          contador += 1
+          if (contador == 4)
+            clientCSV.end()
+            contador=0
+        });
+        let queryLenCSV = clientCSV.query(new Query("COPY (SELECT g.length AS len FROM trajectory_lines3 AS g ORDER BY g.length ASC) TO '"+ newPathLength + "' DELIMITER ';' CSV HEADER"))
+        queryLenCSV.on("end", function (result) {
+          console.log("Length csv ended")
+          contador += 1
+          if (contador == 4)
+            clientCSV.end()
+            contador=0
+        });
+        let queryDurCSV = clientCSV.query(new Query("COPY (SELECT g.duration FROM trajectory_lines3 AS g ORDER BY g.duration ASC) TO '"+ newPathDuration + "' DELIMITER ';' CSV HEADER"))
+        queryDurCSV.on("end", function (result) {
+          console.log("Duration csv ended")
+          contador += 1
+          if (contador == 4)
+            clientCSV.end()
+            contador=0
+        });
+        let queryTimeCSV = clientCSV.query(new Query("COPY (SELECT g.data_time_start FROM trajectory_lines3 AS g ORDER BY g.data_time_start ASC) TO '"+ newPathTime + "' DELIMITER ';' CSV HEADER"))
+        queryTimeCSV.on("end", function (result) {
+          console.log("Time start csv ended")
+          contador += 1
+          if (contador == 4)
+            clientCSV.end()
+            contador=0
+        });
         let timefetch = Math.floor( new Date().getTime()/1000);
         let timeafterGet = timefetch-timeB4draw;
 
@@ -240,6 +291,50 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
   let stDiffs = "geom";
   let queryOfDiff = "";
   let queryOfRest = "";
+
+  let clientCSV = new Client(conString);
+  clientCSV.connect();
+  let newPath
+  console.log(appDir);
+
+  newPath =replaceGlobally(appDir,"bin","public")
+  let tabNumber = req.params.tab.slice(-1);
+  if(tabNumber == "s") tabNumber = "";
+  
+  let newPathVelocity = newPath + "/activeCSV/velocity"+ tabNumber +".csv"
+  let newPathLength = newPath + "/activeCSV/length"+ tabNumber +".csv"
+  let newPathDuration = newPath + "/activeCSV/duration"+ tabNumber +".csv"
+  let newPathTime = newPath + "/activeCSV/time"+ tabNumber +".csv"
+  
+  let contador = 0
+  let queryVelCSV = clientCSV.query(new Query("COPY (SELECT g.veloc_avg FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.veloc_avg ASC) TO '"+ newPathVelocity + "' DELIMITER ';' CSV HEADER"))
+  queryVelCSV.on("end", function (result) {
+    console.log("Velocity csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
+  let queryLenCSV = clientCSV.query(new Query("COPY (SELECT g.length AS len FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.length ASC) TO '"+ newPathLength + "' DELIMITER ';' CSV HEADER"))
+  queryLenCSV.on("end", function (result) {
+    console.log("Length csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
+  let queryDurCSV = clientCSV.query(new Query("COPY (SELECT g.duration FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.duration ASC) TO '"+ newPathDuration + "' DELIMITER ';' CSV HEADER"))
+  queryDurCSV.on("end", function (result) {
+    console.log("Duration csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
+  let queryTimeCSV = clientCSV.query(new Query("COPY (SELECT g.data_time_start FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.data_time_start ASC) TO '"+ newPathTime + "' DELIMITER ';' CSV HEADER"))
+  queryTimeCSV.on("end", function (result) {
+    console.log("Time start csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
   if (activeQuery.length == 0){
     queryOfDiff = " WHERE ";
     queryOfRest = " WHERE ";
@@ -364,12 +459,62 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
   //Radius in meters to degrees
   let radiusDegrees = (req.params.radius/ 111120).toFixed(8);
 
-  let client = new Client(conString); // Setup our Postgres Client
-  client.connect(); // connect to the client
-  let query = client.query(new Query(query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
+   // Setup our Postgres Client
+  let client1 = new Client(conString); 
+   // connect to the client
+  client1.connect();
+  
+  let query = client1.query(new Query(query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
   });
+
+  
+  let clientCSV = new Client(conString);
+  clientCSV.connect();
+  let newPath
+  console.log(appDir);
+
+  newPath =replaceGlobally(appDir,"bin","public")
+  let tabNumber = req.params.tab.slice(-1);
+  if(tabNumber == "s") tabNumber = "";
+  
+  let newPathVelocity = newPath + "/activeCSV/velocity"+ tabNumber +".csv"
+  let newPathLength = newPath + "/activeCSV/length"+ tabNumber +".csv"
+  let newPathDuration = newPath + "/activeCSV/duration"+ tabNumber +".csv"
+  let newPathTime = newPath + "/activeCSV/time"+ tabNumber +".csv"
+  
+  let contador = 0
+  let queryVelCSV = clientCSV.query(new Query("COPY (SELECT g.veloc_avg FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.veloc_avg ASC) TO '"+ newPathVelocity + "' DELIMITER ';' CSV HEADER"))
+  queryVelCSV.on("end", function (result) {
+    console.log("Velocity csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
+  let queryLenCSV = clientCSV.query(new Query("COPY (SELECT g.length AS len FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.length ASC) TO '"+ newPathLength + "' DELIMITER ';' CSV HEADER"))
+  queryLenCSV.on("end", function (result) {
+    console.log("Length csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
+  let queryDurCSV = clientCSV.query(new Query("COPY (SELECT g.duration FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.duration ASC) TO '"+ newPathDuration + "' DELIMITER ';' CSV HEADER"))
+  queryDurCSV.on("end", function (result) {
+    console.log("Duration csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
+  let queryTimeCSV = clientCSV.query(new Query("COPY (SELECT g.data_time_start FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.data_time_start ASC) TO '"+ newPathTime + "' DELIMITER ';' CSV HEADER"))
+  queryTimeCSV.on("end", function (result) {
+    console.log("Time start csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
+
+
 
   let timefetch = Math.floor( new Date().getTime()/1000);
   let timeafterGet = timefetch-timeB4draw;
@@ -380,7 +525,7 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
       res.send(dataNew);
 
       let timeAdraw = Math.floor( new Date().getTime()/1000);
-      client.end();
+      client1.end();
   });
 
 });
@@ -399,6 +544,50 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
   //DELETE OLD QUERY OF THE LENS
   let deleteOldPos = query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue);
   let newQuery = query_args_ContructorQUERIES(req.params.tab,req.params.longNEW, req.params.latNEW, radiusDegreesNEW, req.params.typeNEW, req.params.minValueNEW, req.params.maxValueNEW);
+
+  let clientCSV = new Client(conString);
+  clientCSV.connect();
+  let newPath
+  console.log(appDir);
+
+  newPath =replaceGlobally(appDir,"bin","public")
+  let tabNumber = req.params.tab.slice(-1);
+  if(tabNumber == "s") tabNumber = "";
+  
+  let newPathVelocity = newPath + "/activeCSV/velocity"+ tabNumber +".csv"
+  let newPathLength = newPath + "/activeCSV/length"+ tabNumber +".csv"
+  let newPathDuration = newPath + "/activeCSV/duration"+ tabNumber +".csv"
+  let newPathTime = newPath + "/activeCSV/time"+ tabNumber +".csv"
+  
+  let contador = 0
+  let queryVelCSV = clientCSV.query(new Query("COPY (SELECT g.veloc_avg FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.veloc_avg ASC) TO '"+ newPathVelocity + "' DELIMITER ';' CSV HEADER"))
+  queryVelCSV.on("end", function (result) {
+    console.log("Velocity csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
+  let queryLenCSV = clientCSV.query(new Query("COPY (SELECT g.length AS len FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.length ASC) TO '"+ newPathLength + "' DELIMITER ';' CSV HEADER"))
+  queryLenCSV.on("end", function (result) {
+    console.log("Length csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
+  let queryDurCSV = clientCSV.query(new Query("COPY (SELECT g.duration FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.duration ASC) TO '"+ newPathDuration + "' DELIMITER ';' CSV HEADER"))
+  queryDurCSV.on("end", function (result) {
+    console.log("Duration csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
+  let queryTimeCSV = clientCSV.query(new Query("COPY (SELECT g.data_time_start FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.data_time_start ASC) TO '"+ newPathTime + "' DELIMITER ';' CSV HEADER"))
+  queryTimeCSV.on("end", function (result) {
+    console.log("Time start csv ended")
+    contador += 1
+    if (contador == 4)
+      clientCSV.end()
+  });
 
   let stDiffs = "geom";
   let queryOfDiff = "";
@@ -1106,13 +1295,11 @@ router.post('/fileUpload', (req, res, next) => {
     const subprocess = callPython(8,1);
     try {
 
-      console.log("Files have been uploaded");
-      console.log("Starting the parsing, joining different file formats as one");
+      console.log("Files have been passed to the server, starting preprocess now");
       //const pyProg = spawn('python', ['./public/python/joinTracks-1.py']);
 
     } catch(err) {
           console.log(err);
-          res.send(400);
     }
     // print output of script
     subprocess.stdout.on('data', (data) => {
@@ -1400,7 +1587,14 @@ function unifySubSegsANDDivide(req,res){
     cont += 1
     if(cont == 5){
       console.log(cont)
-      startMap(res)}
+      if (!res.headersSent) {
+        console.log("Headers not sent")
+        if (typeof res.writeHead === 'function'){res.writeHead(200, {
+        "Location": "http://localhost:3000/map"})
+        }
+      }
+      else console.log("Headers already sent")
+    }
     console.log("Completed pairs for attribute lenses");
     let queryUpload = clientUnify.query(new Query("INSERT INTO track_divided_by_time_30s (taxi_id,long,lat,data_time,vel,traj_id,start_long,start_lat,end_long,end_lat ,tid,geom,startpointgeom,endpointgeom,linegeom) SELECT * FROM track_divided_by_time_upload"));
     queryUpload.on("end", function (result) {
@@ -1416,7 +1610,14 @@ function unifySubSegsANDDivide(req,res){
     cont += 1
     if(cont == 5){
       console.log(cont)
-      startMap(res)}
+      if (!res.headersSent) {
+        console.log("Headers not sent")
+        if (typeof res.writeHead === 'function'){res.writeHead(200, {
+        "Location": "http://localhost:3000/map"})
+        }
+      }
+      else console.log("Headers already sent")
+    }
     clientCreateLines1.end();
     console.log("table 1 completed");
   });
@@ -1428,7 +1629,15 @@ function unifySubSegsANDDivide(req,res){
     cont += 1
     if(cont == 5){
       console.log(cont)
-      startMap(res)}
+      if (!res.headersSent) {
+        console.log("Headers not sent")
+        if (typeof res.writeHead === 'function'){res.writeHead(200, {
+        "Location": "http://localhost:3000/map"})
+        }
+      }
+      else console.log("Headers already sent")
+    }
+    
     clientCreateLines2.end();
     console.log("table 2 completed");
 
@@ -1441,7 +1650,14 @@ function unifySubSegsANDDivide(req,res){
     cont += 1
     if(cont == 5){
       console.log(cont)
-      startMap(res)}
+      if (!res.headersSent) {
+        console.log("Headers not sent")
+        if (typeof res.writeHead === 'function'){res.writeHead(200, {
+        "Location": "http://localhost:3000/map"})
+        }
+      }
+      else console.log("Headers already sent")
+    }
     clientCreateLines3.end();
     console.log("table 3 completed");
     
@@ -1454,7 +1670,14 @@ function unifySubSegsANDDivide(req,res){
     cont += 1
     if(cont == 5){
       console.log(cont)
-      startMap(res)}
+      if (!res.headersSent) {
+        console.log("Headers not sent")
+        if (typeof res.writeHead === 'function'){res.writeHead(200, {
+        "Location": "http://localhost:3000/map"})
+        }
+      }
+      else console.log("Headers already sent")
+    }
     clientCreateLines4.end();
     console.log("table 4 completed");
     
@@ -1507,3 +1730,12 @@ function getFormattedUrl(req) {
         host: req.get('host')
     });
 }
+//Give acess to static folders
+//setting middleware
+console.log(__dirname)
+var dirrectoryPublic = replaceGlobally(__dirname,"routes","")
+console.log(dirrectoryPublic)
+app.use(express.static('public'));
+
+//Serves all the request which includes /images in the url from Images folder
+app.use('/activeCSV', express.static(dirrectoryPublic + '/activeCSV'));

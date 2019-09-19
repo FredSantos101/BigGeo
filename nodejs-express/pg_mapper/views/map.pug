@@ -9,11 +9,18 @@ block content
                 <li     class="disabled"><a role="tab"  >----<i class="fa fa-bars"></i></a></li>
                 <li class = "not-tabZoom"><a id="zoomBut" role="tab" class="zoomBut"><img src="images/zoomIcon.png" alt="" style="wdith:100%; height:100%"/><i class="fa fa-info"></i></a></li>
                 <div ></div>
-                <div >----</div>
+                <li     class="disabled"><a role="tab"  >----<i class="fa fa-bars"></i></a></li>
                 <div ></div>
                 <li class = "not-tabFilter"><a id="filterLensBut" role="tab" class="filterLensBut"><img src="images/636051.svg" alt="" style="wdith:100%; height:100%"/><i class="fa fa-info"></i></a></li>
+                <div ></div>
+                <li     class="disabled"><a role="tab"  style="height:10%">----<i class="fa fa-bars"></i></a></li>
+                <div ></div>
                 <li class = "not-tabAttr"><a id="attributeLensBut" role="tab" class="attributeLensBut"><img src="images/queryAtt.png" alt="" style="wdith:100%; height:100%"/><i class="fa fa-info"></i></a></li>
-                <div >----</div>
+                <div ></div>
+                <li     class="disabled"><a role="tab"  >----<i class="fa fa-bars"></i></a></li>
+                <div ></div>
+                <li><a href="#statistics" role="tab" id="statisticsBut" ><img src="images/statistics.png" alt="" style="wdith:100%; height:100%"/><i class="fa fa-user"></i></a></li>
+                
             </ul>
 
             <ul role="tablist">
@@ -37,6 +44,29 @@ block content
                 <p class="lorem">Developped by master's student Frederico Santos and supervised by prof. Daniel Gonçalves From Instituto Superior Tecnico, Portugal. </p>
 
             </div>
+
+            <div class="sidebar-pane" id="statistics" >
+            
+                <h1 class="sidebar-header">Active trajectories statistics
+                    sidebar-v2
+                    <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                </h1>
+
+                <p>This is the statistics panel</a>.</p>
+                <p>The data here being displayed is related to the trajectories currently selected</a>.</p>
+
+                <p class="lorem">Total number of trajectories:</p>
+                <p class="lorem">Velocity:</p>
+                <div id="my_dataviz"></div>
+                <p class="lorem">Duration:</p>
+                <div id="my_datavizDURATION"></div>
+                <p class="lorem">Length:</p>
+                <div id="my_datavizLENGTH"></div>
+                <p class="lorem">Time of creation:</p>
+                <div id="my_datavizTIME"></div>
+
+            </div>
+
             <div class="sidebar-pane" id="upload" >
                 <h1 class="sidebar-header">Upload trajectories<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
                 <p></a></p>
@@ -386,7 +416,10 @@ block content
             map.panTo(defaultLayer.getBounds().getCenter());
         }
 
-    
+        createVelocityHistogram();
+        createLengthHistogram();
+        createDurationHistogram();
+        createTimeHistogram();
         map.on('zoomend', function() {
             console.log(map.getZoom())
             if (map.getZoom() >= 13){
@@ -946,7 +979,14 @@ block content
                     for(i = 0; i < attLensesArray.length; i++){
                         attLensesArray[i].updateALL();
                     };
-                    
+                    clearBox("my_dataviz")
+                    clearBox("my_datavizLENGTH")
+                    clearBox("my_datavizDURATION")
+                    clearBox("my_datavizTIME")
+                    createVelocityHistogram();
+                    createLengthHistogram();
+                    createDurationHistogram();
+                    createTimeHistogram();
                 },
                 updateLENS: function(){
                     this.areaQuery.setStyle({color: 'DarkRed',fillColor: 'red',fillOpacity: 0.6});
@@ -1172,6 +1212,8 @@ block content
                             }
 
                             $('.myDeleteButton').click(function (e) {
+                                lensCanMove=false;
+                                clicked=false;
                                 outterLensesLayer.clearLayers();
                                 lens.deleteLayers();
                                 for(i = 0; i < attLensesArray.length; i++){
@@ -1180,6 +1222,7 @@ block content
                             });  
                             $('.myMoveButton').click(function (e) {
                                 L.DomEvent.stopPropagation(e); 
+                                clicked=false;
                                 lensCanMove = !lensCanMove;
                                 if(lensCanMove){
                                     document.getElementsByClassName('myRadiusButton')[0].style.visibility = "hidden";
@@ -1546,6 +1589,7 @@ block content
                             
                             $('.myRadiusButton').click(function (ev) {
                                 L.DomEvent.stopPropagation(ev);
+                                clicked=false;
                                 changeRadius = !changeRadius;
                                 
                                 if(changeRadius){
@@ -2235,7 +2279,8 @@ block content
                                 
                             });
                             $('.myMoveButton').click(function (e) {
-                                L.DomEvent.stopPropagation(e); 
+                                L.DomEvent.stopPropagation(e);
+                                clicked = false; 
                                 lensCanMove = !lensCanMove;
                                 if(lensCanMove){
                                     map.zoomOut(1,true);
@@ -2353,6 +2398,7 @@ block content
                             });
                             $('.myRadiusButton').click(function (ev) {
                                 L.DomEvent.stopPropagation(ev);
+                                clicked = false;
                                 changeRadius = !changeRadius;
                                 
                                 if(changeRadius){
@@ -3912,7 +3958,7 @@ block content
                 }
 
             });
-            return 
+            return false;
         });
 
         function getMinTimeVal() {
@@ -3999,6 +4045,27 @@ block content
             document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
             
         });
+        var elementIsClicked = false; // declare the variable that tracks the state
+        function clickHandler(){ // declare a function that updates the state
+            elementIsClicked = !elementIsClicked;
+            //if (document.getElementById(elementID).innerHTML )
+            /*clearBox("my_dataviz")
+            clearBox("my_datavizLENGTH")
+            clearBox("my_datavizDURATION")
+            clearBox("my_datavizTIME")
+            if(elementIsClicked){
+                createVelocityHistogram();
+                createLengthHistogram();
+                createDurationHistogram();
+                createTimeHistogram();
+            }*/
+
+        }
+
+        var element = document.getElementById('statisticsBut'); // grab a reference to your element
+        element.addEventListener('click', clickHandler);
+
+        
 
         $(document).ready(function(){
         $('form input').change(function () {
@@ -4030,7 +4097,406 @@ block content
            map.removeLayer(activeMap);
            CartoDB_VoyagerNoLabels.addTo(map);
            activeMap = CartoDB_VoyagerNoLabels;
-        });  
+        }); 
+
+        
+        async function createVelocityHistogram(){   
+            // set the dimensions and margins of the graph
+            var margin = {top: 10, right: 30, bottom: 30, left: 40},
+                width = 400 - margin.left - margin.right,
+                height = 300 - margin.top - margin.bottom;
+
+            // append the svg object to the body of the page
+            var svg = d3.select("#my_dataviz")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+            // get the data
+            d3.csv(await "activeCSV/velocity.csv",async function(data) {
+                let maxData = await d3.max(data, function(d) { return +d.veloc_avg })
+                // X axis: scale and draw:
+                var x = d3.scaleLinear()
+                    .domain([0, maxData])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+                    .range([0, width]);
+                svg.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(d3.axisBottom(x));
+
+                // set the parameters for the histogram
+                var histogram = d3.histogram()
+                    .value(function(d) { return +d.veloc_avg; })   // I need to give the vector of value
+                    .domain(x.domain())  // then the domain of the graphic
+                    .thresholds(x.ticks(10)); // then the numbers of bins
+
+                // And apply this function to data to get the bins
+                var bins = histogram(data);
+
+                // Y axis: scale and draw:
+                var y = d3.scaleLinear()
+                    .range([height, 0]);
+                    y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
+                svg.append("g")
+                    .call(d3.axisLeft(y));
+
+                // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+                // Its opacity is set to 0: we don't see it by default.
+                var tooltip = d3.select("#my_dataviz")
+                    .append("div")
+                    .style("opacity", 0)
+                    .attr("class", "tooltip")
+                    .style("background-color", "black")
+                    .style("color", "white")
+                    .style("border-radius", "5px")
+                    .style("padding", "10px")
+
+                // A function that change this tooltip when the user hover a point.
+                // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+                var showTooltip = function(d) {
+                    tooltip
+                    .transition()
+                    .duration(100)
+                    .style("opacity", 1)
+                    tooltip
+                    .html("Range: " + d.x0 + " - " + d.x1)
+                    .style("left", (d3.mouse(this)[0]+20) + "px")
+                    .style("top", (d3.mouse(this)[1]) + "px")
+                }
+                var moveTooltip = function(d) {
+                    tooltip
+                    .style("left", (d3.mouse(this)[0]+20) + "px")
+                    .style("top", (d3.mouse(this)[1]) + "px")
+                }
+                // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+                var hideTooltip = function(d) {
+                    tooltip
+                    .transition()
+                    .duration(100)
+                    .style("opacity", 0)
+                }
+
+                // append the bar rectangles to the svg element
+                svg.selectAll("rect")
+                    .data(bins)
+                    .enter()
+                    .append("rect")
+                        .attr("x", 1)
+                        .attr("transform", function(d) {console.log("X0");console.log(d.x0);console.log("X0");console.log(d.length); return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+                        .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+                        .attr("height", function(d) { return height - y(d.length); })
+                        .style("fill", "#69b3a2")
+                        // Show tooltip on hover
+                        .on("mouseover", showTooltip )
+                        .on("mousemove", moveTooltip )
+                        .on("mouseleave", hideTooltip )
+
+            });
+        }
+
+        async function createLengthHistogram(){   
+            // set the dimensions and margins of the graph
+            var margin = {top: 10, right: 30, bottom: 30, left: 40},
+                width = 400 - margin.left - margin.right,
+                height = 300 - margin.top - margin.bottom;
+
+            // append the svg object to the body of the page
+            var svg = d3.select("#my_datavizLENGTH")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+            // get the data
+            d3.csv(await "activeCSV/length.csv",async function(data) {
+
+            let maxOfData =await d3.max(data, function(d) { return +d.len })
+
+            // X axis: scale and draw:
+            var x = d3.scaleLinear()
+                .domain([0, maxOfData])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+                .range([0, width]);
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
+
+            // set the parameters for the histogram
+            var histogram = d3.histogram()
+                .value(function(d) { return +d.len; })   // I need to give the vector of value
+                .domain(x.domain())  // then the domain of the graphic
+                .thresholds(x.ticks(10)); // then the numbers of bins
+
+            // And apply this function to data to get the bins
+            var bins = histogram(data);
+
+            // Y axis: scale and draw:
+            var y = d3.scaleLinear()
+                .range([height, 0]);
+                y.domain([0, d3.max(bins, function(d) { return +d.length; })]);   // d3.hist has to be called before the Y axis obviously
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+            // Its opacity is set to 0: we don't see it by default.
+            var tooltip = d3.select("#my_datavizLENGTH")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "black")
+                .style("color", "white")
+                .style("border-radius", "5px")
+                .style("padding", "10px")
+
+            // A function that change this tooltip when the user hover a point.
+            // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+            var showTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 1)
+                tooltip
+                .html("Range: " + d.x0 + " - " + d.x1)
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            var moveTooltip = function(d) {
+                tooltip
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+            var hideTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 0)
+            }
+
+            // append the bar rectangles to the svg element
+            svg.selectAll("rect")
+                .data(bins)
+                .enter()
+                .append("rect")
+                    .attr("x", 1)
+                    .attr("transform", function(d) {console.log(d.x0);console.log(d.length); return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+                    .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+                    .attr("height", function(d) { return height - y(d.length); })
+                    .style("fill", "#69b3a2")
+                    // Show tooltip on hover
+                    .on("mouseover", showTooltip )
+                    .on("mousemove", moveTooltip )
+                    .on("mouseleave", hideTooltip )
+
+            });
+        }
+
+        async function createDurationHistogram(){   
+            // set the dimensions and margins of the graph
+            var margin = {top: 10, right: 30, bottom: 30, left: 40},
+                width = 400 - margin.left - margin.right,
+                height = 300 - margin.top - margin.bottom;
+
+            // append the svg object to the body of the page
+            var svg = d3.select("#my_datavizDURATION")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+            // get the data
+            d3.csv(await "activeCSV/duration.csv",async function(data) {
+
+            let maxOfData =await  d3.max(data, function(d) { return +d.duration })
+
+            // X axis: scale and draw:
+            var x = d3.scaleLinear()
+                .domain([0, maxOfData])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+                .range([0, width]);
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
+
+            // set the parameters for the histogram
+            var histogram = d3.histogram()
+                .value(function(d) { return +d.duration; })   // I need to give the vector of value
+                .domain(x.domain())  // then the domain of the graphic
+                .thresholds(x.ticks(10)); // then the numbers of bins
+
+            // And apply this function to data to get the bins
+            var bins = histogram(data);
+
+            // Y axis: scale and draw:
+            var y = d3.scaleLinear()
+                .range([height, 0]);
+                y.domain([0, d3.max(bins, function(d) { return+d.length; })]);   // d3.hist has to be called before the Y axis obviously
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+            // Its opacity is set to 0: we don't see it by default.
+            var tooltip = d3.select("#my_datavizDURATION")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "black")
+                .style("color", "white")
+                .style("border-radius", "5px")
+                .style("padding", "10px")
+
+            // A function that change this tooltip when the user hover a point.
+            // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+            var showTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 1)
+                tooltip
+                .html("Range: " + d.x0 + " - " + d.x1)
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            var moveTooltip = function(d) {
+                tooltip
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+            var hideTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 0)
+            }
+
+            // append the bar rectangles to the svg element
+            svg.selectAll("rect")
+                .data(bins)
+                .enter()
+                .append("rect")
+                    .attr("x", 1)
+                    .attr("transform", function(d) {console.log(d.x0);console.log(d.length); return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+                    .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+                    .attr("height", function(d) { return height - y(d.length); })
+                    .style("fill", "#69b3a2")
+                    // Show tooltip on hover
+                    .on("mouseover", showTooltip )
+                    .on("mousemove", moveTooltip )
+                    .on("mouseleave", hideTooltip )
+
+            });
+        }
+
+        async function createTimeHistogram(){   
+            // set the dimensions and margins of the graph
+            var margin = {top: 10, right: 30, bottom: 30, left: 40},
+                width = 400 - margin.left - margin.right,
+                height = 300 - margin.top - margin.bottom;
+
+            // append the svg object to the body of the page
+            var svg = d3.select("#my_datavizTIME")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+            // get the data
+            d3.csv(await "activeCSV/time.csv",async function(data) {
+
+            let maxOfData = await d3.max(data, function(d) { return d.data_time_start })
+
+            // X axis: scale and draw:
+            var x = d3.scaleLinear()
+                .domain([0, maxOfData])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+                .range([0, width]);
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
+
+            // set the parameters for the histogram
+            var histogram = d3.histogram()
+                .value(function(d) { return d.data_time_start; })   // I need to give the vector of value
+                .domain(x.domain())  // then the domain of the graphic
+                .thresholds(x.ticks(24)); // then the numbers of bins
+
+            // And apply this function to data to get the bins
+            var bins = histogram(data);
+
+            // Y axis: scale and draw:
+            var y = d3.scaleLinear()
+                .range([height, 0]);
+                y.domain([0, d3.max(bins, function(d) { return+d.length; })]);   // d3.hist has to be called before the Y axis obviously
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+            // Its opacity is set to 0: we don't see it by default.
+            var tooltip = d3.select("#my_datavizTIME")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "black")
+                .style("color", "white")
+                .style("border-radius", "5px")
+                .style("padding", "10px")
+
+            // A function that change this tooltip when the user hover a point.
+            // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+            var showTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 1)
+                tooltip
+                .html("Range: " + d.x0 + " - " + d.x1)
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            var moveTooltip = function(d) {
+                tooltip
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+            var hideTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 0)
+            }
+
+            // append the bar rectangles to the svg element
+            svg.selectAll("rect")
+                .data(bins)
+                .enter()
+                .append("rect")
+                    .attr("x", 1)
+                    .attr("transform", function(d) {console.log(d.x0);console.log(d.length); return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+                    .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+                    .attr("height", function(d) { return height - y(d.length); })
+                    .style("fill", "#69b3a2")
+                    // Show tooltip on hover
+                    .on("mouseover", showTooltip )
+                    .on("mousemove", moveTooltip )
+                    .on("mouseleave", hideTooltip )
+
+            });
+        }
+
+        
+        function clearBox(elementID)
+        {
+            document.getElementById(elementID).innerHTML = "";
+        }
+
+
         /*document
             .querySelector('#basemaps')
             .addEventListener('change', function (e) {
