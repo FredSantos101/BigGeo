@@ -12,6 +12,10 @@ const multer  = require('multer')   //Use to pass files from client to server us
 const {spawn} = require('child_process')
 const os =  require('os')
 const path = require('path');
+const parse = require('postgres-interval') //intervals from postgres to nodejs string
+
+const fs = require('fs');
+const csv = require("fast-csv");
 
 var app = express();
 
@@ -313,6 +317,11 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
   let queryLenCSV = clientCSV.query(new Query("COPY (SELECT g.length AS len FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.length ASC) TO '"+ newPathLength + "' DELIMITER ';' CSV HEADER"))
   queryLenCSV.on("end", function (result) {
@@ -320,6 +329,11 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
   let queryDurCSV = clientCSV.query(new Query("COPY (SELECT g.duration FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.duration ASC) TO '"+ newPathDuration + "' DELIMITER ';' CSV HEADER"))
   queryDurCSV.on("end", function (result) {
@@ -327,6 +341,11 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
   let queryTimeCSV = clientCSV.query(new Query("COPY (SELECT g.data_time_start FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.data_time_start ASC) TO '"+ newPathTime + "' DELIMITER ';' CSV HEADER"))
   queryTimeCSV.on("end", function (result) {
@@ -334,6 +353,11 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
   if (activeQuery.length == 0){
     queryOfDiff = " WHERE ";
@@ -491,6 +515,11 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
   let queryLenCSV = clientCSV.query(new Query("COPY (SELECT g.length AS len FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.length ASC) TO '"+ newPathLength + "' DELIMITER ';' CSV HEADER"))
   queryLenCSV.on("end", function (result) {
@@ -498,6 +527,11 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
   let queryDurCSV = clientCSV.query(new Query("COPY (SELECT g.duration FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.duration ASC) TO '"+ newPathDuration + "' DELIMITER ';' CSV HEADER"))
   queryDurCSV.on("end", function (result) {
@@ -505,6 +539,11 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
   let queryTimeCSV = clientCSV.query(new Query("COPY (SELECT g.data_time_start FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.data_time_start ASC) TO '"+ newPathTime + "' DELIMITER ';' CSV HEADER"))
   queryTimeCSV.on("end", function (result) {
@@ -512,6 +551,11 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
 
 
@@ -566,6 +610,11 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
   let queryLenCSV = clientCSV.query(new Query("COPY (SELECT g.length AS len FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.length ASC) TO '"+ newPathLength + "' DELIMITER ';' CSV HEADER"))
   queryLenCSV.on("end", function (result) {
@@ -573,6 +622,11 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
   let queryDurCSV = clientCSV.query(new Query("COPY (SELECT g.duration FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.duration ASC) TO '"+ newPathDuration + "' DELIMITER ';' CSV HEADER"))
   queryDurCSV.on("end", function (result) {
@@ -580,6 +634,11 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
   let queryTimeCSV = clientCSV.query(new Query("COPY (SELECT g.data_time_start FROM "+ req.params.tab + " AS g " + activeQuery + " ORDER BY g.data_time_start ASC) TO '"+ newPathTime + "' DELIMITER ';' CSV HEADER"))
   queryTimeCSV.on("end", function (result) {
@@ -587,6 +646,11 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
     contador += 1
     if (contador == 4)
       clientCSV.end()
+      startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
+      //.then(() => ...doStuff);
   });
 
   let stDiffs = "geom";
@@ -1196,6 +1260,222 @@ router.get('/minTimeVarValue', function(req, res) {
 
 });
 
+router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
+  let client = new Client(conString); // Setup our Postgres Client
+  let numberOfConnects = 0;
+  client.connect(); // connect to the client
+  let dataNewMaxVel = 0
+  let dataNewMaxDur = {"days": 0, "hours":0, "minutes":0, "seconds":0}
+  let dataNewMaxLen = 0
+  let dataNewMaxTime = 0
+  let dataNewMinTime = Date.now();
+  let query = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timeMax,min(data_time_end) AS timeMin FROM trajectory_lines" + activeQuery)); // Run our Query
+  let query1 = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timeMax,min(data_time_end) AS timeMin  FROM trajectory_lines1" + activeQuery)); // Run our Query
+  let query2 = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timeMax,min(data_time_end) AS timeMin  FROM trajectory_lines2" + activeQuery)); // Run our Query
+  let query3 = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timeMax,min(data_time_end) AS timeMin  FROM trajectory_lines3" + activeQuery)); // Run our Query
+
+  query.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects + 1
+    if(dataNewMaxVel < result.rows[0].veloc_avg && result.rows[0].veloc_avg != null){
+      dataNewMaxVel = result.rows[0].veloc_avg
+    }
+    let intervalVar = result.rows[0].duration
+    
+    console.log(result.rows[0].duration)
+    if(result.rows[0].duration!= null){
+      if(!(result.rows[0].duration.days === 'undefined')){
+        if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
+        dataNewMaxDur.hours =  intervalVar.hours
+        dataNewMaxDur.minutes =  intervalVar.minutes
+        dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.hours === 'undefined')){
+        if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+          dataNewMaxDur.hours =  intervalVar.hours
+          dataNewMaxDur.minutes =  intervalVar.minutes
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.minutes === 'undefined')){
+        if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
+          dataNewMaxDur.minutes =  intervalVar.minutes
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.seconds === 'undefined')){
+        if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+    }
+    if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
+      dataNewMaxLen = result.rows[0].length
+    }
+    if(dataNewMaxTime < new Date(result.rows[0].timeMax) && result.rows[0].timeMax != null){
+      dataNewMaxTime = new Date(result.rows[0].timeMax)
+    }
+    if(dataNewMinTime > new Date(result.rows[0].timeMin) && result.rows[0].timeMin != null){
+      dataNewMaxTime = new Date(result.rows[0].timeMin)
+    }
+    if(numberOfConnects == 4){
+      console.log("Here  is the max")
+      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "time": dataNewMaxTime}
+      console.log(maxArrayValues)
+      client.end();
+      if(maxArrayValues != null){
+        res.status(200).send(JSON.stringify(maxArrayValues));
+      }
+    }
+  });
+  query1.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects + 1
+
+    if(dataNewMaxVel < result.rows[0].veloc_avg && result.rows[0].veloc_avg != null){
+      dataNewMaxVel = result.rows[0].veloc_avg
+    }
+    let intervalVar = result.rows[0].duration
+    
+    console.log(result.rows[0].duration)
+    if(result.rows[0].duration!= null){
+      if(!(result.rows[0].duration.days === 'undefined')){
+        if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
+        dataNewMaxDur.hours =  intervalVar.hours
+        dataNewMaxDur.minutes =  intervalVar.minutes
+        dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.hours === 'undefined')){
+        if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+          dataNewMaxDur.hours =  intervalVar.hours
+          dataNewMaxDur.minutes =  intervalVar.minutes
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.minutes === 'undefined')){
+        if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
+          dataNewMaxDur.minutes =  intervalVar.minutes
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.seconds === 'undefined')){
+        if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+    }
+    if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
+      dataNewMaxLen = result.rows[0].length
+    }
+    if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
+      dataNewMaxTime = new Date(result.rows[0].time)
+    }
+    if(numberOfConnects == 4){
+      console.log("Here  is the max")
+      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "time": dataNewMaxTime}
+      console.log(maxArrayValues)
+      client.end();
+      if(maxArrayValues!= null){
+        res.status(200).send(JSON.stringify(maxArrayValues));
+      }
+    }
+
+  });
+  query2.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects + 1
+    if(dataNewMaxVel < result.rows[0].veloc_avg && result.rows[0].veloc_avg != null){
+      dataNewMaxVel = result.rows[0].veloc_avg
+    }
+    let intervalVar = result.rows[0].duration
+    
+    console.log(result.rows[0].duration)
+    if(result.rows[0].duration!= null){
+      if(!(result.rows[0].duration.days === 'undefined')){
+        if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
+        dataNewMaxDur.hours =  intervalVar.hours
+        dataNewMaxDur.minutes =  intervalVar.minutes
+        dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.hours === 'undefined')){
+        if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+          dataNewMaxDur.hours =  intervalVar.hours
+          dataNewMaxDur.minutes =  intervalVar.minutes
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.minutes === 'undefined')){
+        if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
+          dataNewMaxDur.minutes =  intervalVar.minutes
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.seconds === 'undefined')){
+        if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+    }
+    if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
+      dataNewMaxLen = result.rows[0].length
+    }
+    if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
+      dataNewMaxTime = new Date(result.rows[0].time)
+    }
+    if(numberOfConnects == 4){
+      console.log("Here  is the max")
+      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "time": dataNewMaxTime}
+      console.log(maxArrayValues)
+      client.end();
+      if(maxArrayValues!= null){
+        res.status(200).send(JSON.stringify(maxArrayValues));
+      }
+    }
+
+  });
+  query3.on("end", function (result) {
+    //let data = require('../public/data/geoJSON.json')
+    numberOfConnects = numberOfConnects + 1
+    if(dataNewMaxVel < result.rows[0].veloc_avg && result.rows[0].veloc_avg != null){
+      dataNewMaxVel = result.rows[0].veloc_avg
+    }
+    let intervalVar = result.rows[0].duration
+    
+    console.log(result.rows[0].duration)
+    if(result.rows[0].duration!= null){
+      if(!(result.rows[0].duration.days === 'undefined')){
+        if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
+        dataNewMaxDur.hours =  intervalVar.hours
+        dataNewMaxDur.minutes =  intervalVar.minutes
+        dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.hours === 'undefined')){
+        if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+          dataNewMaxDur.hours =  intervalVar.hours
+          dataNewMaxDur.minutes =  intervalVar.minutes
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.minutes === 'undefined')){
+        if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
+          dataNewMaxDur.minutes =  intervalVar.minutes
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+      else if(!(result.rows[0].duration.seconds === 'undefined')){
+        if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
+          dataNewMaxDur.seconds =  intervalVar.seconds}
+      }
+    }
+    if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
+      dataNewMaxLen = result.rows[0].length
+    }
+    if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
+      dataNewMaxTime = new Date(result.rows[0].time)
+    }
+    if(numberOfConnects == 4){
+      console.log("Here  is the max")
+      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "time": dataNewMaxTime}
+      console.log(maxArrayValues)
+      client.end();
+      if(maxArrayValues!= null){
+        res.status(200).send(JSON.stringify(maxArrayValues));
+      }
+    }
+
+  });
+
+});
+
 router.get('/maxTimeVarValue', function(req, res) {
   let client = new Client(conString); // Setup our Postgres Client
   let numberOfConnects = 0;
@@ -1220,7 +1500,7 @@ router.get('/maxTimeVarValue', function(req, res) {
         res.status(200).send((dataNewMax).toString());
       }
     }
-
+  
   });
   query1.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
@@ -1739,3 +2019,41 @@ app.use(express.static('public'));
 
 //Serves all the request which includes /images in the url from Images folder
 app.use('/activeCSV', express.static(dirrectoryPublic + '/activeCSV'));
+
+//merge csv files
+function startMergingCSVs (csvFilePaths, outputFilePath) {
+  const promises = csvFilePaths.map((path) => {
+    return new Promise((resolve) => {
+      const dataArray = [];
+      return csv
+          .fromPath(path, {headers: true})
+          .on('data', function(data) {
+            dataArray.push(data);
+          })
+          .on('end', function() {
+            resolve(dataArray);
+          });
+    });
+  });
+
+  return Promise.all(promises)
+      .then((results) => {
+
+        const csvStream = csv.format({headers: true});
+        const writableStream = fs.createWriteStream(outputFilePath);
+
+        writableStream.on('finish', function() {
+          console.log('DONE!');
+        });
+
+        csvStream.pipe(writableStream);
+        results.forEach((result) => {
+          result.forEach((data) => {
+            csvStream.write(data);
+          });
+        });
+        csvStream.end();
+
+      });
+
+}
