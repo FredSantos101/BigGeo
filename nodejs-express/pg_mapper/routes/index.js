@@ -1267,12 +1267,12 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
   let dataNewMaxVel = 0
   let dataNewMaxDur = {"days": 0, "hours":0, "minutes":0, "seconds":0}
   let dataNewMaxLen = 0
-  let dataNewMaxTime = 0
-  let dataNewMinTime = Date.now();
-  let query = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timeMax,min(data_time_end) AS timeMin FROM trajectory_lines" + activeQuery)); // Run our Query
-  let query1 = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timeMax,min(data_time_end) AS timeMin  FROM trajectory_lines1" + activeQuery)); // Run our Query
-  let query2 = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timeMax,min(data_time_end) AS timeMin  FROM trajectory_lines2" + activeQuery)); // Run our Query
-  let query3 = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timeMax,min(data_time_end) AS timeMin  FROM trajectory_lines3" + activeQuery)); // Run our Query
+  let dataNewMaxTime = new Date(0)
+  let dataNewMinTime = new Date()
+  let query = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timemax,min(data_time_start) AS timemin FROM trajectory_lines" + activeQuery)); // Run our Query
+  let query1 = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timemax,min(data_time_start) AS timemin  FROM trajectory_lines1" + activeQuery)); // Run our Query
+  let query2 = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timemax,min(data_time_start) AS timemin  FROM trajectory_lines2" + activeQuery)); // Run our Query
+  let query3 = client.query(new Query("SELECT max(veloc_avg) AS veloc_avg, max(length) AS length, max(duration) AS duration, max(data_time_start) AS timemax,min(data_time_start) AS timemin  FROM trajectory_lines3" + activeQuery)); // Run our Query
 
   query.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
@@ -1309,15 +1309,18 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
     if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
       dataNewMaxLen = result.rows[0].length
     }
-    if(dataNewMaxTime < new Date(result.rows[0].timeMax) && result.rows[0].timeMax != null){
-      dataNewMaxTime = new Date(result.rows[0].timeMax)
+    if(dataNewMaxTime < new Date(result.rows[0].timemax) && result.rows[0].timemax != null){
+      dataNewMaxTime = new Date(result.rows[0].timemax)
     }
-    if(dataNewMinTime > new Date(result.rows[0].timeMin) && result.rows[0].timeMin != null){
-      dataNewMaxTime = new Date(result.rows[0].timeMin)
+
+    console.log(dataNewMinTime)
+    console.log(result.rows[0].timemin)
+    if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
+      dataNewMinTime = new Date(result.rows[0].timemin)
     }
     if(numberOfConnects == 4){
       console.log("Here  is the max")
-      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "time": dataNewMaxTime}
+      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "timemax": dataNewMaxTime, "timemin": dataNewMinTime}
       console.log(maxArrayValues)
       client.end();
       if(maxArrayValues != null){
@@ -1364,9 +1367,12 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
     if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
       dataNewMaxTime = new Date(result.rows[0].time)
     }
+    if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
+      dataNewMinTime = new Date(result.rows[0].timemin)
+    }
     if(numberOfConnects == 4){
       console.log("Here  is the max")
-      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "time": dataNewMaxTime}
+      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "timemax": dataNewMaxTime, "timemin": dataNewMinTime}
       console.log(maxArrayValues)
       client.end();
       if(maxArrayValues!= null){
@@ -1413,9 +1419,12 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
     if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
       dataNewMaxTime = new Date(result.rows[0].time)
     }
+    if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
+      dataNewMinTime = new Date(result.rows[0].timemin)
+    }
     if(numberOfConnects == 4){
       console.log("Here  is the max")
-      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "time": dataNewMaxTime}
+      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "timemax": dataNewMaxTime, "timemin": dataNewMinTime}
       console.log(maxArrayValues)
       client.end();
       if(maxArrayValues!= null){
@@ -1462,9 +1471,12 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
     if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
       dataNewMaxTime = new Date(result.rows[0].time)
     }
+    if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
+      dataNewMinTime = new Date(result.rows[0].timemin)
+    }
     if(numberOfConnects == 4){
       console.log("Here  is the max")
-      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "time": dataNewMaxTime}
+      let maxArrayValues = {"velocity": dataNewMaxVel, "duration": dataNewMaxDur, "length":dataNewMaxLen, "timemax": dataNewMaxTime, "timemin": dataNewMinTime}
       console.log(maxArrayValues)
       client.end();
       if(maxArrayValues!= null){
