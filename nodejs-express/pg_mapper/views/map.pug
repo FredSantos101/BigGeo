@@ -227,7 +227,7 @@ block content
         var maxTimeValue = 0;
         getMinTimeVal()
         getMaxTimeVal()
-
+        let lensArrayZORDER = [];
 
         //Change basemaps
         /*var layer = L.esri.basemapLayer('Topographic').addTo(map);
@@ -267,7 +267,7 @@ block content
 
         var sidebar = L.control.sidebar('sidebar').addTo(map);
 
-        let activeLENSNEWMENU
+        let activeLENSNEWMENU=null
         //let myData = jsonData;
         let myData = !{JSON.stringify(jsonData)};
         // Create variable to hold map element, give initial settings to map
@@ -450,6 +450,7 @@ block content
                 }
             }
             lensesLayer.bringToFront();
+            updateZORDER()
         });
         let movedCreateLens = false;
         let radiusValue = 0;
@@ -470,6 +471,9 @@ block content
                 moved = false;
                 lensCanMove = false;
                 clicked = false;
+                if(activeLENSNEWMENU != null){
+                    activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+                }
                 //}
             },
             mousedown: function (e) {
@@ -689,44 +693,81 @@ block content
                     this.outsideCircle = circle;
                 },
                 setRadius : function (value){
+                    
                     this.areaQuery.setRadius(value);
                     this.radiusQuery = value;
+                    
                 },
                 getRadius : function (){
                     return this.radiusQuery;
                 },
                 setRadiusOLD : function (value){
+                    this.deleteFromZORDER();
+                    this.insertZORDER();
                     this.radiusQueryOLD = value;
                 },
                 getRadiusOLD : function (){
                     return this.radiusQueryOLD;
                 },
+                insertZORDER(){
+                    if(lensArrayZORDER.length == 0){
+                        lensArrayZORDER.push(this)
+                    }
+                    else{
+                        let flagMeteu = false;
+                        for(let ind = 0;ind <= lensArrayZORDER.length-1;ind++){
+                            if (lensArrayZORDER[ind].getRadius()>this.getRadius()) continue;
+                            else if (lensArrayZORDER[ind].getRadius() <= this.getRadius()){
+                                lensArrayZORDER.splice(ind, 0, this);
+                                flagMeteu = true;
+                                console.log("ZORDER")
+                                console.log(lensArrayZORDER)
+                                
+                                break;
+                            }
+                            
+                        }
+                        if(!flagMeteu){
+                            lensArrayZORDER.push(this)
+                        }
+                        updateZORDER()
+                    }
+                },
+                deleteFromZORDER(){
+                    for(let i = lensArrayZORDER.length - 1; i >= 0; i--) {
+                        if(lensArrayZORDER[i] === this) {
+                            lensArrayZORDER.splice(i, 1);
+                            console.log(lensArrayZORDER);
+                            break;
+                        }
+                    }
+                },
                 colorSuccess : function() {
-                    if(_type == "Default"){
+                    if(this.getType() == "Default"){
                         console.log("I will now paint the Pass by circle again ....")
                         lens.areaQuery.setStyle({color: 'DodgerBlue', fillColor: 'DodgerBlue', fillOpacity: 0});
                     }
-                    else if(_type == "Start"){
+                    else if(this.getType() == "Start"){
                         console.log("I will now paint the Start circle again ....")
                         lens.areaQuery.setStyle({color: 'MediumSeaGreen', fillColor: 'MediumSeaGreen', fillOpacity: 0});
                     }
-                    else if(_type == "End"){
+                    else if(this.getType() == "End"){
                         console.log("I will now paint the End circle again ....")
                         lens.areaQuery.setStyle({color: 'Violet', fillColor: 'Violet', fillOpacity: 0});
                     }
-                    else if(_type == "Vel_avg"){
+                    else if(this.getType() == "Vel_avg"){
                         console.log("I will now paint the End circle again ....")
                         lens.areaQuery.setStyle({color: 'orange', fillColor: 'orange', fillOpacity: 0});
                     }
-                    else if(_type == "Length"){
+                    else if(this.getType() == "Length"){
                         console.log("I will now paint the End circle again ....")
                         lens.areaQuery.setStyle({color: 'SlateBlue', fillColor: 'SlateBlue', fillOpacity: 0});
                     }
-                    else if(_type == "Time_Interval"){
+                    else if(this.getType() == "Time_Interval"){
                         console.log("I will now paint the End circle again ....")
                         lens.areaQuery.setStyle({color: 'purple', fillColor: 'purple', fillOpacity: 0});
                     }
-                    else if(_type == "Time_Duration"){
+                    else if(this.getType() == "Time_Duration"){
                         console.log("I will now paint the End circle again ....")
                         lens.areaQuery.setStyle({color: 'DarkTurquoise ', fillColor: 'DarkTurquoise ', fillOpacity: 0.2});
                     }
@@ -739,7 +780,6 @@ block content
                     attOPACITYLensesArray.forEach(function(lensInOpacArray){
                         areasArray.push(lensInOpacArray.overallArea.geometry);
                     })
-                    
                     if(defaultLayerFlag){
                         if(defaultLayer != null){
                             defaultLayerFlag = false;
@@ -966,6 +1006,7 @@ block content
                 },
                 deleteLayers: function(){
                     lensesLayer.removeLayer(lens.areaQuery);
+                    this.deleteFromZORDER();
                     if(lastMarkerGroupID !=null){
                         markerGroup.removeLayer(lastMarkerGroupID);
                         lastMarkerGroupID = null;
@@ -1426,7 +1467,7 @@ block content
             };
             
             lens.setBounds(lens.areaQuery.getBounds());
-
+            lens.insertZORDER() //insert into z-order array first time
             /*CALCULATE THE DISTANCE FROM ONE POINT TO ANOTHER IN PIXELS
             let northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
             let southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
@@ -1458,9 +1499,12 @@ block content
                     L.DomEvent.stopPropagation(event);
                     if(clicked && once){
                         once = false;
+
                         console.log("Im on the move event again...");
-                        
-                        
+                        if(activeLENSNEWMENU != null){
+                            activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+                        }
+                        lens.areaQuery.setStyle({fillOpacity:0.3})
                         // code stuff
                         let northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
                         let southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
@@ -1486,7 +1530,7 @@ block content
                             "<div id='sliderIntervalTime' align='center' style='z-index:1018;    position: absolute;        top: 50%;left: 50%;transform: translate(-50%, -50%);display:none;'></div>"
                             });*/
                         
-                        let myOutsideCircle =  L.divIcon({className: 'outside-Circle', iconSize: [600,300], html: 
+                        let myOutsideCircle =  L.divIcon({className: 'outside-Circle', iconSize: [300,200], html: 
                             "<div id='piemenu' data-wheelnav "+
                             "data-wheelnav-slicepath='DonutSlice' "+
                             "data-wheelnav-spreader data-wheelnav-spreaderpath='PieSpreader' "+
@@ -1502,7 +1546,7 @@ block content
                             "<div data-wheelnav-navitemimg='images/radius.png' onmouseup='radiusLENSNEWMENU(activeLENSNEWMENU)'></div>"+
                             "<div data-wheelnav-navitemimg='images/trash.png' onmouseup='deleteLENSNEWMENU(activeLENSNEWMENU)'></div>"+
                             "</div>"+ 
-                            "<div id='type' style='margin-left: 82%;margin-top: -40%;visibility:hidden'><ul>"+
+                            "<div id='type' style='margin-left:88%;margin-top: -40%;visibility:hidden'><ul>"+
                                 "<lu><a style='color:#FFF' class='dropbtnOpt-default'>Pass by</a></lu>"+
                                 "<lu><a style='color:#FFF' class='dropbtnOpt-start'>Start point</a></lu>"+
                                 "<lu><a style='color:#FFF' class='dropbtnOpt-end'>End point</a></lu>"+
@@ -1549,26 +1593,27 @@ block content
                         piemenu.navItemsContinuous = true;
                         piemenu.sliceAngle = 18;
                         piemenu.createWheel();
+                        document.getElementById("wheelnav-piemenu-slice-4").style.fill = "#94342b"
 
                         if (lens.getType() == "Default" || lens.getType() == "Start" || lens.getType() == "End") {
                             //document.getElementsByClassName('myIntervalsButton')[0].style.background = "grey";
                             if(lens.getType() == "Default")
-                                document.getElementsByClassName('dropbtnOpt-default')[0].style.background = "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.background = "#0c270093";
                             else if (lens.getType() == "Start")
-                                document.getElementsByClassName('dropbtnOpt-start')[0].style.background = "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.background = "#0c270093";
                             else
-                                document.getElementsByClassName('dropbtnOpt-end')[0].style.background = "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.background = "#0c270093";
                         } 
                         else {
-                            //document.getElementsByClassName('myIntervalsButton')[0].style.background = "#bbb9b993";
+                            //document.getElementsByClassName('myIntervalsButton')[0].style.background = "#0c270093";
                             if (lens.getType() == "Time_Duration")
-                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#0c270093";
                             else if (lens.getType() == "Time_Interval")
-                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#0c270093";
                             else if (lens.getType() == "Vel_avg")
-                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#0c270093";
                             else
-                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#0c270093";
                         }
 
                         /*$('.myDeleteButton').click(function (e) {
@@ -2092,171 +2137,199 @@ block content
                         }); */
                         $('.dropbtnOpt-default').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            lens.setType("Default");
-                            document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#bbb9b993";
+                            if(lens.getType() != "Default"){
+                                lens.setType("Default");
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#0c270093";
 
-                            document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#44444493";
 
-                            lens.setMinV(0);
-                            lens.setMaxV(0);
-                            lens.updateLENS();
-                            lens.setTypeOLD("Default");
-                            lens.setMinVOLD(0);
-                            lens.setMaxVOLD(0);
+                                lens.setMinV(0);
+                                lens.setMaxV(0);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Default");
+                                lens.setMinVOLD(0);
+                                lens.setMaxVOLD(0);
+                                lens.colorSuccess();
+                                lens.areaQuery.setStyle({fillOpacity:0.3})
+                            }
                         });
                         $('.dropbtnOpt-start').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            lens.setType("Start");
-                            
-                            document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#ffffff00";
+                            if(lens.getType() != "Start"){
+                                lens.setType("Start");
+                                
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#0c270093";
 
-                            document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#ffffff00";
-                            lens.setMinV(0);
-                            lens.setMaxV(0);
-                            lens.updateLENS();
-                            lens.setTypeOLD("Start");
-                            lens.setMinVOLD(0);
-                            lens.setMaxVOLD(0);
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#44444493";
+                                lens.setMinV(0);
+                                lens.setMaxV(0);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Start");
+                                lens.setMinVOLD(0);
+                                lens.setMaxVOLD(0);
+                                lens.colorSuccess();
+                                lens.areaQuery.setStyle({fillOpacity:0.3})
+                            }
                         });
                         $('.dropbtnOpt-end').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            lens.setType("End");
-                            
-                            document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#ffffff00";
+                            if(lens.getType() != "End"){
+                                lens.setType("End");
+                                
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#0c270093";
 
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#ffffff00";
-                            lens.setMinV(0);
-                            lens.setMaxV(0);
-                            lens.updateLENS();
-                            lens.setTypeOLD("End");
-                            lens.setMinVOLD(0);
-                            lens.setMaxVOLD(0);
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#44444493";
+                                lens.setMinV(0);
+                                lens.setMaxV(0);
+                                lens.updateLENS();
+                                lens.setTypeOLD("End");
+                                lens.setMinVOLD(0);
+                                lens.setMaxVOLD(0);
+                                lens.colorSuccess();
+                                lens.areaQuery.setStyle({fillOpacity:0.3})
+                            }
                         });
                         $('.dropbtnOpt-length').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            lens.setType("Length");
-                            
-                            document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#ffffff00";
+                            if(lens.getType() != "Length"){
+                                lens.setType("Length");
+                                
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#0c270093";
 
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#ffffff00";
-                            lens.setMinV(1);
-                            lens.setMaxV(500000);
-                            lens.updateLENS();
-                            lens.setTypeOLD("Length");
-                            lens.setMinVOLD(1);
-                            lens.setMaxVOLD(500000);
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#44444493";
+                                lens.setMinV(1);
+                                lens.setMaxV(500000);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Length");
+                                lens.setMinVOLD(1);
+                                lens.setMaxVOLD(500000);
+                                lens.colorSuccess();
+                                lens.areaQuery.setStyle({fillOpacity:0.3})
+                            }
                         });
                         $('.dropbtnOpt-velocity').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            lens.setType("Vel_avg");
-                            
-                            document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#ffffff00";
+                            if(lens.getType() != "Vel_avg"){
+                                lens.setType("Vel_avg");
+                                
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#bbb9b993";
-                            lens.setMinV(0);
-                            lens.setMaxV(250);
-                            lens.updateLENS();
-                            lens.setTypeOLD("Vel_avg");
-                            lens.setMinVOLD(0);
-                            lens.setMaxVOLD(250);
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#0c270093";
+                                lens.setMinV(0);
+                                lens.setMaxV(250);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Vel_avg");
+                                lens.setMinVOLD(0);
+                                lens.setMaxVOLD(250);
+                                lens.colorSuccess();
+                                lens.areaQuery.setStyle({fillOpacity:0.3})
+                            }
                         });
                         $('.dropbtnOpt-time').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            lens.setType("Time_Interval");
-                            
-                            document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#ffffff00";
+                            if(lens.getType() != "Time_Interval"){
+                                lens.setType("Time_Interval");
+                                
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#0c270093";
 
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#ffffff00";
-                            lens.setMinV(minTimeValue);
-                            lens.setMaxV(maxTimeValue);
-                            lens.updateLENS();
-                            lens.setTypeOLD("Time_Interval");
-                            lens.setMinVOLD(minTimeValue);
-                            lens.setMaxVOLD(maxTimeValue);
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#44444493";
+                                lens.setMinV(minTimeValue);
+                                lens.setMaxV(maxTimeValue);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Time_Interval");
+                                lens.setMinVOLD(minTimeValue);
+                                lens.setMaxVOLD(maxTimeValue);
+                                lens.colorSuccess();
+                                lens.areaQuery.setStyle({fillOpacity:0.3})
+                            }
                         });
                         $('.dropbtnOpt-duration').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            lens.setType("Time_Duration");
-                            
-                            document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#ffffff00";
+                            if(lens.getType() != "Time_Duration"){
+                                lens.setType("Time_Duration");
+                                
+                                document.getElementsByClassName('dropbtnOpt-default')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-start')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-end')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#bbb9b993";
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background= "#0c270093";
 
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#ffffff00";
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#44444493";
 
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#ffffff00";
-                            lens.setMinV(0);
-                            lens.setMaxV(85839);
-                            lens.updateLENS();
-                            lens.setTypeOLD("Time_Duration");
-                            lens.setMinVOLD(0);
-                            lens.setMaxVOLD(85839);
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#44444493";
+                                lens.setMinV(0);
+                                lens.setMaxV(85839);
+                                lens.updateLENS();
+                                lens.setTypeOLD("Time_Duration");
+                                lens.setMinVOLD(0);
+                                lens.setMaxVOLD(85839);
+                                lens.colorSuccess();
+                                lens.areaQuery.setStyle({fillOpacity:0.3})
+                            }
                         });  
         
                     }
@@ -2355,6 +2428,41 @@ block content
                 getRadius : function (){
                     return this.radiusQuery;
                 },
+                insertZORDER(){
+                    if(lensArrayZORDER.length == 0){
+                        lensArrayZORDER.push(this)
+                    }
+                    else{
+                        let flagMeteu = false
+                        for(let ind = 0;ind <= lensArrayZORDER.length-1;ind++){
+                            if (lensArrayZORDER[ind].getRadius()>this.getRadius()) continue;
+                            else if (lensArrayZORDER[ind].getRadius() <= this.getRadius()){
+                                flagMeteu = true;
+                                lensArrayZORDER.splice(ind, 0, this);
+                                console.log("ZORDER")
+                                console.log(lensArrayZORDER)
+                                
+                                break;
+                            }
+                        }
+
+                        if(!flagMeteu){
+                            lensArrayZORDER.push(this)
+                        }
+                        updateZORDER()
+                        
+                    }
+
+                },
+                deleteFromZORDER(){
+                    for(let i = lensArrayZORDER.length - 1; i >= 0; i--) {
+                        if(lensArrayZORDER[i] === this) {
+                            lensArrayZORDER.splice(i, 1);
+                            console.log(lensArrayZORDER);
+                            break;
+                        }
+                    }
+                },
                 addOpacityLens : function(opacLens){
                     this.opacityLensArray.push(opacLens);
                     for(let i = this.areas.length - 1; i >= 0; i--) {
@@ -2374,7 +2482,7 @@ block content
                 colorSuccess : function() {
                     //if(_attribute == "length"){
                     console.log("I will now paint the Pass by circle again ....")
-                    this.areaQuery.setStyle({color: '#FFFFFF', fillColor: '#FFFFFF', fillOpacity: 0.01});
+                    this.areaQuery.setStyle({color: '#FFFFFF', fillColor: '#FFFFFF', fillOpacity: 0});
                     
                 },
                 updateLayer : function(layer, value){
@@ -2403,6 +2511,7 @@ block content
                     }   
                 },
                 addIntersections : function(){
+
                     for(i=0; i< attLensesArray.length;i++){
                         if(this.areaQuery.getBounds().intersects(attLensesArray[i].areaQuery.getBounds())){
                             this.addIntersection(attLensesArray[i]);
@@ -2411,9 +2520,11 @@ block content
                     attLensesArray.push(this);
                 },
                 createAreas : function(){
+                    this.insertZORDER();
                     this.overallArea = null;
                     this.intersections.splice(0,this.intersections.length);
                     this.addIntersections();
+
                     let radius = this.getRadius()/1000;
                     let options = {steps: 32,units: 'kilometers'};
                     let circle = turf.circle([this.getLngLat().lng, this.getLngLat().lat], radius, options);
@@ -2434,6 +2545,7 @@ block content
                         eachArea.createLayers();
                     });
                     this.colorSuccess();
+                    
                 },
                 updateALL : function (){
                     //TODO CHAMAR ARRAY DE TRAS PARA A FRENTE PARA NAO TER DE FAZER VERIFICACOES  
@@ -2493,13 +2605,17 @@ block content
                     for(let areaIndex = this.areas.length - 1;areaIndex>=0; areaIndex--){
                         this.areas[areaIndex].delete();  
                     }
+
                     this.areas.splice(0,this.areas.length);
                     console.log(this.areas.length);
+
+                    
                 },
                 deleteLayers: function(){
                     for(let areaIndex = this.areas.length - 1;areaIndex>=0; areaIndex--){
                         this.areas[areaIndex].delete();
                     }
+                    this.deleteFromZORDER();
                 },
                 removeOpacityArray: function(){
                     for(let i = attOPACITYLensesArray.length - 1; i >= 0; i--) {
@@ -2578,7 +2694,7 @@ block content
             };
 
             lens.setBounds(lens.areaQuery.getBounds());
-           
+            lens.insertZORDER() //insert into z-order array first time
             //CALCULATE THE DISTANCE FROM ONE POINT TO ANOTHER IN PIXELS
             
             
@@ -2605,13 +2721,17 @@ block content
                     if(clicked && once){
                         once = false;
                         console.log("Im on the move event again...");
+                        if(activeLENSNEWMENU != null){
+                            activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+                        }
+                        lens.areaQuery.setStyle({fillOpacity:0.3})
                         //L.DomEvent.stopPropagation(ev);
                         
                             // code stuff
                         let northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
                         let southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
                         let numOfPixl = northVar.distanceTo(southVar);
-                        let myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [600,300], html: 
+                        let myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [300,200], html: 
                             "<div id='piemenu' data-wheelnav "+
                             "data-wheelnav-slicepath='DonutSlice' "+
                             "data-wheelnav-spreader data-wheelnav-spreaderpath='PieSpreader' "+
@@ -2625,9 +2745,9 @@ block content
                             "<div data-wheelnav-navitemimg='images/encoding.png' onmouseup='encLENSNEWMENU(activeLENSNEWMENU)'></div>"+
                             "<div data-wheelnav-navitemimg='images/move.png' onmouseup='moveATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
                             "<div data-wheelnav-navitemimg='images/radius.png' onmouseup='radiusATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
-                            "<div data-wheelnav-navitemimg='images/trash.png' onmouseup='deleteATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
+                            "<div data-wheelnav-navitemimg='images/trash.png' style='fill:#a73328' onmouseup='deleteATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
                             "</div>"+ 
-                            "<div id='attribute' style='margin-left: 82%;margin-top: -40%;visibility:hidden'><ul>"+
+                            "<div id='attribute' style='margin-left: 88%;margin-top: -40%;visibility:hidden'><ul>"+
                                 "<lu><a style='color:#FFF' class='dropbtnOpt-length'>Length</a></lu>"+
                                 "<lu><a style='color:#FFF' class='dropbtnOpt-duration'>Duration</a></lu>"+
                                 "<lu><a style='color:#FFF' class='dropbtnOpt-velocity'>Velocity</a></lu>"+
@@ -2635,7 +2755,7 @@ block content
                                 "<lu><a style='color:#FFF' class='dropbtnOpt-weekDay'>Weekday</a></lu>"+
                                 "<lu><a style='color:#FFF' class='dropbtnOpt-hourDay'>Hour</a></lu>"+
                             "</ul></div>"+
-                            "<div id='encoding' style='margin-left: 82%;margin-top: -40%;visibility:hidden'><ul>"+
+                            "<div id='encoding' style='margin-left: 88%;margin-top: -40%;visibility:hidden'><ul>"+
                                 "<lu><a style='color:#FFF' class='dropbtnOpt-color'>Color</a></lu>"+
                                 "<lu><a style='color:#FFF' class='dropbtnOpt-width'>Width</a></lu>"+
                                 "<lu><a style='color:#FFF' class='dropbtnOpt-brightness'>Brightness</a></lu>"+
@@ -2666,33 +2786,33 @@ block content
                         
                         outterLensesLayer.addLayer(lens.outsideCircle);
                         activeLENSNEWMENU = lens;
-                            var piemenu = new wheelnav('piemenu');
+                        var piemenu = new wheelnav('piemenu');
                         piemenu.wheelRadius = piemenu.wheelRadius * 0.83;
                         piemenu.navItemsContinuous = true;
                         piemenu.sliceAngle = 18;
                         piemenu.createWheel();
-
+                        document.getElementById("wheelnav-piemenu-slice-4").style.fill = "#94342b"
                         if(lens.att == "length")
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#bbb9b993";
+                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#0c270093";
                         else if(lens.att == "velocity")
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#bbb9b993";
+                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#0c270093";
                         else if(lens.att == "time")
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#bbb9b993";
+                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#0c270093";
                         else if(lens.att == "duration")
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#bbb9b993";
+                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#0c270093";
                         else if(lens.att == "weekDay")
-                            document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#bbb9b993";
+                            document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#0c270093";
                         else 
-                            document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#bbb9b993";
+                            document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#0c270093";
                         
                         if (lens.enc == "color")
-                            document.getElementsByClassName('dropbtnOpt-color')[0].style.background = "#bbb9b993";
+                            document.getElementsByClassName('dropbtnOpt-color')[0].style.background = "#0c270093";
                         else if (lens.enc == "width")
-                            document.getElementsByClassName('dropbtnOpt-width')[0].style.background = "#bbb9b993";
+                            document.getElementsByClassName('dropbtnOpt-width')[0].style.background = "#0c270093";
                         else if (lens.enc == "brightness")
-                            document.getElementsByClassName('dropbtnOpt-brightness')[0].style.background = "#bbb9b993";
+                            document.getElementsByClassName('dropbtnOpt-brightness')[0].style.background = "#0c270093";
                         else
-                            document.getElementsByClassName('dropbtnOpt-opacity')[0].style.background = "#bbb9b993";
+                            document.getElementsByClassName('dropbtnOpt-opacity')[0].style.background = "#0c270093";
                         
                         /*$('.myDeleteButton').click(function (e) {
                             L.DomEvent.stopPropagation(e); 
@@ -2957,163 +3077,190 @@ block content
                         }); */
                         $('.dropbtnOpt-length').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            //lens.updateOthers();
-                            lens.updateLENS(true,"length");
-                            //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
-                            
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#bbb9b993";                        
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#ffffff00";                                
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#ffffff00";                            
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#ffffff00";
-                            document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#ffffff00";
-                            document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#ffffff00";
+                            if(lens.att != "length"){
+                                //lens.updateOthers();
+                                lens.updateLENS(true,"length");
+                                //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                                
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#0c270093";                        
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#44444493";                                
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#44444493";                            
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
+                                document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
+                                document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
+                            }
                         });
                         $('.dropbtnOpt-velocity').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            //lens.updateOthers();
-                            lens.updateLENS(true,"velocity");
-                            //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "ffffff00";                        
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#bbb9b993";                                
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "ffffff00";                            
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "ffffff00";
-                            document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "ffffff00";
-                            document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "ffffff00";
+                            if(lens.att != "velocity"){
+                                //lens.updateOthers();
+                                lens.updateLENS(true,"velocity");
+                                //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#0c270093";                                
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#44444493";                            
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
+                                document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
+                                document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
+                            }
                         });
                         $('.dropbtnOpt-time').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            //lens.updateOthers();
-                            //lens.att = "time"
-                            lens.updateLENS(true,"time");
-                            //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "ffffff00";                        
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "ffffff00";                                
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#bbb9b993";                            
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "ffffff00";
-                            document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "ffffff00";
-                            document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "ffffff00";
+                            if(lens.att != "time"){
+                                //lens.updateOthers();
+                                //lens.att = "time"
+                                lens.updateLENS(true,"time");
+                                //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#44444493";                                
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#0c270093";                            
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
+                                document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
+                                document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
+                            }
                         });
                         $('.dropbtnOpt-duration').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            //lens.updateOthers();
-                            //lens.att = "duration"
-                            lens.updateLENS(true,"duration");
-                            //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "ffffff00";                        
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "ffffff00";                                
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "ffffff00";                            
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#bbb9b993";
-                            document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "ffffff00";
-                            document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "ffffff00";
+
+                            if(lens.att != "duration"){
+                                //lens.updateOthers();
+                                //lens.att = "duration"
+                                lens.updateLENS(true,"duration");
+                                //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#44444493";                                
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#44444493";                            
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#0c270093";
+                                document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
+                                document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
+                            }
                         });
                         $('.dropbtnOpt-weekDay').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            //lens.updateOthers();
-                            //lens.att = "duration"
-                            lens.updateLENS(true,"weekday");
-                            //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "ffffff00";                        
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "ffffff00";                                
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "ffffff00";                            
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "ffffff00";
-                            document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#bbb9b993";
-                            document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "ffffff00";
+
+                            if(lens.att != "weekday"){
+                                //lens.updateOthers();
+                                //lens.att = "duration"
+                                lens.updateLENS(true,"weekday");
+                                //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#44444493";                                
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#44444493";                            
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
+                                document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#0c270093";
+                                document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
+                            }
                         });
                         $('.dropbtnOpt-hourDay').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            //lens.updateOthers();
-                            //lens.att = "duration"
-                            lens.updateLENS(true,"hourday");
-                            //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
-                            document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "ffffff00";                        
-                            document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "ffffff00";                                
-                            document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "ffffff00";                            
-                            document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "ffffff00";
-                            document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "ffffff00";
-                            document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#bbb9b993";
+
+                            if(lens.att != "hourday"){
+                                //lens.updateOthers();
+                                //lens.att = "duration"
+                                lens.updateLENS(true,"hourday");
+                                //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
+                                document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
+                                document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background = "#44444493";                                
+                                document.getElementsByClassName('dropbtnOpt-time')[0].style.background = "#44444493";                            
+                                document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
+                                document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
+                                document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#0c270093";
+                            }
                         });
                         $('.dropbtnOpt-color').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            //lens.updateOthers();
-                            //lens.enc = "color"
-                            if(lens.enc == "opacity"){
-                                lens.removeOpacityArray();
-                                for(let j = 0; j < lens.intersections.length; j++){
-                                    lens.intersections[j].removeOpacityLens(lens);  
+
+                            if(lens.enc != "color"){
+                                //lens.updateOthers();
+                                //lens.enc = "color"
+                                if(lens.enc == "opacity"){
+                                    lens.removeOpacityArray();
+                                    for(let j = 0; j < lens.intersections.length; j++){
+                                        lens.intersections[j].removeOpacityLens(lens);  
+                                    }
                                 }
+                                lens.updateLENS(false,"color");
+                                //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                                document.getElementsByClassName('dropbtnOpt-color')[0].style.background = "#0c270093";             
+                                document.getElementsByClassName('dropbtnOpt-width')[0].style.background = "#44444493";                              
+                                document.getElementsByClassName('dropbtnOpt-brightness')[0].style.background = "#44444493";                              
+                                document.getElementsByClassName('dropbtnOpt-opacity')[0].style.background = "#44444493";
                             }
-                            lens.updateLENS(false,"color");
-                            //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
-                            document.getElementsByClassName('dropbtnOpt-color')[0].style.background = "#bbb9b993";             
-                            document.getElementsByClassName('dropbtnOpt-width')[0].style.background = "ffffff00";                              
-                            document.getElementsByClassName('dropbtnOpt-brightness')[0].style.background = "ffffff00";                              
-                            document.getElementsByClassName('dropbtnOpt-opacity')[0].style.background = "ffffff00";
                         });
                         $('.dropbtnOpt-width').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            //lens.updateOthers();
-                            //lens.enc = "width"
-                            if(lens.enc == "opacity"){
-                                lens.removeOpacityArray();
-                                for(let j = 0; j < lens.intersections.length; j++){
-                                    lens.intersections[j].removeOpacityLens(lens);  
+
+                            if(lens.enc != "width"){
+                                //lens.updateOthers();
+                                //lens.enc = "width"
+                                if(lens.enc == "opacity"){
+                                    lens.removeOpacityArray();
+                                    for(let j = 0; j < lens.intersections.length; j++){
+                                        lens.intersections[j].removeOpacityLens(lens);  
+                                    }
                                 }
+                                lens.updateLENS(false,"width");
+                                //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                                document.getElementsByClassName('dropbtnOpt-color')[0].style.background = "#44444493";             
+                                document.getElementsByClassName('dropbtnOpt-width')[0].style.background = "#0c270093";                              
+                                document.getElementsByClassName('dropbtnOpt-brightness')[0].style.background = "#44444493";                              
+                                document.getElementsByClassName('dropbtnOpt-opacity')[0].style.background = "#44444493";
                             }
-                            lens.updateLENS(false,"width");
-                            //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
-                            document.getElementsByClassName('dropbtnOpt-color')[0].style.background = "ffffff00";             
-                            document.getElementsByClassName('dropbtnOpt-width')[0].style.background = "#bbb9b993";                              
-                            document.getElementsByClassName('dropbtnOpt-brightness')[0].style.background = "ffffff00";                              
-                            document.getElementsByClassName('dropbtnOpt-opacity')[0].style.background = "ffffff00";
                         });
                         $('.dropbtnOpt-brightness').click(function (e) {
                             L.DomEvent.stopPropagation(e);
-                            //lens.updateOthers();
-                            //lens.enc = "brightness"
-                            if(lens.enc == "opacity"){
-                                for(let j = 0; j < lens.intersections.length; j++){
-                                    lens.intersections[j].removeOpacityLens(lens);  
+
+                            if(lens.enc != "brightness"){
+                                //lens.updateOthers();
+                                //lens.enc = "brightness"
+                                if(lens.enc == "opacity"){
+                                    for(let j = 0; j < lens.intersections.length; j++){
+                                        lens.intersections[j].removeOpacityLens(lens);  
+                                    }
+                                    lens.removeOpacityArray();
                                 }
-                                lens.removeOpacityArray();
+                                lens.updateLENS(false,"brightness");
+                                //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                                document.getElementsByClassName('dropbtnOpt-color')[0].style.background = "#44444493";             
+                                document.getElementsByClassName('dropbtnOpt-width')[0].style.background = "#44444493";                              
+                                document.getElementsByClassName('dropbtnOpt-brightness')[0].style.background = "#0c270093";                              
+                                document.getElementsByClassName('dropbtnOpt-opacity')[0].style.background = "#44444493";
                             }
-                            lens.updateLENS(false,"brightness");
-                            //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
-                            document.getElementsByClassName('dropbtnOpt-color')[0].style.background = "ffffff00";             
-                            document.getElementsByClassName('dropbtnOpt-width')[0].style.background = "ffffff00";                              
-                            document.getElementsByClassName('dropbtnOpt-brightness')[0].style.background = "#bbb9b993";                              
-                            document.getElementsByClassName('dropbtnOpt-opacity')[0].style.background = "ffffff00";
                         });
                         $('.dropbtnOpt-opacity').click(async function (e) {
                             L.DomEvent.stopPropagation(e);
-                            //lens.updateOthers();
-                            //lens.enc = "opacity"
-                            
-                            //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
-                            document.getElementsByClassName('dropbtnOpt-color')[0].style.background = "ffffff00";             
-                            document.getElementsByClassName('dropbtnOpt-width')[0].style.background = "ffffff00";                              
-                            document.getElementsByClassName('dropbtnOpt-brightness')[0].style.background = "ffffff00";                              
-                            document.getElementsByClassName('dropbtnOpt-opacity')[0].style.background = "#bbb9b993";
-                            console.log(attLensesArray)
-                            console.log(lens.hasBeenOpacity);
-                            attOPACITYLensesArray.push(lens);
-                            if(!lens.hasBeenOpacity){
-                                lens.hasBeenOpacity = true;
 
-                                console.log("Here is opc Array")
-                                console.log(attOPACITYLensesArray);
-                                attLensArrayToServer();
+                            if(lens.enc != "opacity"){
+                                //lens.updateOthers();
+                                //lens.enc = "opacity"
                                 
-                                
-                                for(let j = 0; j < lens.intersections.length; j++){
-                                    lens.intersections[j].addOpacityLens(lens);
-                                    for(let i = 0; i < lens.intersections[j].areas.length; i++){
-                                        lens.intersections[j].areas[i].delete();
-                                        lens.intersections[j].areas[i].createLayers();
+                                //document.getElementsByClassName('explanation')[1].innerText=capitalizeFirstLetter(lens.enc);
+                                document.getElementsByClassName('dropbtnOpt-color')[0].style.background = "#44444493";             
+                                document.getElementsByClassName('dropbtnOpt-width')[0].style.background = "#44444493";                              
+                                document.getElementsByClassName('dropbtnOpt-brightness')[0].style.background = "#44444493";                              
+                                document.getElementsByClassName('dropbtnOpt-opacity')[0].style.background = "#0c270093";
+                                console.log(attLensesArray)
+                                console.log(lens.hasBeenOpacity);
+                                attOPACITYLensesArray.push(lens);
+                                if(!lens.hasBeenOpacity){
+                                    lens.hasBeenOpacity = true;
+
+                                    console.log("Here is opc Array")
+                                    console.log(attOPACITYLensesArray);
+                                    attLensArrayToServer();
+                                    
+                                    
+                                    for(let j = 0; j < lens.intersections.length; j++){
+                                        lens.intersections[j].addOpacityLens(lens);
+                                        for(let i = 0; i < lens.intersections[j].areas.length; i++){
+                                            lens.intersections[j].areas[i].delete();
+                                            lens.intersections[j].areas[i].createLayers();
+                                        }
                                     }
                                 }
+                                
+                                lens.updateLENS(false,"opacity");
                             }
-                            
-                            lens.updateLENS(false,"opacity");
                             
                         }); 
                         
@@ -4441,6 +4588,11 @@ block content
         }
 
         $('.filterLensBut').click(function (e) {
+            clicked=false;
+            changeRadius = false;
+            lensCanMove = false;
+            mapPressForCreation = false;
+            outterLensesLayer.clearLayers();
             console.log(createQueryLensesFlag);
             createQueryLensesFlag = !createQueryLensesFlag;
             if(createQueryLensesFlag)
@@ -4454,9 +4606,14 @@ block content
             
         });
         $('.attributeLensBut').click(function (e) {
+            clicked=false;
+            changeRadius = false;
+            lensCanMove = false;
+            mapPressForCreation = false;
             console.log(createAttributeLensesFlag);
             createQueryLensesFlag = false;
             tabZoom = false;
+            outterLensesLayer.clearLayers();
             zoomControlVar.remove()
             document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
             createAttributeLensesFlag = !createAttributeLensesFlag;
@@ -4950,9 +5107,10 @@ block content
                     correctSizeVar = false;
                 },
                 mousedown: function (e) {
-                    L.DomEvent.stopPropagation(e);
-                    console.log(lens.getRadiusFlag())
-                    if(changeRadius){    
+                    
+                    if(changeRadius){  
+                        L.DomEvent.stopPropagation(e);
+                        console.log(lens.getRadiusFlag())  
                         let from = turf.point(lens.getLngLat());
                         let optionsCreateCirc = {units: 'kilometers'};
 
@@ -4987,10 +5145,11 @@ block content
                     }
                 },
                 mouseup: function (e) {
-                    L.DomEvent.stopPropagation(e);
-                    map.removeEventListener('mousemove');
-                    document.getElementById('piemenu').style.visibility = "visible";
+                    
                     if(changeRadius && lens.getRadiusFlag()){
+                        L.DomEvent.stopPropagation(e);
+                        map.removeEventListener('mousemove');
+                        document.getElementById('piemenu').style.visibility = "visible";
                         
                         console.log(correctSizeVar);
                         if (mapPressForCreation && correctSizeVar) {
@@ -5028,6 +5187,7 @@ block content
             clicked=false;
             outterLensesLayer.clearLayers();
             lens.deleteLayers();
+            lens.deleteFromZORDER();
             for(i = 0; i < attLensesArray.length; i++){
                 attLensesArray[i].updateALL();
             };
@@ -5319,6 +5479,8 @@ block content
             clicked=false;
             changeRadius = false;
             lensCanMove = false;
+
+            lens.deleteFromZORDER();
             document.getElementById('attribute').style.display = "none";
             document.getElementById('attribute').style.visibility = "hidden";
 
@@ -5343,37 +5505,33 @@ block content
         }
 
         function radiusATTLENSNEWMENU(lens){
-            document.getElementById('attribute').style.display = "none";
             document.getElementById('attribute').style.visibility = "hidden";
 
-            document.getElementById('encoding').style.display = "none";
             document.getElementById('encoding').style.visibility = "hidden";
             clicked=false;
             changeRadius = true;
             lensCanMove = false;
             mapPressForCreation = false;
-
+            let once = true;
             lens.setRadiusFlag(true);
-            map.on({
-                click: function(e){
-                    L.DomEvent.stopPropagation(e);
-                    mapPressForCreation = false;
-                    correctSizeVar = false;
-                },
+            mapPressForCreation = false;
+            correctSizeVar = false;
+            console.log("OK TOU NA FUNCAO")
+            lens.outsideCircle.on({
                 mousedown: function (e) {
-                    L.DomEvent.stopPropagation(e);
-
-                    if(changeRadius){    
+                    if(changeRadius){  
+                        L.DomEvent.stopPropagation(e);
+                        console.log("OK TOU No mouse down")
                         let from = turf.point([lens.getLngLat().lat,lens.getLngLat().lng]);
                         let optionsCreateCirc = {units: 'kilometers'};
-                        let once = true;
+                        
                         mapPressForCreation = true;
                         map.on('mousemove', function (event) {
                             if(lens.getRadiusFlag()){
-
                                 L.DomEvent.stopPropagation(event);
+                                console.log("OK TOU No map move")
                                 if(once){
-
+                                    document.getElementById('piemenu').style.visibility="hidden";
                                     lens.delete();
                                     lens.updateOthersV2(true);
                                     if(lens.hasBeenOpacity){
@@ -5389,7 +5547,7 @@ block content
                                 }
                                 if (mapPressForCreation && changeRadius) {
                                     
-                                    document.getElementById('piemenu').style.visibility="hidden";
+                                    
                                     map.dragging.disable();
 
                                     let to = turf.point([event.latlng.lat, event.latlng.lng]);
@@ -5413,8 +5571,10 @@ block content
                 },
                 mouseup: function (e) {
                     L.DomEvent.stopPropagation(e);
+                    console.log("OK TOU No mouse up")
                     map.removeEventListener('mousemove');
                     map.dragging.enable();
+                    once = true;
                     if(changeRadius && lens.getRadiusFlag()){
                         
                         document.getElementById('piemenu').style.visibility="visible";
@@ -5444,6 +5604,7 @@ block content
                             lens.setRadiusOLD(lens.getRadius());
                         }
                         else{
+                            lens.colorSuccess();
                             lens.setRadius(lens.getRadiusOLD());
                         }
 
@@ -5464,7 +5625,7 @@ block content
             clicked = false; 
             changeRadius = false;
             lensCanMove = true;
-            
+            lens.setRadiusFlag(false);
             let mouseDown = false;
             lens.outsideCircle.on({
                 dbclick:function(e){
@@ -5480,6 +5641,7 @@ block content
                         
                     
                     map.on('mousemove', function (e) {
+                        L.DomEvent.stopPropagation(e);
                         document.getElementById('piemenu').style.visibility = "hidden";
                         createQueryLensesFlag = false;
                         createAttributeLensesFlag = false;
@@ -5487,7 +5649,7 @@ block content
                         document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
                         /*container1.style.backgroundColor = 'white'; 
                         container2.style.backgroundColor = 'white';*/
-                        L.DomEvent.stopPropagation(e);
+                        
                         if(lensCanMove && mouseDown){
                             
                             if(!(moved)){
@@ -5555,12 +5717,6 @@ block content
 
                         }
                     }
-                },
-                mouseout:function(){
-                    console.log("Bellow is the attLensesArray");
-                    console.log(attLensesArray);
-                    //outterLensesLayer.removeLayer(lens.outsideCircle);
-                    
                 }
             });
         }
@@ -5586,5 +5742,14 @@ block content
             document.getElementById('encoding').style.visibility = "visible";
             document.getElementById('attribute').style.display = "none";
             document.getElementById('attribute').style.visibility = "none";
+        }
+
+        ///////Z-ORDER/////
+
+        function updateZORDER(){
+            for(let ind = 0; ind <= lensArrayZORDER.length - 1; ind ++){
+                lensesLayer.getLayer(lensArrayZORDER[ind].areaQuery._leaflet_id).bringToFront();
+                console.log(lensArrayZORDER[ind].areaQuery)
+            }
         }
         
