@@ -229,6 +229,8 @@ block content
         getMaxTimeVal()
         let lensArrayZORDER = [];
 
+        let maxArrayValuesGlobal = {"velocity":0,"duration":{"hours":0,"minutes":0,"seconds":0},"length":0,"timemin":"","timemax" :""};
+
         //Change basemaps
         /*var layer = L.esri.basemapLayer('Topographic').addTo(map);
         var layerLabels;*/
@@ -586,7 +588,7 @@ block content
         }
         async function attributeLensMenu(locationLatLng,radius){
             //lensPreCreationLayer.clearLayers();
-            let holder = createALens(locationLatLng, radius,'time','color')
+            let holder = createALens(locationLatLng, radius,'velocity','color')
             holder = await holder.createAreas();
             
             //holder.createLayers();
@@ -852,7 +854,11 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-                                
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
                                 createDurationHistogram(newDataMax.responseJSON.duration);
@@ -898,11 +904,15 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-
-                                createVelocityHistogram(newDataMax.responseJSON.velocity);
-                                createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                createVelocityHistogram(maxArrayValuesGlobal.velocity);
+                                createLengthHistogram(maxArrayValuesGlobal.length);
+                                createDurationHistogram(maxArrayValuesGlobal.duration);
+                                createTimeHistogram(maxArrayValuesGlobal.timemax, maxArrayValuesGlobal.timemin);
                             });
                         }
                     });
@@ -944,7 +954,11 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
                                 createDurationHistogram(newDataMax.responseJSON.duration);
@@ -990,7 +1004,11 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
                                 createDurationHistogram(newDataMax.responseJSON.duration);
@@ -1069,7 +1087,11 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
                                 createDurationHistogram(newDataMax.responseJSON.duration);
@@ -1118,7 +1140,11 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
                                 createDurationHistogram(newDataMax.responseJSON.duration);
@@ -1166,7 +1192,11 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
                                 createDurationHistogram(newDataMax.responseJSON.duration);
@@ -1214,7 +1244,11 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
                                 createDurationHistogram(newDataMax.responseJSON.duration);
@@ -1302,7 +1336,11 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
                                 createDurationHistogram(newDataMax.responseJSON.duration);
@@ -1352,7 +1390,11 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
                                 createDurationHistogram(newDataMax.responseJSON.duration);
@@ -1401,7 +1443,11 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
                                 createDurationHistogram(newDataMax.responseJSON.duration);
@@ -1450,7 +1496,11 @@ block content
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
-
+                                maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
+                                maxArrayValuesGlobal.length = newDataMax.responseJSON.length
+                                maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
+                                maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
+                                maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
                                 createDurationHistogram(newDataMax.responseJSON.duration);
@@ -2363,6 +2413,7 @@ block content
                 opacityLensArray: [],
                 bounds : null,
                 radiusChangeFlag: false,
+                attArrayCircHistogram:{},
                 getRadiusFlag(){
                     return this.radiusChangeFlag;
                 },
@@ -2490,23 +2541,23 @@ block content
                     //TODO
                     switch(this.att) {
                         case "length":
-                            lengthAtt(layer, value,this.enc);
+                            lengthAtt(layer, value,this.enc,this.attArrayCircHistogram);
                             break;
                         case "duration":
-                            durationAtt(layer,value, this.enc);
+                            durationAtt(layer,value, this.enc,this.attArrayCircHistogram);
                             break;
                         case "velocity":
-                            velocityAtt(layer,value,this.enc);
+                            velocityAtt(layer,value,this.enc,this.attArrayCircHistogram);
                             break;
                         case "time":
-                            timeAtt(layer,value, this.enc);
+                            timeAtt(layer,value, this.enc,this.attArrayCircHistogram);
                             break;
                         case "weekday":
-                            weekdayAtt(layer,value, this.enc);
+                            weekdayAtt(layer,value, this.enc,this.attArrayCircHistogram);
                             break;
 
                         case "hourday":
-                            hourdayAtt(layer,value, this.enc);
+                            hourdayAtt(layer,value, this.enc,this.attArrayCircHistogram);
                             break;
                     }   
                 },
@@ -2521,6 +2572,7 @@ block content
                 },
                 createAreas : function(){
                     this.insertZORDER();
+                    this.assignCircHistogram()
                     this.overallArea = null;
                     this.intersections.splice(0,this.intersections.length);
                     this.addIntersections();
@@ -2541,6 +2593,7 @@ block content
                     return thisVar;
                 },
                 createLayers : function(){
+                    
                     this.areas.forEach(function(eachArea, index, array) {
                         eachArea.createLayers();
                     });
@@ -2555,15 +2608,18 @@ block content
                     this.createLayers();
                 },
                 updateLENS : function(attORenc , value){
+                    //clean array for circ histogram
                     //Will check if any of the lenses if any of the intersections has an area wich recieves the styling from it
                     //True for attriute
                     if(attORenc){
                         this.att = value;
+                        
                     }
                     //False for encoding
                     else{
                         this.enc = value;
                     }
+                    this.assignCircHistogram() 
                     this.areas.forEach( function(item,index,array){
                         console.log(item.getlID());
                         if(item.getlID() != null){
@@ -2599,6 +2655,7 @@ block content
                         }
 
                     }
+                    
                     
                 },
                 delete: function(){
@@ -2690,11 +2747,49 @@ block content
                             }
                         }
                     }
+                },
+                assignCircHistogram: function(){
+                    if(this.att == "velocity") 
+                        lens.attArrayCircHistogram = [{name:"[0-9[", value:0},{name:"[9-16[",value:0},{name:"[16-25[",value:0},{name:"[25-40[",value:0},{name:"[40-50[",value:0},{name:"[50-60[" ,value:0},{name:"[60-70[" ,value:0},{name:"[70-80["  ,value:0},{name:"[80-90[" , value:0},{name:"[90-300[" , value:0}];
+                    else if(this.att == "length")
+                        lens.attArrayCircHistogram = [{name:"[0-1[km", value:0},{name:"[1-4[km",value:0},{name:"[4-7[km",value:0},{name:"[7-10[km",value:0},{name:"[10-15[km",value:0},{name:"[15-20[km" ,value:0},{name:"[20-35[km" ,value:0},{name:"[35-60[km"  ,value:0},{name:"[60-100[" , value:0},{name:"[100-[" , value:0}];
+                    else if(this.att == "duration")
+                        lens.attArrayCircHistogram = [{name:"00:00-05:00", value:0},{name:"05:00-10:00",value:0},{name:"10:00-30:00",value:0},{name:"30:00-45:00",value:0},{name:"45:00-01:30:00",value:0},{name:"01:30:00- " ,value:0}];
+                    else if(this.att == "time")
+                        lens.attArrayCircHistogram = [{name:"Newest bin", value:0},{name:"bin-2",value:0},{name:"bin-3",value:0},{name:"bin-4",value:0},{name:"bin-5",value:0},{name:"bin-6" ,value:0},{name:"bin-7" ,value:0},{name:"bin-8" ,value:0},{name:"bin-9" ,value:0},{name:"bin-10" ,value:0},{name:"bin-11" ,value:0},{name:"bin-12" ,value:0},{name:"bin-13" ,value:0},{name:"bin-14" ,value:0},{name:"bin-15" ,value:0},{name:"bin-16" ,value:0},{name:"bin-17" ,value:0},{name:"bin-18" ,value:0},{name:"bin-19" ,value:0},{name:"bin-20" ,value:0},{name:"bin-21" ,value:0},{name:"bin-22" ,value:0},{name:"bin-23" ,value:0},{name:"Oldest bin" ,value:0}];
+                    else if(this.att == "weekday")
+                        lens.attArrayCircHistogram = [{name:"Monday", value:0},{name:"Thuesday",value:0},{name:"Wednesday",value:0},{name:"Thursday",value:0},{name:"Friday",value:0},{name:"Saturday" ,value:0},{name:"Sunday" ,value:0}];
+                    else if(this.att == "hourday")
+                        lens.attArrayCircHistogram = [{name:"00", value:0},{name:"1",value:0},{name:"2",value:0},{name:"3",value:0},{name:"4",value:0},{name:"5" ,value:0},{name:"6" ,value:0},{name:"7" ,value:0},{name:"8" ,value:0},{name:"9" ,value:0},{name:"10" ,value:0},{name:"11" ,value:0},{name:"12" ,value:0},{name:"13" ,value:0},{name:"14" ,value:0},{name:"15" ,value:0},{name:"16" ,value:0},{name:"17" ,value:0},{name:"18" ,value:0},{name:"19" ,value:0},{name:"20" ,value:0},{name:"21" ,value:0},{name:"22" ,value:0},{name:"23" ,value:0}];
+                },
+                color(index){
+                    if(this.att == "velocity" || this.att == "length"){ 
+                        let colorArrayHist =['#ff3232','#ff6928','#fcb42f','#fcce28','#fcd62f','#fcf528','#d5fc28','#b9fc28','#80fc28','#00ff00']
+                        return colorArrayHist[index];
+                    }
+                    else if(this.att == "duration"){ 
+                        let colorArrayHist =['#ff3232','#fcb42f','#fcd62f','#fcf528','#b9fc28','#00ff00']
+                        return colorArrayHist[index];
+                    }
+                    else if(this.att == "time" || this.att == "hourday"){ 
+                        let colorArrayHist =['#49BC01','#57BD01','#66BE01','#75BF01','#84C101','#94C201','#A3C301','#B3C501','#C3C601','#C7BB01','#C9AD01','#CA9F01','#CB9101','#CC8201','#CE7401','#CF6501','#D05601','#D24701','#D33701','#D42801','#D61801','#D70801','#D80109','#DA0019']
+                        return colorArrayHist[index];
+                    }
+                    else if(this.att == "weekday"){ 
+                        let colorArrayHist =['#49BC01','#82C101','#BEC601','#CB9801','#D06001','#D52501','#DA0019']
+                        return colorArrayHist[index];
+                    }
+                
                 }
+            
             };
 
             lens.setBounds(lens.areaQuery.getBounds());
             lens.insertZORDER() //insert into z-order array first time
+
+            
+                    
+
             //CALCULATE THE DISTANCE FROM ONE POINT TO ANOTHER IN PIXELS
             
             
@@ -2732,54 +2827,37 @@ block content
                         let southVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getSouthWest());
                         let numOfPixl = northVar.distanceTo(southVar);
                         let myOutsideCircle = L.divIcon({className: 'outside-Circle', iconSize: [300,200], html: 
-                            "<div id='piemenu' data-wheelnav "+
-                            "data-wheelnav-slicepath='DonutSlice' "+
-                            "data-wheelnav-spreader data-wheelnav-spreaderpath='PieSpreader' "+
-                            "data-wheelnav-marker data-wheelnav-markerpath='PieLineMarker' "+
-                            "data-wheelnav-rotateoff "+
-                            "data-wheelnav-navangle='9' "+
-                            "data-wheelnav-titleheight='18' "+
-                            "data-wheelnav-cssmode "+
-                            "data-wheelnav-init>"+
-                            "<div data-wheelnav-navitemimg='images/attribute.png' onmouseup='attLENSNEWMENU(activeLENSNEWMENU)'></div>"+
-                            "<div data-wheelnav-navitemimg='images/encoding.png' onmouseup='encLENSNEWMENU(activeLENSNEWMENU)'></div>"+
-                            "<div data-wheelnav-navitemimg='images/move.png' onmouseup='moveATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
-                            "<div data-wheelnav-navitemimg='images/radius.png' onmouseup='radiusATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
-                            "<div data-wheelnav-navitemimg='images/trash.png' style='fill:#a73328' onmouseup='deleteATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
-                            "</div>"+ 
-                            "<div id='attribute' style='margin-left: 88%;margin-top: -40%;visibility:hidden'><ul>"+
-                                "<lu><a style='color:#FFF' class='dropbtnOpt-length'>Length</a></lu>"+
-                                "<lu><a style='color:#FFF' class='dropbtnOpt-duration'>Duration</a></lu>"+
-                                "<lu><a style='color:#FFF' class='dropbtnOpt-velocity'>Velocity</a></lu>"+
-                                "<lu><a style='color:#FFF' class='dropbtnOpt-time'>Time</a></lu>"+
-                                "<lu><a style='color:#FFF' class='dropbtnOpt-weekDay'>Weekday</a></lu>"+
-                                "<lu><a style='color:#FFF' class='dropbtnOpt-hourDay'>Hour</a></lu>"+
-                            "</ul></div>"+
-                            "<div id='encoding' style='margin-left: 88%;margin-top: -40%;visibility:hidden'><ul>"+
-                                "<lu><a style='color:#FFF' class='dropbtnOpt-color'>Color</a></lu>"+
-                                "<lu><a style='color:#FFF' class='dropbtnOpt-width'>Width</a></lu>"+
-                                "<lu><a style='color:#FFF' class='dropbtnOpt-brightness'>Brightness</a></lu>"+
-                                "<lu><a style='color:#FFF' class='dropbtnOpt-opacity'>Opacity</a></lu>"+
-                            "</ul></div>"
-                            /*"<button class='myDeleteButton' style='z-index: 1000;position: fixed;margin-top: 2%;margin-left: 12.5%;'><img src='images/trash.png' style='width: 85%; height: 80%;'></button>"+
-                            "<div class='dropdown' style='z-index: 1019; position:fixed;margin-left: 76.5%;margin-top: 2%;'><button class='dropbtn'><img src='images/attribute.png' style='width: 150%;height: 150%;margin: -25%;'></button><div class='dropdown-content'>" + //<span class='explanation' style='color:white;margin: 30%;'> "+capitalizeFirstLetter(lens.att)+"</span>
-                            "<button class='dropbtnOpt-length'>Length</button>"+
-                            "<button class='dropbtnOpt-velocity'>Velocity</button>"+
-                            "<button class='dropbtnOpt-time'>Time</button>"+
-                            "<button class='dropbtnOpt-duration'>Duration</button>"+
-                            "<button class='dropbtnOpt-weekDay'>Week Day</button>"+
-                            "<button class='dropbtnOpt-hourDay'>Hour of Day</button>"+
-                            "</div></div>" +
-                            "<div class='dropdown'style='z-index: 1019; position:fixed;margin-left: 96%;margin-top: 24%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 150%;height: 150%;margin: -25%;'></button><div class='dropdown-content'>" + //<span class='explanation' style='color:white;margin: 28%;'> "+capitalizeFirstLetter(lens.enc)+"</span>
-                            "<button class='dropbtnOpt-color'>Color</button>"+
-                            "<button class='dropbtnOpt-width'>Width</button>"+
-                            "<button class='dropbtnOpt-brightness'>Brightness</button>"+
-                            "<button class='dropbtnOpt-opacity'>Opacity</button>"+
-                            "</div></div>" +
-                            "<button class='myRadiusButton' style='margin-left: 89%;margin-top: 82.5%;position: static;'><img src='images/radius.png' style='z-index: 999;width: 150%;height: 150%;margin: inherit;margin-left: -3px;margin-top: -4px;'><span class='explanation' style='color:white;margin: -50%;'> \n"+lens.getRadius().toFixed(0)+"meters</span></button>"+
-                            "<button class='myMoveButton' style='margin-left: 77%;margin-top: 5%;position: static;'><img src='images/move.png' style='    z-index: 999; width: 190%; height: 190%; margin: inherit; margin-left: -48%;margin-top: -43%;'></button>"+
-                            "<div id='sliderRadius' align='center' style='z-index:1018;    position: absolute;    top: 32%;left: 32%;transform: translate(-50%, -50%)display:none;'></div>"*/
-                            //"<div class='dropdown'style='margin-left: 102.5%; margin-top: 75%;'><button class='dropbtn'><img src='images/encoding.png' style='width: 15px; height: 17px;'></button><div class='dropdown-content'>"
+                        "<div id='piemenu' data-wheelnav "+
+                        "data-wheelnav-slicepath='DonutSlice' "+
+                        "data-wheelnav-spreader data-wheelnav-spreaderpath='PieSpreader' "+
+                        "data-wheelnav-marker data-wheelnav-markerpath='PieLineMarker' "+
+                        "data-wheelnav-rotateoff "+
+                        "data-wheelnav-navangle='9' "+
+                        "data-wheelnav-titleheight='18' "+
+                        "data-wheelnav-cssmode "+
+                        "data-wheelnav-init>"+
+                        "<div data-wheelnav-navitemimg='images/attribute.png' onmouseup='attLENSNEWMENU(activeLENSNEWMENU)'></div>"+
+                        "<div data-wheelnav-navitemimg='images/encoding.png' onmouseup='encLENSNEWMENU(activeLENSNEWMENU)'></div>"+
+                        "<div data-wheelnav-navitemimg='images/statistics.png' onmouseup='statsLENSNEWMENU(activeLENSNEWMENU)'></div>"+
+                        "<div data-wheelnav-navitemimg='images/move.png' onmouseup='moveATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
+                        "<div data-wheelnav-navitemimg='images/radius.png' onmouseup='radiusATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
+                        "<div data-wheelnav-navitemimg='images/trash.png'  onmouseup='deleteATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
+                        "</div>"+ 
+                        "<div id='attribute' style='margin-left: 88%;margin-top: -40%;visibility:hidden'><ul>"+
+                            "<lu><a style='color:#FFF' class='dropbtnOpt-length'>Length</a></lu>"+
+                            "<lu><a style='color:#FFF' class='dropbtnOpt-duration'>Duration</a></lu>"+
+                            "<lu><a style='color:#FFF' class='dropbtnOpt-velocity'>Velocity</a></lu>"+
+                            "<lu><a style='color:#FFF' class='dropbtnOpt-time'>Time</a></lu>"+
+                            "<lu><a style='color:#FFF' class='dropbtnOpt-weekDay'>Weekday</a></lu>"+
+                            "<lu><a style='color:#FFF' class='dropbtnOpt-hourDay'>Hour</a></lu>"+
+                        "</ul></div>"+
+                        "<div id='encoding' style='margin-left: 88%;margin-top: -40%;visibility:hidden'><ul>"+
+                            "<lu><a style='color:#FFF' class='dropbtnOpt-color'>Color</a></lu>"+
+                            "<lu><a style='color:#FFF' class='dropbtnOpt-width'>Width</a></lu>"+
+                            "<lu><a style='color:#FFF' class='dropbtnOpt-brightness'>Brightness</a></lu>"+
+                            "<lu><a style='color:#FFF' class='dropbtnOpt-opacity'>Opacity</a></lu>"+
+                        "</ul></div>"+
+                        "<div id='my_datavizCIRCULAR' style='margin-top: -129.5%;margin-left: -24.9%;visibility:hidden'></div>"
                         });
                         let outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
                         lens.setOutsideCircle(outsideCircVar);
@@ -2789,9 +2867,10 @@ block content
                         var piemenu = new wheelnav('piemenu');
                         piemenu.wheelRadius = piemenu.wheelRadius * 0.83;
                         piemenu.navItemsContinuous = true;
-                        piemenu.sliceAngle = 18;
+                        piemenu.sliceAngle = 15;
                         piemenu.createWheel();
-                        document.getElementById("wheelnav-piemenu-slice-4").style.fill = "#94342b"
+                        
+                        document.getElementById("wheelnav-piemenu-slice-5").style.fill = "#94342b"
                         if(lens.att == "length")
                             document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#0c270093";
                         else if(lens.att == "velocity")
@@ -3079,6 +3158,7 @@ block content
                             L.DomEvent.stopPropagation(e);
                             if(lens.att != "length"){
                                 //lens.updateOthers();
+                                clearBox("my_datavizCIRCULAR")
                                 lens.updateLENS(true,"length");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 
@@ -3088,12 +3168,15 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
+
+                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
                             }
                         });
                         $('.dropbtnOpt-velocity').click(function (e) {
                             L.DomEvent.stopPropagation(e);
                             if(lens.att != "velocity"){
                                 //lens.updateOthers();
+                                clearBox("my_datavizCIRCULAR")
                                 lens.updateLENS(true,"velocity");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
@@ -3102,6 +3185,8 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
+                                console.log(lens.attArrayCircHistogram)
+                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
                             }
                         });
                         $('.dropbtnOpt-time').click(function (e) {
@@ -3109,6 +3194,7 @@ block content
                             if(lens.att != "time"){
                                 //lens.updateOthers();
                                 //lens.att = "time"
+                                clearBox("my_datavizCIRCULAR")
                                 lens.updateLENS(true,"time");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
@@ -3117,6 +3203,7 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
+                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
                             }
                         });
                         $('.dropbtnOpt-duration').click(function (e) {
@@ -3125,6 +3212,7 @@ block content
                             if(lens.att != "duration"){
                                 //lens.updateOthers();
                                 //lens.att = "duration"
+                                clearBox("my_datavizCIRCULAR")
                                 lens.updateLENS(true,"duration");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
@@ -3133,6 +3221,7 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#0c270093";
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
+                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
                             }
                         });
                         $('.dropbtnOpt-weekDay').click(function (e) {
@@ -3141,6 +3230,7 @@ block content
                             if(lens.att != "weekday"){
                                 //lens.updateOthers();
                                 //lens.att = "duration"
+                                clearBox("my_datavizCIRCULAR")
                                 lens.updateLENS(true,"weekday");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
@@ -3149,6 +3239,7 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#0c270093";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
+                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
                             }
                         });
                         $('.dropbtnOpt-hourDay').click(function (e) {
@@ -3157,6 +3248,7 @@ block content
                             if(lens.att != "hourday"){
                                 //lens.updateOthers();
                                 //lens.att = "duration"
+                                clearBox("my_datavizCIRCULAR")
                                 lens.updateLENS(true,"hourday");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
@@ -3165,6 +3257,7 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#0c270093";
+                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
                             }
                         });
                         $('.dropbtnOpt-color').click(function (e) {
@@ -3263,7 +3356,7 @@ block content
                             }
                             
                         }); 
-                        
+                        circularHistogram(maxArrayValuesGlobal.velocity,lens)
                     }     
                     //});
                    
@@ -3475,302 +3568,496 @@ block content
         /////  Functions per attribute
         /////
 
-        function velocityAtt(layer, properties, encoding){
+        function velocityAtt(layer, properties, encoding, attArrayCircHistogram){
              // code block
             let velAtt = properties.f4;
+            //{"[0-9[":0,"[9-16[":0,"[16-25[":0,"[25-40[":0,"[40-50[":0,"[50-60[":0,"[60-70[":0,"[70-80[" :0,"[80-90[" :0,"[90-200[" :0}
             switch(encoding){
                 case "color":
-                    /*layer.setStyle({opacity:0});
-                    let pointsArray = layer.feature.geometry.coordinates;
-                    
-                    let velArray =  layer.feature.properties.f5;
-
-                    let finalArray = [];
-                    
-                    for(let i = 0;i < velArray.length;i++ ){
-                        finalArray.push([pointsArray[i][1],pointsArray[i][0],velArray[i]]);    
-                    }
-                    console.log(pointsArray);
-                    let hotlineLayer = L.hotline(finalArray, {
-                        min: 0,
-                        max: 60,
-                        palette: {
-                            0.0: '#ff0000',
-                            0.3: '#ffff00',
-                            1.0: '#008800'
-                        },
-                        weight: 1,
-                        outlineColor: '#FFFFFF',
-                        outlineWidth: 0
-                    });
-                    
-                    delete finalArray;
-                    delete pointsArray;
-                    delete velArray;
-                    
-
-                    console.log(hotlineLayer);
-                    hotlineLayer.addTo(layerToPaint);
-                    */
-
                     if(velAtt <= 9)          {
-                            layer.setStyle({color :'#ff3232'});
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({color :'#ff3232'});
                     }
                     else if(velAtt <= 16)     {
-                            layer.setStyle({color :'#ff6928'});
+                        attArrayCircHistogram[1].value  = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({color :'#ff6928'});
                     }
                     else if(velAtt <= 25)    {
-                            layer.setStyle({color :'#fcb42f'});
+                        attArrayCircHistogram[2].value  = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({color :'#fcb42f'});
                     }
                     else if(velAtt <= 40)    {
-                            layer.setStyle({color :'#fcce28'});
+                        attArrayCircHistogram[3].value  = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({color :'#fcce28'});
                     }
                     else if(velAtt <= 50)    {
-                            layer.setStyle({color :'#fcd62f'});
+                        attArrayCircHistogram[4].value  = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({color :'#fcd62f'});
                     }
                     else if(velAtt <= 60)    {
-                            layer.setStyle({color :'#fcf528'});
+                        attArrayCircHistogram[5].value  = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({color :'#fcf528'});
                     }
                     else if(velAtt <=  70)   {
-                            layer.setStyle({color :'#d5fc28'});
+                        attArrayCircHistogram[6].value  = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({color :'#d5fc28'});
                     }
                     else if(velAtt <=  80)   {
-                            layer.setStyle({color :'#b9fc28'});
+                        attArrayCircHistogram[7].value  = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({color :'#b9fc28'});
                     }
                     else if(velAtt <=  90)   {
-                            layer.setStyle({color :'#80fc28'});
+                        attArrayCircHistogram[8].value  = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({color :'#80fc28'});
                     }
-                    else    layer.setStyle({color :'#00ff00'});
+                    else    {
+                        attArrayCircHistogram[9].value  = attArrayCircHistogram[9].value  + 1
+                        layer.setStyle({color :'#00ff00'});}
                     break;
                     
                 case "brightness":
                     if(velAtt <= 10)          {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.9);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <= 20)     {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.7);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <= 30)    {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.5);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <= 40)    {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.3);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <= 50)    {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.1);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <= 60)    {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.1);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <=  70)   {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.3);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <=  80)   {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.5);
                         layer.setStyle({"color":colr});
                     }
                     else if(velAtt <=  90)   {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.7);
                         layer.setStyle({"color":colr});
                     }
                     else    {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.9);
                         layer.setStyle({"color":colr});
                     }            
                     break;
                 case "opacity":
                     if(velAtt <= 10)          {
-                            layer.setStyle({opacity : 0.1});
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({opacity : 0.1});
                     }
                     else if(velAtt <= 20)     {
-                            layer.setStyle({opacity : 0.2});
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({opacity : 0.2});
                     }
                     else if(velAtt <= 30)    {
-                            layer.setStyle({opacity : 0.3});
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({opacity : 0.3});
                     }
                     else if(velAtt <= 40)    {
-                            layer.setStyle({opacity : 0.4});
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({opacity : 0.4});
                     }
                     else if(velAtt <= 50)    {
-                            layer.setStyle({opacity : 0.5});
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({opacity : 0.5});
                     }
                     else if(velAtt <= 60)    {
-                            layer.setStyle({opacity : 0.6});
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({opacity : 0.6});
                     }
                     else if(velAtt <=  70)   {
-                            layer.setStyle({opacity : 0.7});
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({opacity : 0.7});
                     }
                     else if(velAtt <=  80)   {
-                            layer.setStyle({opacity : 0.8});
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({opacity : 0.8});
                     }
                     else if(velAtt <=  90)   {
-                            layer.setStyle({opacity : 0.9});
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({opacity : 0.9});
                     }
-                    else    layer.setStyle({opacity : 1});
+                    else    {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
+                        layer.setStyle({opacity : 1});
+                    }
                     break;
                 case "width":
-                    if(velAtt <= 10)        layer.setStyle({"weight": 1});
-                    else if(velAtt <= 20)   layer.setStyle({"weight": 1.4});
-                    else if(velAtt <= 30)   layer.setStyle({"weight": 1.8});
-                    else if(velAtt <= 40)   layer.setStyle({"weight": 2.2});
-                    else if(velAtt <= 50)   layer.setStyle({"weight": 2.6});
-                    else if(velAtt <= 60)   layer.setStyle({"weight": 3});
-                    else if(velAtt <= 70)   layer.setStyle({"weight": 3.4});
-                    else if(velAtt <= 80)   layer.setStyle({"weight": 3.8});
-                    else if(velAtt <= 90)   layer.setStyle({"weight": 4.2});
-                    else                    layer.setStyle({"weight": 4.6});
+                    if(velAtt <= 10)        {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({"weight": 1});
+                        }
+                    else if(velAtt <= 20)   {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({"weight": 1.4});
+                        }
+                    else if(velAtt <= 30)   {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({"weight": 1.8});
+                        }
+                    else if(velAtt <= 40)   {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({"weight": 2.2});
+                        }
+                    else if(velAtt <= 50)   {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({"weight": 2.6});
+                        }
+                    else if(velAtt <= 60)   {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({"weight": 3});
+                        }
+                    else if(velAtt <= 70)   {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({"weight": 3.4});
+                        }
+                    else if(velAtt <= 80)   {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({"weight": 3.8});
+                        }
+                    else if(velAtt <= 90)   {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({"weight": 4.2});
+                        }
+                    else                    {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
+                        layer.setStyle({"weight": 4.6});
+                        }
                     break;
             }
         }
 
-        function lengthAtt(layer,properties, encoding){
+        function lengthAtt(layer,properties, encoding, attArrayCircHistogram){
              // code block
             let len = properties.f1;
+            
             switch(encoding){
                 case "color":
-                    if(len <= 1000)          layer.setStyle({color :'#ff3232'}) 
-                    else if(len <= 4000)     layer.setStyle({color :'#ff6928'})
-                    else if(len <= 7000)    layer.setStyle({color :'#fcb42f'}) 
-                    else if(len <= 10000)    layer.setStyle({color :'#fcce28'})
-                    else if(len <= 15000)    layer.setStyle({color :'#fcd62f'}) 
-                    else if(len <= 20000)    layer.setStyle({color :'#fcf528'}) 
-                    else if(len <= 35000)   layer.setStyle({color :'#d5fc28'})
-                    else if(len <= 60000)   layer.setStyle({color :'#b9fc28'})
-                    else if (len <= 100000) layer.setStyle({color :'#80fc28'})
-                    else                    layer.setStyle({color :'#00ff00'})
+                    if(len <= 1000)          {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({color :'#ff3232'}) 
+                        }
+                    else if(len <= 4000)     {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({color :'#ff6928'})
+                        }
+                    else if(len <= 7000)    {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({color :'#fcb42f'}) 
+                        }
+                    else if(len <= 10000)    {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({color :'#fcce28'})
+                        }
+                    else if(len <= 15000)   { 
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({color :'#fcd62f'}) 
+                        }
+                    else if(len <= 20000)    {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({color :'#fcf528'}) 
+                        }
+                    else if(len <= 35000)   {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({color :'#d5fc28'})
+                        }
+                    else if(len <= 60000)   {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({color :'#b9fc28'})
+                        }
+                    else if (len <= 100000) {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({color :'#80fc28'})
+                        }
+                    else                    {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
+                        layer.setStyle({color :'#00ff00'})
+                        }
                     break;
                 case "brightness":
                     if(len <= 1000)          {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.95);
                         layer.setStyle({"color":colr});
                     }
                   else if(len <= 4000)     {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.8);
                         layer.setStyle({"color":colr});
                     }
                   else if(len <= 7000)    {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.6);
                         layer.setStyle({"color":colr});
                     }
                   else if(len <= 10000)    {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.4);
                         layer.setStyle({"color":colr});
                     }
                   else if(len <= 20000)    {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.2);
                         layer.setStyle({"color":colr});
                     }
                   else if(len <= 30000)    {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
                         console.log("brightness already at 1")
                     }
                   else if(len <=  50000)   {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.2);
                         layer.setStyle({"color":colr});
                     }
                   else if(len <=  75000)   {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.4);
                         layer.setStyle({"color":colr});
                     }
                   else if(len <=  100000)   {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.6);
                         layer.setStyle({"color":colr});
                     }
                     else {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.8);
                         layer.setStyle({"color":colr});
                     }                   
                     break;
                 case "opacity":
-                    if(len <= 1000)          layer.setStyle({opacity:0.05});
-                  else if(len <= 4000)     layer.setStyle({opacity:0.10});
-                  else if(len <= 7000)    layer.setStyle({opacity:0.20}); 
-                  else if(len <= 10000)    layer.setStyle({opacity:0.35});
-                  else if(len <= 20000)    layer.setStyle({opacity:0.5});
-                  else if(len <= 30000)    layer.setStyle({opacity:0.65});
-                  else if(len <= 50000)   layer.setStyle({opacity:0.8});
-                  else if(len <= 75000)   layer.setStyle({opacity:0.9});
-                  else if(len <= 100000)  layer.setStyle({opacity:0.95});
-                    else                    console.log("Opcacity already at 1")
+                    if(len <= 1000)          {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({opacity:0.05});
+                        }
+                  else if(len <= 4000)     {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({opacity:0.10});
+                        }
+                  else if(len <= 7000)    {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({opacity:0.20}); 
+                        }
+                  else if(len <= 10000)    {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({opacity:0.35});
+                        }
+                  else if(len <= 20000)    {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({opacity:0.5});
+                        }
+                  else if(len <= 30000)    {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({opacity:0.65});
+                        }
+                  else if(len <= 50000)   {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({opacity:0.8});
+                        }
+
+                  else if(len <= 75000)   {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({opacity:0.9});
+                        }
+
+                  else if(len <= 100000)  {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({opacity:0.95});
+                        }
+
+                    else                    {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
+                        console.log("Opcacity already at 1")}
                     break;
                 case "width":
-                  if(len <= 1000)              layer.setStyle({"weight": 1});
-                  else if(len <= 4000)     layer.setStyle({"weight": 1.4});
-                  else if(len <= 7000)    layer.setStyle({"weight": 1.8});
-                  else if(len <= 10000)    layer.setStyle({"weight": 2.2});
-                  else if(len <= 20000)    layer.setStyle({"weight": 2.6});
-                  else if(len <= 30000)    layer.setStyle({"weight": 3});
-                  else if(len <= 50000)   layer.setStyle({"weight": 3.4});
-                  else if(len <= 75000)   layer.setStyle({"weight": 3.8});
-                  else if(len <= 100000)  layer.setStyle({"weight": 4.2});
-                  else                    layer.setStyle({"weight": 4.6});
+                  if(len <= 1000)              {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({"weight": 1});
+                        }
+                  else if(len <= 4000)     {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({"weight": 1.4});
+                        }
+                  else if(len <= 7000)    {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({"weight": 1.8});
+                        }
+                  else if(len <= 10000)    {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({"weight": 2.2});
+                        }
+                  else if(len <= 20000)    {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({"weight": 2.6});
+                        }
+                  else if(len <= 30000)    {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({"weight": 3});
+                        }
+                  else if(len <= 50000)   {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({"weight": 3.4});
+                        }
+                  else if(len <= 75000)   {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({"weight": 3.8});
+                        }
+                  else if(len <= 100000)  {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({"weight": 4.2});
+                        }
+                  else                    {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
+                        layer.setStyle({"weight": 4.6});
+                        }
                   break;
             }
         }
         
-        function durationAtt(layer, properties, encoding){
+        function durationAtt(layer, properties, encoding, attArrayCircHistogram){
              // code block
             let dur = properties.f2;
             switch(encoding){
                 case "color":
-                    if(dur <= "00:05:00")           layer.setStyle({color :'#ff3232'})
-                    else if(dur <= "00:10:00")      layer.setStyle({color :'#fcb42f'})
-                    else if(dur <= "00:30:00")      layer.setStyle({color :'#fcd62f'})
-                    else if(dur <= "00:45:00")     layer.setStyle({color :'#fcf528'})
-                    else if(dur <=  "01:30:00")     layer.setStyle({color :'#b9fc28'})
-                    else                            layer.setStyle({color :'#00ff00'})
+                    if(dur <= "00:05:00")           {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({color :'#ff3232'})
+                        }
+                    else if(dur <= "00:10:00")      {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({color :'#fcb42f'})
+                        }
+                    else if(dur <= "00:30:00")      {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({color :'#fcd62f'})
+                        }
+                    else if(dur <= "00:45:00")     {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({color :'#fcf528'})
+                        }
+                    else if(dur <=  "01:30:00")     {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({color :'#b9fc28'})
+                        }
+                    else                            {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({color :'#00ff00'})
+                        }
                     break;
                 case "brightness":
                     if(dur <= "00:05:00")          {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.9);
                         layer.setStyle({"color":colr});
                     }
                     else if(dur <= "00:10:00")     {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.6);
                         layer.setStyle({"color":colr});
                     }
                     else if(dur <= "00:30:00")    {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
                         console.log("brightness already at 1")
                     }
                     else if(dur <= "00:45:00")    {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.3);
                         layer.setStyle({"color":colr});
                     }
                     else if(dur <=  "01:30:00")   {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.6);
                         layer.setStyle({"color":colr});
                     }
                     else  {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.9);
                         layer.setStyle({"color":colr});
                         }                  
                     break;
                 case "opacity":
-                    if(dur <= "00:05:00")           layer.setStyle({opacity:0.05});
-                    else if(dur <= "00:10:00")      layer.setStyle({opacity:0.15}); 
-                    else if(dur <= "00:30:00")      layer.setStyle({opacity:0.3});
-                    else if(dur <= "00:45:00")      layer.setStyle({opacity:0.55});
-                    else if(dur <=  "01:30:00")     layer.setStyle({opacity:0.8});
-                    else                            console.log("Opcacity already at 1")
+                    if(dur <= "00:05:00")           {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({opacity:0.05});
+                        }
+                    else if(dur <= "00:10:00")      {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({opacity:0.15}); 
+                        }
+                    else if(dur <= "00:30:00")      {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({opacity:0.3});
+                        }
+                    else if(dur <= "00:45:00")      {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({opacity:0.55});
+                        }
+                    else if(dur <=  "01:30:00")     {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({opacity:0.8});
+                        }
+                    else                            {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        console.log("Opcacity already at 1")
+                        }
                     break;
                 case "width":
-                    if(dur <= "00:05:00")           layer.setStyle({"weight": 1});
-                    else if(dur <= "00:10:00")      layer.setStyle({"weight": 1.5});
-                    else if(dur <= "00:30:00")      layer.setStyle({"weight": 2});
-                    else if(dur <= "00:45:00")      layer.setStyle({"weight": 2.5});
-                    else if(dur <=  "01:30:00")     layer.setStyle({"weight": 3});
-                    else                            layer.setStyle({"weight": 3.5});
+                    if(dur <= "00:05:00")           {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({"weight": 1});
+                        }
+                    else if(dur <= "00:10:00")      {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({"weight": 1.5});
+                        }
+                    else if(dur <= "00:30:00")      {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({"weight": 2});
+                        }
+                    else if(dur <= "00:45:00")      {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({"weight": 2.5});
+                        }
+                    else if(dur <=  "01:30:00")    { 
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({"weight": 3});
+                        }
+                    else                            {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({"weight": 3.5});
+                        }
                     break;
             }
         }
 
-         function timeAtt(layer, properties, encoding){
+         function timeAtt(layer, properties, encoding, attArrayCircHistogram){
             // 2008-02-02 13:30:44
             // 2008-02-08 17:39:18
             // code block
@@ -3782,191 +4069,438 @@ block content
             switch(encoding){
                 case "color":
                     if (tim >= timeNow.setUTCHours(timeNow.getHours()-2)) layer.setStyle({color :'#01BC86'})
+                    
                     else if (tim >= timeNow.setHours(timeNow.getHours()-12)) layer.setStyle({color :'#1EC79F'})
+                    
                     else if (tim >= timeNow.setDate(timeNow.getDate()-1)) layer.setStyle({color :'#3ED2B6'})
+                    
                     else if (tim >= timeNow.setDate(timeNow.getDate()-2)) layer.setStyle({color :'#62DDCC'})
+                    
                     else if (tim >= timeNow.setDate(timeNow.getDate()-3)) layer.setStyle({color :'#89E8DF'})
+                    
                     else if (tim >= timeNow.setDate(timeNow.getDate()-7)) layer.setStyle({color :'#B3F3F0'})
+                    
                     else if (tim >= timeNow.setMonth(timeNow.getMonth() - 1)) layer.setStyle({color :'#E1FFFF'})
-                    else if(tim >= maxTimeValue - diffIntervals)       layer.setStyle({color :'#49BC01'})
-                    else if(tim >= maxTimeValue - 2*diffIntervals)       layer.setStyle({color :'#57BD01'})
-                    else if(tim >= maxTimeValue - 3*diffIntervals)       layer.setStyle({color :'#66BE01'})
-                    else if(tim >= maxTimeValue - 4*diffIntervals)      layer.setStyle({color :'#75BF01'})
-                    else if(tim >= maxTimeValue - 5*diffIntervals)      layer.setStyle({color :'#84C101'})
-                    else if(tim >= maxTimeValue - 6*diffIntervals)      layer.setStyle({color :'#94C201'})
-                    else if(tim >= maxTimeValue - 7*diffIntervals)      layer.setStyle({color :'#A3C301'})
-                    else if(tim >= maxTimeValue - 8*diffIntervals)      layer.setStyle({color :'#B3C501'})
-                    else if(tim >= maxTimeValue - 9*diffIntervals)      layer.setStyle({color :'#C3C601'})
-                    else if(tim >= maxTimeValue - 10*diffIntervals)      layer.setStyle({color :'#C7BB01'})
-                    else if(tim >= maxTimeValue - 11*diffIntervals)      layer.setStyle({color :'#C9AD01'})
-                    else if(tim >= maxTimeValue - 12*diffIntervals)      layer.setStyle({color :'#CA9F01'})
-                    else if(tim >= maxTimeValue - 13*diffIntervals)      layer.setStyle({color :'#CB9101'})
-                    else if(tim >= maxTimeValue - 14*diffIntervals)       layer.setStyle({color :'#CC8201'})
-                    else if(tim >= maxTimeValue - 15*diffIntervals)       layer.setStyle({color :'#CE7401'})
-                    else if(tim >= maxTimeValue - 16*diffIntervals)       layer.setStyle({color :'#CF6501'})
-                    else if(tim >= maxTimeValue - 17*diffIntervals)      layer.setStyle({color :'#D05601'})
-                    else if(tim >= maxTimeValue - 18*diffIntervals)      layer.setStyle({color :'#D24701'})
-                    else if(tim >= maxTimeValue - 19*diffIntervals)      layer.setStyle({color :'#D33701'})
-                    else if(tim >= maxTimeValue - 20*diffIntervals)      layer.setStyle({color :'#D42801'})
-                    else if(tim >= maxTimeValue - 21*diffIntervals)      layer.setStyle({color :'#D61801'})
-                    else if(tim >= maxTimeValue - 22*diffIntervals)      layer.setStyle({color :'#D70801'})
-                    else if(tim >= maxTimeValue - 23*diffIntervals)      layer.setStyle({color :'#D80109'})
-                    else                    layer.setStyle({color :'#DA0019'})
+                    
+                    else if(tim >= maxTimeValue - diffIntervals)       {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({color :'#49BC01'})
+                    }
+                    else if(tim >= maxTimeValue - 2*diffIntervals)       {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({color :'#57BD01'})
+                    }
+                    else if(tim >= maxTimeValue - 3*diffIntervals)       {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({color :'#66BE01'})
+                    }
+                    else if(tim >= maxTimeValue - 4*diffIntervals)      {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({color :'#75BF01'})
+                    }
+                    else if(tim >= maxTimeValue - 5*diffIntervals)      {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({color :'#84C101'})
+                    }
+                    else if(tim >= maxTimeValue - 6*diffIntervals)      {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({color :'#94C201'})
+                    }
+                    else if(tim >= maxTimeValue - 7*diffIntervals)      {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({color :'#A3C301'})
+                    }
+                    else if(tim >= maxTimeValue - 8*diffIntervals)      {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({color :'#B3C501'})
+                    }
+                    else if(tim >= maxTimeValue - 9*diffIntervals)      {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({color :'#C3C601'})
+                    }
+                    else if(tim >= maxTimeValue - 10*diffIntervals)      {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
+                        layer.setStyle({color :'#C7BB01'})
+                    }
+                    else if(tim >= maxTimeValue - 11*diffIntervals)      {
+                        attArrayCircHistogram[10].value = attArrayCircHistogram[10].value  + 1
+                        layer.setStyle({color :'#C9AD01'})
+                    }
+                    else if(tim >= maxTimeValue - 12*diffIntervals)      {
+                        attArrayCircHistogram[11].value = attArrayCircHistogram[11].value  + 1
+                        layer.setStyle({color :'#CA9F01'})
+                    }
+                    else if(tim >= maxTimeValue - 13*diffIntervals)      {
+                        attArrayCircHistogram[12].value = attArrayCircHistogram[12].value  + 1
+                        layer.setStyle({color :'#CB9101'})
+                    }
+                    else if(tim >= maxTimeValue - 14*diffIntervals)       {
+                        attArrayCircHistogram[13].value = attArrayCircHistogram[13].value  + 1
+                        layer.setStyle({color :'#CC8201'})
+                    }
+                    else if(tim >= maxTimeValue - 15*diffIntervals)       {
+                        attArrayCircHistogram[14].value = attArrayCircHistogram[14].value  + 1
+                        layer.setStyle({color :'#CE7401'})
+                    }
+                    else if(tim >= maxTimeValue - 16*diffIntervals)       {
+                        attArrayCircHistogram[15].value = attArrayCircHistogram[15].value  + 1
+                        layer.setStyle({color :'#CF6501'})
+                    }
+                    else if(tim >= maxTimeValue - 17*diffIntervals)      {
+                        attArrayCircHistogram[16].value = attArrayCircHistogram[16].value  + 1
+                        layer.setStyle({color :'#D05601'})
+                    }
+                    else if(tim >= maxTimeValue - 18*diffIntervals)      {
+                        attArrayCircHistogram[17].value = attArrayCircHistogram[17].value  + 1
+                        layer.setStyle({color :'#D24701'})
+                    }
+                    else if(tim >= maxTimeValue - 19*diffIntervals)      {
+                        attArrayCircHistogram[18].value = attArrayCircHistogram[18].value  + 1
+                        layer.setStyle({color :'#D33701'})
+                    }
+                    else if(tim >= maxTimeValue - 20*diffIntervals)      {
+                        attArrayCircHistogram[19].value = attArrayCircHistogram[19].value  + 1
+                        layer.setStyle({color :'#D42801'})
+                    }
+                    else if(tim >= maxTimeValue - 21*diffIntervals)      {
+                        attArrayCircHistogram[20].value = attArrayCircHistogram[20].value  + 1
+                        layer.setStyle({color :'#D61801'})
+                    }
+                    else if(tim >= maxTimeValue - 22*diffIntervals)      {
+                        attArrayCircHistogram[21].value = attArrayCircHistogram[21].value  + 1
+                        layer.setStyle({color :'#D70801'})
+                    }
+                    else if(tim >= maxTimeValue - 23*diffIntervals)      {
+                        attArrayCircHistogram[22].value = attArrayCircHistogram[22].value  + 1
+                        layer.setStyle({color :'#D80109'})
+                    }
+                    else                    {
+                        attArrayCircHistogram[23].value = attArrayCircHistogram[23].value  + 1
+                        layer.setStyle({color :'#DA0019'})
+                        }
                     break;
                 case "brightness":
                     if(tim <= minTimeValue + diffIntervals)          {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.92);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 2*diffIntervals)     {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.84);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 3*diffIntervals)    {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.76);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 4*diffIntervals)   {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.68);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 5*diffIntervals)   {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.60);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 6*diffIntervals)     {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.52);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 7*diffIntervals)    {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.44);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 8*diffIntervals)   {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.36);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 9*diffIntervals)   {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.28);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 10*diffIntervals)          {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.20);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 11*diffIntervals)     {
+                        attArrayCircHistogram[10].value = attArrayCircHistogram[10].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.12);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 12*diffIntervals)    {
+                        attArrayCircHistogram[11].value = attArrayCircHistogram[11].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.6);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 13*diffIntervals)   {
+                        attArrayCircHistogram[12].value = attArrayCircHistogram[12].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.02);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 14*diffIntervals)   {
+                        attArrayCircHistogram[13].value = attArrayCircHistogram[13].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.1);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 15*diffIntervals)     {
+                        attArrayCircHistogram[14].value = attArrayCircHistogram[14].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.18);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 16*diffIntervals)    {
+                        attArrayCircHistogram[15].value = attArrayCircHistogram[15].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.26);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 17*diffIntervals)   {
+                        attArrayCircHistogram[16].value = attArrayCircHistogram[16].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.34);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 18*diffIntervals)   {
+                        attArrayCircHistogram[17].value = attArrayCircHistogram[17].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.42);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 19*diffIntervals)   {
+                        attArrayCircHistogram[18].value = attArrayCircHistogram[18].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.5);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 20*diffIntervals)   {
+                        attArrayCircHistogram[19].value = attArrayCircHistogram[19].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.58);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 21*diffIntervals)     {
+                        attArrayCircHistogram[20].value = attArrayCircHistogram[20].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.66);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 22*diffIntervals)    {
+                        attArrayCircHistogram[21].value = attArrayCircHistogram[21].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.74);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= minTimeValue + 23*diffIntervals)   {
+                        attArrayCircHistogram[22].value = attArrayCircHistogram[22].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.82);
                         layer.setStyle({"color":colr});
                     }
                     else  {
+                        attArrayCircHistogram[23].value = attArrayCircHistogram[23].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.9);
                         layer.setStyle({"color":colr});
                     }
                     break;
                 case "opacity":
-                    if(tim <= minTimeValue + diffIntervals)       layer.setStyle({opacity :0.04})
-                    else if(tim <= minTimeValue + 2*diffIntervals)       layer.setStyle({opacity :0.08})
-                    else if(tim <= minTimeValue + 3*diffIntervals)       layer.setStyle({opacity :0.12})
-                    else if(tim <= minTimeValue + 4*diffIntervals)      layer.setStyle({opacity :0.16})
-                    else if(tim <= minTimeValue + 5*diffIntervals)      layer.setStyle({opacity :0.20})
-                    else if(tim <= minTimeValue + 6*diffIntervals)      layer.setStyle({opacity :0.24})
-                    else if(tim <= minTimeValue + 7*diffIntervals)      layer.setStyle({opacity :0.28})
-                    else if(tim <= minTimeValue + 8*diffIntervals)      layer.setStyle({opacity :0.32})
-                    else if(tim <= minTimeValue + 9*diffIntervals)      layer.setStyle({opacity :0.36})
-                    else if(tim <= minTimeValue + 10*diffIntervals)      layer.setStyle({opacity :0.40})
-                    else if(tim <= minTimeValue + 11*diffIntervals)      layer.setStyle({opacity :0.44})
-                    else if(tim <= minTimeValue + 12*diffIntervals)      layer.setStyle({opacity :0.48})
-                    else if(tim <= minTimeValue + 13*diffIntervals)      layer.setStyle({opacity :0.52})
-                    else if(tim <= minTimeValue + 14*diffIntervals)       layer.setStyle({opacity :0.56})
-                    else if(tim <= minTimeValue + 15*diffIntervals)       layer.setStyle({opacity :0.6})
-                    else if(tim <= minTimeValue + 16*diffIntervals)       layer.setStyle({opacity :0.64})
-                    else if(tim <= minTimeValue + 17*diffIntervals)      layer.setStyle({opacity :0.68})
-                    else if(tim <= minTimeValue + 18*diffIntervals)      layer.setStyle({opacity :0.72})
-                    else if(tim <= minTimeValue + 19*diffIntervals)      layer.setStyle({opacity :0.76})
-                    else if(tim <= minTimeValue + 20*diffIntervals)      layer.setStyle({opacity :0.8})
-                    else if(tim <= minTimeValue + 21*diffIntervals)      layer.setStyle({opacity :0.84})
-                    else if(tim <= minTimeValue + 22*diffIntervals)      layer.setStyle({opacity :0.88})
-                    else if(tim <= minTimeValue + 23*diffIntervals)      layer.setStyle({opacity :0.92})
-                    else                    layer.setStyle({opacity :0.96})
+                    if(tim <= minTimeValue + diffIntervals)       {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({opacity :0.04})
+                    }
+                    else if(tim <= minTimeValue + 2*diffIntervals)       {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({opacity :0.08})
+                    }
+                    else if(tim <= minTimeValue + 3*diffIntervals)       {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({opacity :0.12})
+                    }
+                    else if(tim <= minTimeValue + 4*diffIntervals)      {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({opacity :0.16})
+                    }
+                    else if(tim <= minTimeValue + 5*diffIntervals)      {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({opacity :0.20})
+                    }
+                    else if(tim <= minTimeValue + 6*diffIntervals)      {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({opacity :0.24})
+                    }
+                    else if(tim <= minTimeValue + 7*diffIntervals)      {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({opacity :0.28})
+                    }
+                    else if(tim <= minTimeValue + 8*diffIntervals)      {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({opacity :0.32})
+                    }
+                    else if(tim <= minTimeValue + 9*diffIntervals)      {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({opacity :0.36})
+                    }
+                    else if(tim <= minTimeValue + 10*diffIntervals)      {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
+                        layer.setStyle({opacity :0.40})
+                    }
+                    else if(tim <= minTimeValue + 11*diffIntervals)      {
+                        attArrayCircHistogram[10].value = attArrayCircHistogram[10].value  + 1
+                        layer.setStyle({opacity :0.44})
+                    }
+                    else if(tim <= minTimeValue + 12*diffIntervals)      {
+                        attArrayCircHistogram[11].value = attArrayCircHistogram[11].value  + 1
+                        layer.setStyle({opacity :0.48})
+                    }
+                    else if(tim <= minTimeValue + 13*diffIntervals)      {
+                        attArrayCircHistogram[12].value = attArrayCircHistogram[12].value  + 1
+                        layer.setStyle({opacity :0.52})
+                    }
+                    else if(tim <= minTimeValue + 14*diffIntervals)       {
+                        attArrayCircHistogram[13].value = attArrayCircHistogram[13].value  + 1
+                        layer.setStyle({opacity :0.56})
+                    }
+                    else if(tim <= minTimeValue + 15*diffIntervals)       {
+                        attArrayCircHistogram[14].value = attArrayCircHistogram[14].value  + 1
+                        layer.setStyle({opacity :0.6})
+                    }
+                    else if(tim <= minTimeValue + 16*diffIntervals)       {
+                        attArrayCircHistogram[15].value = attArrayCircHistogram[15].value  + 1
+                        layer.setStyle({opacity :0.64})
+                    }
+                    else if(tim <= minTimeValue + 17*diffIntervals)      {
+                        attArrayCircHistogram[16].value = attArrayCircHistogram[16].value  + 1
+                        layer.setStyle({opacity :0.68})
+                    }
+                    else if(tim <= minTimeValue + 18*diffIntervals)      {
+                        attArrayCircHistogram[17].value = attArrayCircHistogram[17].value  + 1
+                        layer.setStyle({opacity :0.72})
+                    }
+                    else if(tim <= minTimeValue + 19*diffIntervals)      {
+                        attArrayCircHistogram[18].value = attArrayCircHistogram[18].value  + 1
+                        layer.setStyle({opacity :0.76})
+                    }
+                    else if(tim <= minTimeValue + 20*diffIntervals)      {
+                        attArrayCircHistogram[19].value = attArrayCircHistogram[19].value  + 1
+                        layer.setStyle({opacity :0.8})
+                    }
+                    else if(tim <= minTimeValue + 21*diffIntervals)      {
+                        attArrayCircHistogram[20].value = attArrayCircHistogram[20].value  + 1
+                        layer.setStyle({opacity :0.84})
+                    }
+                    else if(tim <= minTimeValue + 22*diffIntervals)      {
+                        attArrayCircHistogram[21].value = attArrayCircHistogram[21].value  + 1
+                        layer.setStyle({opacity :0.88})
+                    }
+                    else if(tim <= minTimeValue + 23*diffIntervals)      {
+                        attArrayCircHistogram[22].value = attArrayCircHistogram[22].value  + 1
+                        layer.setStyle({opacity :0.92})
+                    }
+                    else                    {
+                        attArrayCircHistogram[23].value = attArrayCircHistogram[23].value  + 1
+                        layer.setStyle({opacity :0.96})
+                        }
                     break;
                 case "width":
-                    if(tim <= minTimeValue + diffIntervals)       layer.setStyle({weight :1})
-                    else if(tim <= minTimeValue + 2*diffIntervals)       layer.setStyle({weight :1.15})
-                    else if(tim <= minTimeValue + 3*diffIntervals)       layer.setStyle({weight :1.3})
-                    else if(tim <= minTimeValue + 4*diffIntervals)      layer.setStyle({weight :1.45})
-                    else if(tim <= minTimeValue + 5*diffIntervals)      layer.setStyle({weight :1.6})
-                    else if(tim <= minTimeValue + 6*diffIntervals)      layer.setStyle({weight :1.75})
-                    else if(tim <= minTimeValue + 7*diffIntervals)      layer.setStyle({weight :1.9})
-                    else if(tim <= minTimeValue + 8*diffIntervals)      layer.setStyle({weight :2.05})
-                    else if(tim <= minTimeValue + 9*diffIntervals)      layer.setStyle({weight :2.2})
-                    else if(tim <= minTimeValue + 10*diffIntervals)      layer.setStyle({weight :2.35})
-                    else if(tim <= minTimeValue + 11*diffIntervals)      layer.setStyle({weight :2.5})
-                    else if(tim <= minTimeValue + 12*diffIntervals)      layer.setStyle({weight :2.65})
-                    else if(tim <= minTimeValue + 13*diffIntervals)      layer.setStyle({weight :2.8})
-                    else if(tim <= minTimeValue + 14*diffIntervals)       layer.setStyle({weight :2.95})
-                    else if(tim <= minTimeValue + 15*diffIntervals)       layer.setStyle({weight :3.1})
-                    else if(tim <= minTimeValue + 16*diffIntervals)       layer.setStyle({weight :3.25})
-                    else if(tim <= minTimeValue + 17*diffIntervals)      layer.setStyle({weight :3.4})
-                    else if(tim <= minTimeValue + 18*diffIntervals)      layer.setStyle({weight :3.55})
-                    else if(tim <= minTimeValue + 19*diffIntervals)      layer.setStyle({weight :3.70})
-                    else if(tim <= minTimeValue + 20*diffIntervals)      layer.setStyle({weight :3.85})
-                    else if(tim <= minTimeValue + 21*diffIntervals)      layer.setStyle({weight :4})
-                    else if(tim <= minTimeValue + 22*diffIntervals)      layer.setStyle({weight :4.15})
-                    else if(tim <= minTimeValue + 23*diffIntervals)      layer.setStyle({weight :4.3})
-                    else                    layer.setStyle({weight :4.45})
+                    if(tim <= minTimeValue + diffIntervals)       {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({weight :1})
+                    }
+                    else if(tim <= minTimeValue + 2*diffIntervals)       {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({weight :1.15})
+                    }
+                    else if(tim <= minTimeValue + 3*diffIntervals)       {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({weight :1.3})
+                    }
+                    else if(tim <= minTimeValue + 4*diffIntervals)      {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({weight :1.45})
+                    }
+                    else if(tim <= minTimeValue + 5*diffIntervals)      {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({weight :1.6})
+                    }
+                    else if(tim <= minTimeValue + 6*diffIntervals)      {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({weight :1.75})
+                    }
+                    else if(tim <= minTimeValue + 7*diffIntervals)      {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({weight :1.9})
+                    }
+                    else if(tim <= minTimeValue + 8*diffIntervals)      {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({weight :2.05})
+                    }
+                    else if(tim <= minTimeValue + 9*diffIntervals)      {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({weight :2.2})
+                    }
+                    else if(tim <= minTimeValue + 10*diffIntervals)      {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
+                        layer.setStyle({weight :2.35})
+                    }
+                    else if(tim <= minTimeValue + 11*diffIntervals)      {
+                        attArrayCircHistogram[10].value = attArrayCircHistogram[10].value  + 1
+                        layer.setStyle({weight :2.5})
+                    }
+                    else if(tim <= minTimeValue + 12*diffIntervals)      {
+                        attArrayCircHistogram[11].value = attArrayCircHistogram[11].value  + 1
+                        layer.setStyle({weight :2.65})
+                    }
+                    else if(tim <= minTimeValue + 13*diffIntervals)      {
+                        attArrayCircHistogram[12].value = attArrayCircHistogram[12].value  + 1
+                        layer.setStyle({weight :2.8})
+                    }
+                    else if(tim <= minTimeValue + 14*diffIntervals)       {
+                        attArrayCircHistogram[13].value = attArrayCircHistogram[13].value  + 1
+                        layer.setStyle({weight :2.95})
+                    }
+                    else if(tim <= minTimeValue + 15*diffIntervals)       {
+                        attArrayCircHistogram[14].value = attArrayCircHistogram[14].value  + 1
+                        layer.setStyle({weight :3.1})
+                    }
+                    else if(tim <= minTimeValue + 16*diffIntervals)       {
+                        attArrayCircHistogram[15].value = attArrayCircHistogram[15].value  + 1
+                        layer.setStyle({weight :3.25})
+                    }
+                    else if(tim <= minTimeValue + 17*diffIntervals)      {
+                        attArrayCircHistogram[16].value = attArrayCircHistogram[16].value  + 1
+                        layer.setStyle({weight :3.4})
+                    }
+                    else if(tim <= minTimeValue + 18*diffIntervals)      {
+                        attArrayCircHistogram[17].value = attArrayCircHistogram[17].value  + 1
+                        layer.setStyle({weight :3.55})
+                    }
+                    else if(tim <= minTimeValue + 19*diffIntervals)      {
+                        attArrayCircHistogram[18].value = attArrayCircHistogram[18].value  + 1
+                        layer.setStyle({weight :3.70})
+                    }
+                    else if(tim <= minTimeValue + 20*diffIntervals)      {
+                        attArrayCircHistogram[19].value = attArrayCircHistogram[19].value  + 1
+                        layer.setStyle({weight :3.85})
+                    }
+                    else if(tim <= minTimeValue + 21*diffIntervals)      {
+                        attArrayCircHistogram[20].value = attArrayCircHistogram[20].value  + 1
+                        layer.setStyle({weight :4})
+                    }
+                    else if(tim <= minTimeValue + 22*diffIntervals)      {
+                        attArrayCircHistogram[21].value = attArrayCircHistogram[21].value  + 1
+                        layer.setStyle({weight :4.15})
+                    }
+                    else if(tim <= minTimeValue + 23*diffIntervals)      {
+                        attArrayCircHistogram[22].value = attArrayCircHistogram[22].value  + 1
+                        layer.setStyle({weight :4.3})
+                    }
+                    else                    {
+                        attArrayCircHistogram[23].value = attArrayCircHistogram[23].value  + 1
+                        layer.setStyle({weight :4.45})
+                        }
                     break;
             }
         }
 
-         function weekdayAtt(layer, properties, encoding){
+         function weekdayAtt(layer, properties, encoding, attArrayCircHistogram){
             // 2008-02-02 13:30:44
             // 2008-02-08 17:39:18
             // code block
@@ -3990,66 +4524,136 @@ block content
             var diffIntervals = (maxTimeValue - minTimeValue)/10
             switch(encoding){
                 case "color":
-                    if(day == "Monday")             layer.setStyle({color :'#49BC01'})
-                    else if(day == "Tuesday")       layer.setStyle({color :'#82C101'})
-                    else if(day == "Wednesday")     layer.setStyle({color :'#BEC601'})
-                    else if(day == "Thursday")      layer.setStyle({color :'#CB9801'})
-                    else if(day == "Friday")        layer.setStyle({color :'#D06001'})
-                    else if(day == "Saturday")      layer.setStyle({color :'#D52501'})
-                    else if(day == "Sunday")        layer.setStyle({color :'#DA0019'})
+                    if(day == "Monday")             {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({color :'#49BC01'})
+                        }
+                    else if(day == "Tuesday")       {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({color :'#82C101'})
+                        }
+                    else if(day == "Wednesday")     {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({color :'#BEC601'})
+                        }
+                    else if(day == "Thursday")      {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({color :'#CB9801'})
+                        }
+                    else if(day == "Friday")        {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({color :'#D06001'})
+                        }
+                    else if(day == "Saturday")      {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({color :'#D52501'})
+                        }
+                    else if(day == "Sunday")        {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({color :'#DA0019'})
+                        }
                     break;
                 case "brightness":
                     if(day == "Monday") {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.9);
                         layer.setStyle({"color":colr});
                     }
                     else if(day == "Tuesday") {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.6);
                         layer.setStyle({"color":colr});
                     }
                     else if(day == "Wednesday") {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.3);
                         layer.setStyle({"color":colr});
                     }
                     else if(day == "Thursday") {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
                         let colr = ColorLuminance(layer.options.color,0.0);
                         layer.setStyle({"color":colr});
                     }
                     else if(day == "Friday") {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.3);
                         layer.setStyle({"color":colr});
                     }
                     else if(day == "Saturday") {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.6);
                         layer.setStyle({"color":colr});
                     }
                     else if(day == "Sunday") {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.9);
                         layer.setStyle({"color":colr});
                     }
                     break;
                 case "opacity":
-                    if(day == "Monday")             layer.setStyle({opacity:0.90});
-                    else if(day == "Tuesday")       layer.setStyle({opacity:0.77}); 
-                    else if(day == "Wednesday")       layer.setStyle({opacity:0.64}); 
-                    else if(day == "Thursday")       layer.setStyle({opacity:0.51}); 
-                    else if(day == "Friday")       layer.setStyle({opacity:0.38}); 
-                    else if(day == "Saturday")       layer.setStyle({opacity:0.25}); 
-                    else if(day == "Sunday")       layer.setStyle({opacity:0.12}); 
+                    if(day == "Monday")             {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({opacity:0.90});
+                        }
+                    else if(day == "Tuesday")       {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({opacity:0.77}); 
+                        }
+                    else if(day == "Wednesday")       {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({opacity:0.64});
+                        } 
+                    else if(day == "Thursday")       {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({opacity:0.51}); 
+                        }
+                    else if(day == "Friday")       {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({opacity:0.38}); 
+                        }
+                    else if(day == "Saturday")      { 
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({opacity:0.25}); 
+                        }
+                    else if(day == "Sunday")       {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({opacity:0.12}); 
+                        }
                     break;
                 case "width":
-                    if(day == "Monday")             layer.setStyle({"weight":4});
-                    else if(day == "Tuesday")       layer.setStyle({"weight":3.5});
-                    else if(day == "Wednesday")     layer.setStyle({"weight":3});
-                    else if(day == "Thursday")      layer.setStyle({"weight":2.5});
-                    else if(day == "Friday")        layer.setStyle({"weight":2});
-                    else if(day == "Saturday")      layer.setStyle({"weight":1.5});
-                    else if(day == "Sunday")        layer.setStyle({"weight":1});
+                    if(day == "Monday")             {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({"weight":4});
+                        }
+                    else if(day == "Tuesday")       {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({"weight":3.5});
+                        }
+                    else if(day == "Wednesday")     {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({"weight":3});
+                        }
+                    else if(day == "Thursday")      {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({"weight":2.5});
+                        }
+                    else if(day == "Friday")        {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({"weight":2});
+                        }
+                    else if(day == "Saturday")      {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({"weight":1.5});
+                        }
+                    else if(day == "Sunday")        {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({"weight":1});
+                        }
                     break;
             }
         }
 
-        function hourdayAtt(layer, properties, encoding){
+        function hourdayAtt(layer, properties, encoding, attArrayCircHistogram){
             // 2008-02-02 13:30:44
             // 2008-02-08 17:39:18
             // code block
@@ -4060,180 +4664,351 @@ block content
             var diffIntervals = (maxTimeValue - minTimeValue)/10
             switch(encoding){
                 case "color":
-                    if(tim <= 1)       layer.setStyle({color :'#49BC01'})
-                    else if(tim <= 2)       layer.setStyle({color :'#57BD01'})
-                    else if(tim <= 3)       layer.setStyle({color :'#66BE01'})
-                    else if(tim <= 4)      layer.setStyle({color :'#75BF01'})
-                    else if(tim <= 5)      layer.setStyle({color :'#84C101'})
-                    else if(tim <= 6)      layer.setStyle({color :'#94C201'})
-                    else if(tim <= 7)      layer.setStyle({color :'#A3C301'})
-                    else if(tim <= 8)      layer.setStyle({color :'#B3C501'})
-                    else if(tim <= 9)      layer.setStyle({color :'#C3C601'})
-                    else if(tim <= 10)      layer.setStyle({color :'#C7BB01'})
-                    else if(tim <= 11)      layer.setStyle({color :'#C9AD01'})
-                    else if(tim <= 12)      layer.setStyle({color :'#CA9F01'})
-                    else if(tim <= 13)      layer.setStyle({color :'#CB9101'})
-                    else if(tim <= 14)       layer.setStyle({color :'#CC8201'})
-                    else if(tim <= 15)       layer.setStyle({color :'#CE7401'})
-                    else if(tim <= 16)       layer.setStyle({color :'#CF6501'})
-                    else if(tim <= 17)      layer.setStyle({color :'#D05601'})
-                    else if(tim <= 18)      layer.setStyle({color :'#D24701'})
-                    else if(tim <= 19)      layer.setStyle({color :'#D33701'})
-                    else if(tim <= 20)      layer.setStyle({color :'#D42801'})
-                    else if(tim <= 21)      layer.setStyle({color :'#D61801'})
-                    else if(tim <= 22)      layer.setStyle({color :'#D70801'})
-                    else if(tim <= 23)      layer.setStyle({color :'#D80109'})
-                    else                    layer.setStyle({color :'#DA0019'})
+                    if(tim <= 1)      {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({color :'#49BC01'})
+                        }
+                    else if(tim <= 2)       {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({color :'#57BD01'})}
+                    else if(tim <= 3)       {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({color :'#66BE01'})}
+                    else if(tim <= 4)       {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({color :'#75BF01'})}
+                    else if(tim <= 5)       {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({color :'#84C101'})}
+                    else if(tim <= 6)       {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({color :'#94C201'})}
+                    else if(tim <= 7)       {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({color :'#A3C301'})}
+                    else if(tim <= 8)       {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({color :'#B3C501'})}
+                    else if(tim <= 9)       {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({color :'#C3C601'})}
+                    else if(tim <= 10)       {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
+                        layer.setStyle({color :'#C7BB01'})}
+                    else if(tim <= 11)       {
+                        attArrayCircHistogram[10].value = attArrayCircHistogram[10].value  + 1
+                        layer.setStyle({color :'#C9AD01'})}
+                    else if(tim <= 12)       {
+                        attArrayCircHistogram[11].value = attArrayCircHistogram[11].value  + 1
+                        layer.setStyle({color :'#CA9F01'})}
+                    else if(tim <= 13)       {
+                        attArrayCircHistogram[12].value = attArrayCircHistogram[12].value  + 1
+                        layer.setStyle({color :'#CB9101'})}
+                    else if(tim <= 14)       {
+                        attArrayCircHistogram[13].value = attArrayCircHistogram[13].value  + 1
+                        layer.setStyle({color :'#CC8201'})}
+                    else if(tim <= 15)       {
+                        attArrayCircHistogram[14].value = attArrayCircHistogram[14].value  + 1
+                        layer.setStyle({color :'#CE7401'})}
+                    else if(tim <= 16)       {
+                        attArrayCircHistogram[15].value = attArrayCircHistogram[15].value  + 1
+                        layer.setStyle({color :'#CF6501'})}
+                    else if(tim <= 17)       {
+                        attArrayCircHistogram[16].value = attArrayCircHistogram[16].value  + 1
+                        layer.setStyle({color :'#D05601'})}
+                    else if(tim <= 18)       {
+                        attArrayCircHistogram[17].value = attArrayCircHistogram[17].value  + 1
+                        layer.setStyle({color :'#D24701'})}
+                    else if(tim <= 19)       {
+                        attArrayCircHistogram[18].value = attArrayCircHistogram[18].value  + 1
+                        layer.setStyle({color :'#D33701'})}
+                    else if(tim <= 20)       {
+                        attArrayCircHistogram[19].value = attArrayCircHistogram[19].value  + 1
+                        layer.setStyle({color :'#D42801'})}
+                    else if(tim <= 21)       {
+                        attArrayCircHistogram[20].value = attArrayCircHistogram[20].value  + 1
+                        layer.setStyle({color :'#D61801'})}
+                    else if(tim <= 22)       {
+                        attArrayCircHistogram[21].value = attArrayCircHistogram[21].value  + 1
+                        layer.setStyle({color :'#D70801'})}
+                    else if(tim <= 23)       {
+                        attArrayCircHistogram[22].value = attArrayCircHistogram[22].value  + 1
+                        layer.setStyle({color :'#D80109'})}
+                    else                    {
+                        attArrayCircHistogram[23].value = attArrayCircHistogram[23].value  + 1
+                        layer.setStyle({color :'#DA0019'})
+                        }
                     break;
                 case "brightness":
                     if(tim <= 1)          {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.92);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 2)     {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.84);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 3)    {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.76);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 4)   {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.68);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 5)   {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.60);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 6)     {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.52);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 7)    {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.44);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 8)   {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.36);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 9)   {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.28);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 10)   {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.20);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 11)   {
+                        attArrayCircHistogram[10].value = attArrayCircHistogram[10].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.12);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 12)   {
+                        attArrayCircHistogram[11].value = attArrayCircHistogram[11].value  + 1
                         let colr = ColorLuminance(layer.options.color,-0.04);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 13)   {
+                        attArrayCircHistogram[12].value = attArrayCircHistogram[12].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.04);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 14)   {
+                        attArrayCircHistogram[13].value = attArrayCircHistogram[13].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.12);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 15)   {
+                        attArrayCircHistogram[14].value = attArrayCircHistogram[14].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.2);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 16)     {
+                        attArrayCircHistogram[15].value = attArrayCircHistogram[15].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.28);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 17)    {
+                        attArrayCircHistogram[16].value = attArrayCircHistogram[16].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.36);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 18)   {
+                        attArrayCircHistogram[17].value = attArrayCircHistogram[17].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.44);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 19)   {
+                        attArrayCircHistogram[18].value = attArrayCircHistogram[18].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.52);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 20)   {
+                        attArrayCircHistogram[19].value = attArrayCircHistogram[19].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.6);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 21)   {
+                        attArrayCircHistogram[20].value = attArrayCircHistogram[20].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.68);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 22)   {
+                        attArrayCircHistogram[21].value = attArrayCircHistogram[21].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.76);
                         layer.setStyle({"color":colr});
                     }
                     else if(tim <= 23)   {
+                        attArrayCircHistogram[22].value = attArrayCircHistogram[22].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.84);
                         layer.setStyle({"color":colr});
                     }
                     else  {
+                        attArrayCircHistogram[23].value = attArrayCircHistogram[23].value  + 1
                         let colr = ColorLuminance(layer.options.color,+0.92);
                         layer.setStyle({"color":colr});
                     }
                     break;
                 case "opacity":
-                    if(tim <= 1)       layer.setStyle({opacity :0.04})
-                    else if(tim <= 2)       layer.setStyle({opacity :0.08})
-                    else if(tim <= 3)       layer.setStyle({opacity :0.12})
-                    else if(tim <= 4)      layer.setStyle({opacity :0.16})
-                    else if(tim <= 5)      layer.setStyle({opacity :0.20})
-                    else if(tim <= 6)      layer.setStyle({opacity :0.24})
-                    else if(tim <= 7)      layer.setStyle({opacity :0.28})
-                    else if(tim <= 8)      layer.setStyle({opacity :0.32})
-                    else if(tim <= 9)      layer.setStyle({opacity :0.36})
-                    else if(tim <= 10)      layer.setStyle({opacity :0.40})
-                    else if(tim <= 11)      layer.setStyle({opacity :0.44})
-                    else if(tim <= 12)      layer.setStyle({opacity :0.48})
-                    else if(tim <= 13)      layer.setStyle({opacity :0.52})
-                    else if(tim <= 14)       layer.setStyle({opacity :0.56})
-                    else if(tim <= 15)       layer.setStyle({opacity :0.6})
-                    else if(tim <= 16)       layer.setStyle({opacity :0.64})
-                    else if(tim <= 17)      layer.setStyle({opacity :0.68})
-                    else if(tim <= 18)      layer.setStyle({opacity :0.72})
-                    else if(tim <= 19)      layer.setStyle({opacity :0.76})
-                    else if(tim <= 20)      layer.setStyle({opacity :0.8})
-                    else if(tim <= 21)      layer.setStyle({opacity :0.84})
-                    else if(tim <= 22)      layer.setStyle({opacity :0.88})
-                    else if(tim <= 23)      layer.setStyle({opacity :0.92})
-                    else                    layer.setStyle({opacity :0.96})
+                    if(tim <= 1)       {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({opacity :0.04})}
+                    else if(tim <= 2)       {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({opacity :0.08})}
+                    else if(tim <= 3)       {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({opacity :0.12})}
+                    else if(tim <= 4)       {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({opacity :0.16})}
+                    else if(tim <= 5)       {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({opacity :0.20})}
+                    else if(tim <= 6)       {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({opacity :0.24})}
+                    else if(tim <= 7)       {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({opacity :0.28})}
+                    else if(tim <= 8)       {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({opacity :0.32})}
+                    else if(tim <= 9)       {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({opacity :0.36})}
+                    else if(tim <= 10)       {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
+                        layer.setStyle({opacity :0.40})}
+                    else if(tim <= 11)       {
+                        attArrayCircHistogram[10].value = attArrayCircHistogram[10].value  + 1
+                        layer.setStyle({opacity :0.44})}
+                    else if(tim <= 12)       {
+                        attArrayCircHistogram[11].value = attArrayCircHistogram[11].value  + 1
+                        layer.setStyle({opacity :0.48})}
+                    else if(tim <= 13)       {
+                        attArrayCircHistogram[12].value = attArrayCircHistogram[12].value  + 1
+                        layer.setStyle({opacity :0.52})}
+                    else if(tim <= 14)       {
+                        attArrayCircHistogram[13].value = attArrayCircHistogram[13].value  + 1
+                        layer.setStyle({opacity :0.56})}
+                    else if(tim <= 15)       {
+                        attArrayCircHistogram[14].value = attArrayCircHistogram[14].value  + 1
+                        layer.setStyle({opacity :0.6})}
+                    else if(tim <= 16)       {
+                        attArrayCircHistogram[15].value = attArrayCircHistogram[15].value  + 1
+                        layer.setStyle({opacity :0.64})}
+                    else if(tim <= 17)       {
+                        attArrayCircHistogram[16].value = attArrayCircHistogram[16].value  + 1
+                        layer.setStyle({opacity :0.68})}
+                    else if(tim <= 18)       {
+                        attArrayCircHistogram[17].value = attArrayCircHistogram[17].value  + 1
+                        layer.setStyle({opacity :0.72})}
+                    else if(tim <= 19)       {
+                        attArrayCircHistogram[18].value = attArrayCircHistogram[18].value  + 1
+                        layer.setStyle({opacity :0.76})}
+                    else if(tim <= 20)       {
+                        attArrayCircHistogram[19].value = attArrayCircHistogram[19].value  + 1
+                        layer.setStyle({opacity :0.8})}
+                    else if(tim <= 21)       {
+                        attArrayCircHistogram[20].value = attArrayCircHistogram[20].value  + 1
+                        layer.setStyle({opacity :0.84})}
+                    else if(tim <= 22)       {
+                        attArrayCircHistogram[21].value = attArrayCircHistogram[21].value  + 1
+                        layer.setStyle({opacity :0.88})}
+                    else if(tim <= 23)       {
+                        attArrayCircHistogram[22].value = attArrayCircHistogram[22].value  + 1
+                        layer.setStyle({opacity :0.92})}
+                    else                    {
+                        attArrayCircHistogram[23].value = attArrayCircHistogram[23].value  + 1
+                        layer.setStyle({opacity :0.96})
+                        }
                     break;
                 case "width":
-                    if(tim <= 1)       layer.setStyle({weight :1})
-                    else if(tim <= 2)       layer.setStyle({weight :1.15})
-                    else if(tim <= 3)       layer.setStyle({weight :1.3})
-                    else if(tim <= 4)      layer.setStyle({weight :1.45})
-                    else if(tim <= 5)      layer.setStyle({weight :1.6})
-                    else if(tim <= 6)      layer.setStyle({weight :1.75})
-                    else if(tim <= 7)      layer.setStyle({weight :1.9})
-                    else if(tim <= 8)      layer.setStyle({weight :2.05})
-                    else if(tim <= 9)      layer.setStyle({weight :2.2})
-                    else if(tim <= 10)      layer.setStyle({weight :2.35})
-                    else if(tim <= 11)      layer.setStyle({weight :2.5})
-                    else if(tim <= 12)      layer.setStyle({weight :2.65})
-                    else if(tim <= 13)      layer.setStyle({weight :2.8})
-                    else if(tim <= 14)       layer.setStyle({weight :2.95})
-                    else if(tim <= 15)       layer.setStyle({weight :3.1})
-                    else if(tim <= 16)       layer.setStyle({weight :3.25})
-                    else if(tim <= 17)      layer.setStyle({weight :3.4})
-                    else if(tim <= 18)      layer.setStyle({weight :3.55})
-                    else if(tim <= 19)      layer.setStyle({weight :3.70})
-                    else if(tim <= 20)      layer.setStyle({weight :3.85})
-                    else if(tim <= 21)      layer.setStyle({weight :4})
-                    else if(tim <= 22)      layer.setStyle({weight :4.15})
-                    else if(tim <= 23)      layer.setStyle({weight :4.3})
-                    else                    layer.setStyle({weight :4.45})
+                    if(tim <= 1)       {
+                        attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
+                        layer.setStyle({weight :1})}
+                    else if(tim <= 2)       {
+                        attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
+                        layer.setStyle({weight :1.15})}
+                    else if(tim <= 3)       {
+                        attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
+                        layer.setStyle({weight :1.3})}
+                    else if(tim <= 4)       {
+                        attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
+                        layer.setStyle({weight :1.45})}
+                    else if(tim <= 5)       {
+                        attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
+                        layer.setStyle({weight :1.6})}
+                    else if(tim <= 6)       {
+                        attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
+                        layer.setStyle({weight :1.75})}
+                    else if(tim <= 7)       {
+                        attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
+                        layer.setStyle({weight :1.9})}
+                    else if(tim <= 8)       {
+                        attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
+                        layer.setStyle({weight :2.05})}
+                    else if(tim <= 9)       {
+                        attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
+                        layer.setStyle({weight :2.2})}
+                    else if(tim <= 10)       {
+                        attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
+                        layer.setStyle({weight :2.35})}
+                    else if(tim <= 11)       {
+                        attArrayCircHistogram[10].value = attArrayCircHistogram[10].value  + 1
+                        layer.setStyle({weight :2.5})}
+                    else if(tim <= 12)       {
+                        attArrayCircHistogram[11].value = attArrayCircHistogram[11].value  + 1
+                        layer.setStyle({weight :2.65})}
+                    else if(tim <= 13)       {
+                        attArrayCircHistogram[12].value = attArrayCircHistogram[12].value  + 1
+                        layer.setStyle({weight :2.8})}
+                    else if(tim <= 14)       {
+                        attArrayCircHistogram[13].value = attArrayCircHistogram[13].value  + 1
+                        layer.setStyle({weight :2.95})}
+                    else if(tim <= 15)       {
+                        attArrayCircHistogram[14].value = attArrayCircHistogram[14].value  + 1
+                        layer.setStyle({weight :3.1})}
+                    else if(tim <= 16)       {
+                        attArrayCircHistogram[15].value = attArrayCircHistogram[15].value  + 1
+                        layer.setStyle({weight :3.25})}
+                    else if(tim <= 17)       {
+                        attArrayCircHistogram[16].value = attArrayCircHistogram[16].value  + 1
+                        layer.setStyle({weight :3.4})}
+                    else if(tim <= 18)       {
+                        attArrayCircHistogram[17].value = attArrayCircHistogram[17].value  + 1
+                        layer.setStyle({weight :3.55})}
+                    else if(tim <= 19)       {
+                        attArrayCircHistogram[18].value = attArrayCircHistogram[18].value  + 1
+                        layer.setStyle({weight :3.70})}
+                    else if(tim <= 20)       {
+                        attArrayCircHistogram[19].value = attArrayCircHistogram[19].value  + 1
+                        layer.setStyle({weight :3.85})}
+                    else if(tim <= 21)       {
+                        attArrayCircHistogram[20].value = attArrayCircHistogram[20].value  + 1
+                        layer.setStyle({weight :4})}
+                    else if(tim <= 22)       {
+                        attArrayCircHistogram[21].value = attArrayCircHistogram[21].value  + 1
+                        layer.setStyle({weight :4.15})}
+                    else if(tim <= 23)       {
+                        attArrayCircHistogram[22].value = attArrayCircHistogram[22].value  + 1
+                        layer.setStyle({weight :4.3})}
+                    else                    {
+                        attArrayCircHistogram[23].value = attArrayCircHistogram[23].value  + 1
+                        layer.setStyle({weight :4.45})}
                     break;
             }
         }
@@ -4660,13 +5435,15 @@ block content
         var element = document.getElementById('statisticsBut'); // grab a reference to your element
         element.addEventListener('click', clickHandler);
 
-        
+        //////////////////////////////////////////        
 
         $(document).ready(function(){
         $('form input').change(function () {
             $('form p').text(this.files.length + " file(s) selected");
         });
         });
+
+        //////////////////////////////////////////
 
         $('.firstMap').click(function (e) {
            map.removeLayer(activeMap);
@@ -4693,6 +5470,12 @@ block content
            CartoDB_VoyagerNoLabels.addTo(map);
            activeMap = CartoDB_VoyagerNoLabels;
         }); 
+
+
+        //////////////////////////////////////////
+        //////////////////////////////////////////
+        //////////////////////////////////////////
+
 
         function convertLeng(d) {
             return {
@@ -4973,26 +5756,95 @@ block content
             });
         }
 
+        function circularHistogram(dataInput,lens){
+            // set the dimensions and margins of the graph
+            var margin = {top: 100, right: 0, bottom: 0, left: 0},
+                width = 450 - margin.left - margin.right,
+                height = 450 - margin.top - margin.bottom,
+                innerRadius = 105,
+                outerRadius = Math.min(width, height) / 2;   // the outerRadius goes from the middle of the SVG area to the border
+
+            // append the svg object
+            var svg = d3.select("#my_datavizCIRCULAR")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", "translate(" + (width / 2 + margin.left) + "," + (height / 2 + margin.top) + ")");
+            console.log(lens.attArrayCircHistogram)
+            let jsonToUse = lens.attArrayCircHistogram;
+            console.log(jsonToUse)
+            
+            // Scales
+            var x = d3.scaleBand()
+                .range([(-1 * Math.PI)*0.99, (0.5 * Math.PI)*0.99])    // X axis goes from 0 to 2pi = all around the circle. If I stop at 1Pi, it will be around a half circle
+                .align(0)                  // This does nothing
+                .domain(jsonToUse.map(function(d) { return d.name; })); // The domain of the X axis is the list of states.
+            var y = d3.scaleRadial()
+                .range([innerRadius, outerRadius])   // Domain will be define later.
+                .domain([0, 1000]); // Domain of Y is from 0 to the max seen in the data
+            // Add the bars
+            svg.append("g")
+                .selectAll("path")
+                .data(jsonToUse)
+                .enter()
+                .append("path")
+                .attr("fill", function(d, i) {
+                    return lens.color(i);
+                })
+                .attr("d", d3.arc()     // imagine your doing a part of a donut plot
+                    .innerRadius(innerRadius)
+                    .outerRadius(function(d) { return y(+d.value); })
+                    .startAngle(function(d) { return x(d.name); })
+                    .endAngle(function(d) { return x(d.name) + x.bandwidth(); })
+                    .padAngle(0.01)
+                    .padRadius(innerRadius))
+
+            // Add the labels
+            svg.append("g")
+                .selectAll("g")
+                .data(jsonToUse)
+                .enter()
+                .append("g")
+                    .attr("text-anchor", function(d) { return (x(d.name) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
+                    .attr("transform", function(d) { return "rotate(" + ((x(d.name) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")"+"translate(" + (y(+d.value)+10) + ",0)"; })
+                .append("text")
+                    .text(function(d){return(d.name)})
+                    .attr("transform", function(d) { return (x(d.name) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
+                    .style("font-size", "11px")
+                    .attr("alignment-baseline", "middle")
+        }
         
+
+        //////////////////////////////////////////
+        //////////////////////////////////////////
+        //////////////////////////////////////////
+
+
         function clearBox(elementID)
         {
             document.getElementById(elementID).innerHTML = "";
         }
 
+        //////////////////////////////////////////
+        //////////////////////////////////////////
+        //////////////////////////////////////////
 
         // Function to compute density
         function kernelDensityEstimator(kernel, X) {
-        return function(V) {
-            return X.map(function(x) {
-            return [x, d3.mean(V, function(v) { return kernel(x - v); })];
-            });
-        };
+            return function(V) {
+                return X.map(function(x) {
+                return [x, d3.mean(V, function(v) { return kernel(x - v); })];
+                });
+            };
         }
         function kernelEpanechnikov(k) {
-        return function(v) {
-            return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
-        };
+            return function(v) {
+                return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
+            };
         }
+
+        //////////////////////////////////////////
 
         function replaceGlobally(original, searchTxt, replaceTxt) {
             original = original.split(searchTxt).join(replaceTxt);
@@ -5075,12 +5927,6 @@ block content
                                 };
                             }
                         }
-                    },
-                    mouseout:function(){
-                        console.log("Bellow is the attLensesArray");
-                        console.log(attLensesArray);
-                        //outterLensesLayer.removeLayer(lens.outsideCircle);
-                        
                     }
                 });
             }
@@ -5486,6 +6332,8 @@ block content
 
             document.getElementById('encoding').style.display = "none";
             document.getElementById('encoding').style.visibility = "hidden";
+
+            document.getElementById('my_datavizCIRCULAR').style.visibility = "hidden";
             outterLensesLayer.removeLayer(lens.outsideCircle);
             lensesLayer.removeLayer(lens.areaQuery);
             
@@ -5505,9 +6353,12 @@ block content
         }
 
         function radiusATTLENSNEWMENU(lens){
+            document.getElementById('attribute').style.display = "none";
             document.getElementById('attribute').style.visibility = "hidden";
-
+            document.getElementById('encoding').style.display = "none";
             document.getElementById('encoding').style.visibility = "hidden";
+
+            document.getElementById('my_datavizCIRCULAR').style.visibility = "hidden";
             clicked=false;
             changeRadius = true;
             lensCanMove = false;
@@ -5622,6 +6473,8 @@ block content
 
             document.getElementById('encoding').style.display = "none";
             document.getElementById('encoding').style.visibility = "hidden";
+
+            document.getElementById('my_datavizCIRCULAR').style.visibility = "hidden";
             clicked = false; 
             changeRadius = false;
             lensCanMove = true;
@@ -5641,17 +6494,17 @@ block content
                         
                     
                     map.on('mousemove', function (e) {
-                        L.DomEvent.stopPropagation(e);
-                        document.getElementById('piemenu').style.visibility = "hidden";
-                        createQueryLensesFlag = false;
-                        createAttributeLensesFlag = false;
-                        document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
-                        document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
-                        /*container1.style.backgroundColor = 'white'; 
-                        container2.style.backgroundColor = 'white';*/
+                        
                         
                         if(lensCanMove && mouseDown){
-                            
+                            L.DomEvent.stopPropagation(e);
+                            document.getElementById('piemenu').style.visibility = "hidden";
+                            createQueryLensesFlag = false;
+                            createAttributeLensesFlag = false;
+                            document.getElementsByClassName("not-tabFilter")[0].style.backgroundColor ="#14599100"
+                            document.getElementsByClassName("not-tabAttr")[0].style.backgroundColor ="#14599100"
+                            /*container1.style.backgroundColor = 'white'; 
+                            container2.style.backgroundColor = 'white';*/
                             if(!(moved)){
                                 
                                 lens.delete();
@@ -5722,26 +6575,41 @@ block content
         }
 
         function attLENSNEWMENU(lens){
-            
-            clicked=false;
-            lensCanMove = false;
+            clicked = false; 
             changeRadius = false;
+            lensCanMove = false;
+            lens.setRadiusFlag(false);
             document.getElementById('attribute').style.display = "block";
             document.getElementById('attribute').style.visibility = "visible";
 
             document.getElementById('encoding').style.display = "none";
             document.getElementById('encoding').style.visibility = "hidden";
+
+            document.getElementById('my_datavizCIRCULAR').style.visibility = "hidden";
         }
 
         function encLENSNEWMENU(lens){
-            
-            clicked=false;
-            lensCanMove = false;
+            clicked = false; 
             changeRadius = false;
+            lensCanMove = false;
+            lens.setRadiusFlag(false);
             document.getElementById('encoding').style.display = "block";
             document.getElementById('encoding').style.visibility = "visible";
             document.getElementById('attribute').style.display = "none";
-            document.getElementById('attribute').style.visibility = "none";
+            document.getElementById('attribute').style.visibility = "hidden";
+            document.getElementById('my_datavizCIRCULAR').style.visibility = "hidden";
+        }
+
+        function statsLENSNEWMENU(lens){
+            clicked = false; 
+            changeRadius = false;
+            lensCanMove = false;
+            lens.setRadiusFlag(false);
+            document.getElementById('encoding').style.display = "none";
+            document.getElementById('encoding').style.visibility = "hidden";
+            document.getElementById('attribute').style.display = "none";
+            document.getElementById('attribute').style.visibility = "hidden";
+            document.getElementById('my_datavizCIRCULAR').style.visibility = "visible";
         }
 
         ///////Z-ORDER/////
