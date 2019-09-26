@@ -58,8 +58,6 @@ block content
                 <p class="lorem">Total number of trajectories:</p>
                 <p class="lorem">Velocity:</p>
                 <div id="my_dataviz"></div>
-                <p class="lorem">Duration:</p>
-                <div id="my_datavizDURATION"></div>
                 <p class="lorem">Length:</p>
                 <div id="my_datavizLENGTH"></div>
                 <p class="lorem">Time of creation:</p>
@@ -230,6 +228,7 @@ block content
         let lensArrayZORDER = [];
 
         let maxArrayValuesGlobal = {"velocity":0,"duration":{"hours":0,"minutes":0,"seconds":0},"length":0,"timemin":"","timemax" :""};
+        let colorToUseWithMap = "#FFF"
 
         //Change basemaps
         /*var layer = L.esri.basemapLayer('Topographic').addTo(map);
@@ -850,7 +849,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -861,8 +860,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                 //createDurationHistogram(newDataMax.responseJSON.duration);
+                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     }); 
@@ -900,7 +899,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -911,8 +910,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(maxArrayValuesGlobal.velocity);
                                 createLengthHistogram(maxArrayValuesGlobal.length);
-                                createDurationHistogram(maxArrayValuesGlobal.duration);
-                                createTimeHistogram(maxArrayValuesGlobal.timemax, maxArrayValuesGlobal.timemin);
+                                 //createDurationHistogram(maxArrayValuesGlobal.duration);
+                                 createTimeHistogram(maxArrayValuesGlobal.timemax, maxArrayValuesGlobal.timemin);
                             });
                         }
                     });
@@ -950,7 +949,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -961,8 +960,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                 //createDurationHistogram(newDataMax.responseJSON.duration);
+                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1000,7 +999,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1011,8 +1010,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                 //createDurationHistogram(newDataMax.responseJSON.duration);
+                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1083,7 +1082,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1094,8 +1093,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                 //createDurationHistogram(newDataMax.responseJSON.duration);
+                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                         
@@ -1136,7 +1135,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1147,8 +1146,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                 //createDurationHistogram(newDataMax.responseJSON.duration);
+                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1188,7 +1187,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1199,8 +1198,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                 //createDurationHistogram(newDataMax.responseJSON.duration);
+                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1240,7 +1239,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1251,8 +1250,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                 //createDurationHistogram(newDataMax.responseJSON.duration);
+                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1332,7 +1331,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1343,8 +1342,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                 //createDurationHistogram(newDataMax.responseJSON.duration);
+                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                         
@@ -1386,7 +1385,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1397,8 +1396,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                 //createDurationHistogram(newDataMax.responseJSON.duration);
+                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1439,7 +1438,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1450,8 +1449,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                 //createDurationHistogram(newDataMax.responseJSON.duration);
+                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1492,7 +1491,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                clearBox("my_datavizDURATION")
+                                //clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1503,8 +1502,8 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                createDurationHistogram(newDataMax.responseJSON.duration);
-                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                 //createDurationHistogram(newDataMax.responseJSON.duration);
+                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -2751,9 +2750,9 @@ block content
                 },
                 assignCircHistogram: function(){
                     if(this.att == "velocity") 
-                        lens.attArrayCircHistogram = [{name:"[0-9[", value:0},{name:"[9-16[",value:0},{name:"[16-25[",value:0},{name:"[25-40[",value:0},{name:"[40-50[",value:0},{name:"[50-60[" ,value:0},{name:"[60-70[" ,value:0},{name:"[70-80["  ,value:0},{name:"[80-90[" , value:0},{name:"[90-300[" , value:0}];
+                        lens.attArrayCircHistogram = [{name:"[0-9]", value:0},{name:"[10-16]",value:0},{name:"[17-25]",value:0},{name:"[26-40]",value:0},{name:"[41-50]",value:0},{name:"[51-60]" ,value:0},{name:"[61-70]" ,value:0},{name:"[71-80]"  ,value:0},{name:"[81-90]" , value:0},{name:"[91-300]" , value:0}];
                     else if(this.att == "length")
-                        lens.attArrayCircHistogram = [{name:"[0-1[km", value:0},{name:"[1-4[km",value:0},{name:"[4-7[km",value:0},{name:"[7-10[km",value:0},{name:"[10-15[km",value:0},{name:"[15-20[km" ,value:0},{name:"[20-35[km" ,value:0},{name:"[35-60[km"  ,value:0},{name:"[60-100[" , value:0},{name:"[100-[" , value:0}];
+                        lens.attArrayCircHistogram = [{name:"[0-1]km", value:0},{name:"[2-4]km",value:0},{name:"[5-7]km",value:0},{name:"[8-10]km",value:0},{name:"[11-15]km",value:0},{name:"[16-20]km" ,value:0},{name:"[21-35]km" ,value:0},{name:"[36-60]km"  ,value:0},{name:"[61-100]km" , value:0},{name:"[100-]km" , value:0}];
                     else if(this.att == "duration")
                         lens.attArrayCircHistogram = [{name:"00:00-05:00", value:0},{name:"05:00-10:00",value:0},{name:"10:00-30:00",value:0},{name:"30:00-45:00",value:0},{name:"45:00-01:30:00",value:0},{name:"01:30:00- " ,value:0}];
                     else if(this.att == "time")
@@ -2858,7 +2857,7 @@ block content
                             "<lu><a style='color:#FFF' class='dropbtnOpt-brightness'>Brightness</a></lu>"+
                             "<lu><a style='color:#FFF' class='dropbtnOpt-opacity'>Opacity</a></lu>"+
                         "</ul></div>"+
-                        "<div id='my_datavizCIRCULAR' style='margin-top: -129.5%;margin-left: -24.9%;visibility:hidden'></div>"
+                        "<div id='my_datavizCIRCULAR' style='margin-top: -187.5%;margin-left: -83.9%;visibility:hidden'></div>"
                         });
                         let outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
                         lens.setOutsideCircle(outsideCircVar);
@@ -5422,12 +5421,12 @@ block content
             //if (document.getElementById(elementID).innerHTML )
             /*clearBox("my_dataviz")
             clearBox("my_datavizLENGTH")
-            clearBox("my_datavizDURATION")
+            //clearBox("my_datavizDURATION")
             clearBox("my_datavizTIME")
             if(elementIsClicked){
                 createVelocityHistogram();
                 createLengthHistogram();
-                createDurationHistogram();
+                 //createDurationHistogram();
                 createTimeHistogram();
             }*/
 
@@ -5447,29 +5446,74 @@ block content
         //////////////////////////////////////////
 
         $('.firstMap').click(function (e) {
-           map.removeLayer(activeMap);
-           blackNoLabel.addTo(map);
-           activeMap = blackNoLabel;
+            changeRadius = false;  
+            outterLensesLayer.clearLayers();
+            moved = false;
+            lensCanMove = false;
+            clicked = false;
+            if(activeLENSNEWMENU != null){
+                activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+            }
+            map.removeLayer(activeMap);
+            blackNoLabel.addTo(map);
+            activeMap = blackNoLabel;
+            colorToUseWithMap = "#FFF"
         }); 
         $('.secMap').click(function (e) {
-           map.removeLayer(activeMap);
-           CartoDB_DarkMatter.addTo(map);
-           activeMap = CartoDB_DarkMatter;
+            changeRadius = false;  
+            outterLensesLayer.clearLayers();
+            moved = false;
+            lensCanMove = false;
+            clicked = false;
+            if(activeLENSNEWMENU != null){
+                activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+            }
+            map.removeLayer(activeMap);
+            CartoDB_DarkMatter.addTo(map);
+            activeMap = CartoDB_DarkMatter;
+            colorToUseWithMap = "#FFF"
         }); 
         $('.trdMap').click(function (e) {
-           map.removeLayer(activeMap);
-           Hydda_Full.addTo(map);
-           activeMap = Hydda_Full;
+            changeRadius = false;  
+            outterLensesLayer.clearLayers();
+            moved = false;
+            lensCanMove = false;
+            clicked = false;
+            if(activeLENSNEWMENU != null){
+                activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+            }
+            map.removeLayer(activeMap);
+            Hydda_Full.addTo(map);
+            activeMap = Hydda_Full;
+            colorToUseWithMap = "#000"
         }); 
         $('.fourMap').click(function (e) {
-           map.removeLayer(activeMap);
-           CartoDB_Voyager.addTo(map);
-           activeMap = CartoDB_Voyager;
+            changeRadius = false;  
+            outterLensesLayer.clearLayers();
+            moved = false;
+            lensCanMove = false;
+            clicked = false;
+            if(activeLENSNEWMENU != null){
+                activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+            }
+            map.removeLayer(activeMap);
+            CartoDB_Voyager.addTo(map);
+            activeMap = CartoDB_Voyager;
+            colorToUseWithMap = "#000"
         }); 
         $('.fiveMap').click(function (e) {
-           map.removeLayer(activeMap);
-           CartoDB_VoyagerNoLabels.addTo(map);
-           activeMap = CartoDB_VoyagerNoLabels;
+            changeRadius = false;  
+            outterLensesLayer.clearLayers();
+            moved = false;
+            lensCanMove = false;
+            clicked = false;
+            if(activeLENSNEWMENU != null){
+                activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+            }
+            map.removeLayer(activeMap);
+            CartoDB_VoyagerNoLabels.addTo(map);
+            activeMap = CartoDB_VoyagerNoLabels;
+            colorToUseWithMap = "#000"
         }); 
 
 
@@ -5499,12 +5543,12 @@ block content
                 data_time_start: parseData2(d.data_time_start)     
             };
         } 
-        async function createVelocityHistogram(dataInput){  
+        function createVelocityHistogram(dataInput){  
              
             // set the dimensions and margins of the graph
-            var margin = {top: 30, right: 30, bottom: 30, left: 50},
+            var margin = {top: 10, right: 30, bottom: 30, left: 40},
                 width = 400 - margin.left - margin.right,
-                height = 350 - margin.top - margin.bottom;
+                height = 300 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
             var svg = d3.select("#my_dataviz")
@@ -5515,59 +5559,93 @@ block content
                 .attr("transform",
                     "translate(" + margin.left + "," + margin.top + ")");
 
-            
             // get the data
-            d3.csv(await "activeCSV/velocityFinal.csv",convertVel, function(data) {
-            
-            console.log("in velocAVG ")
-            // add the x Axis
+            d3.csv("activeCSV/velocityFinal.csv", function(data) {
+
+            // X axis: scale and draw:
             var x = d3.scaleLinear()
-                        .domain([0, +dataInput])
-                        .range([0, width]);
+                .domain([0, dataInput])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+                .range([0, width]);
             svg.append("g")
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x));
 
-            // add the y Axis
+            // set the parameters for the histogram
+            var histogram = d3.histogram()
+                .value(function(d) { return +d.veloc_avg; })   // I need to give the vector of value
+                .domain(x.domain())  // then the domain of the graphic
+                .thresholds(x.ticks(20)); // then the numbers of bins
+
+            // And apply this function to data to get the bins
+            var bins = histogram(data);
+
+            // Y axis: scale and draw:
             var y = d3.scaleLinear()
-                        .range([height, 0])
-                        .domain([0, 0.8]);
+                .range([height, 0]);
+                y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
             svg.append("g")
                 .call(d3.axisLeft(y));
 
-            // Compute kernel density estimation
-            var kde = kernelDensityEstimator(kernelEpanechnikov(.9), x.ticks(50))
-            var density =  kde( data.map(function(d){ if(d.veloc_avg != NaN && d.veloc_avg != null) return d.veloc_avg; }) )
-            let firstValue = [0,0];
-            density=[firstValue].concat(density)
-            density.push([dataInput,0])
-            console.log(density);
-            
-            // Plot the area
-            svg.append("path")
-                .attr("class", "mypath")
-                .datum(density)
-                .attr("fill", "#69b3a2")
-                .attr("opacity", ".8")
-                .attr("stroke", "#000")
-                .attr("stroke-width", 1)
-                .attr("stroke-linejoin", "round")
-                .attr("d",  d3.line()
-                    .curve(d3.curveBasis)
-                    .x(function(d) { return x(d[0]); })
-                    .y(function(d) { return y(d[1]); })
-                );
+            // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+            // Its opacity is set to 0: we don't see it by default.
+            var tooltip = d3.select("#my_dataviz")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "black")
+                .style("color", "white")
+                .style("border-radius", "5px")
+                .style("padding", "10px")
+
+            // A function that change this tooltip when the user hover a point.
+            // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+            var showTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 1)
+                tooltip
+                .html("Range: " + d.x0 + " - " + d.x1)
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            var moveTooltip = function(d) {
+                tooltip
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+            var hideTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 0)
+            }
+
+            // append the bar rectangles to the svg element
+            svg.selectAll("rect")
+                .data(bins)
+                .enter()
+                .append("rect")
+                    .attr("x", 1)
+                    .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+                    .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+                    .attr("height", function(d) { return height - y(d.length); })
+                    .style("fill", "#69b3a2")
+                    // Show tooltip on hover
+                    .on("mouseover", showTooltip )
+                    .on("mousemove", moveTooltip )
+                    .on("mouseleave", hideTooltip )
 
             });
-
         }
         
         function createLengthHistogram(dataInput){ 
             
-             // set the dimensions and margins of the graph
-            var margin = {top: 30, right: 30, bottom: 30, left: 50},
+            // set the dimensions and margins of the graph
+            var margin = {top: 10, right: 30, bottom: 30, left: 40},
                 width = 400 - margin.left - margin.right,
-                height = 350 - margin.top - margin.bottom;
+                height = 300 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
             var svg = d3.select("#my_datavizLENGTH")
@@ -5579,51 +5657,88 @@ block content
                     "translate(" + margin.left + "," + margin.top + ")");
 
             // get the data
-            d3.csv("activeCSV/lengthFinal.csv",convertLeng, function(data) {
-            console.log("in length ")
-            // add the x Axis
+            d3.csv("activeCSV/lengthFinal.csv", function(data) {
+
+            // X axis: scale and draw:
             var x = d3.scaleLinear()
-                        .domain([0, dataInput])
-                        .range([0, width]);
+                .domain([0, dataInput])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+                .range([0, width]);
             svg.append("g")
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x));
 
-            // add the y Axis
+            // set the parameters for the histogram
+            var histogram = d3.histogram()
+                .value(function(d) { return +d.len; })   // I need to give the vector of value
+                .domain(x.domain())  // then the domain of the graphic
+                .thresholds(x.ticks(20)); // then the numbers of bins
+
+            // And apply this function to data to get the bins
+            var bins = histogram(data);
+
+            // Y axis: scale and draw:
             var y = d3.scaleLinear()
-                        .range([height, 0])
-                        .domain([0, 0.002]);
+                .range([height, 0]);
+                y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
             svg.append("g")
                 .call(d3.axisLeft(y));
 
-            // Compute kernel density estimation
-            var kde = kernelDensityEstimator(kernelEpanechnikov(1), x.ticks(50))
-            var density =  kde( data.map(function(d){if(d.len != NaN && d.len != null)  return d.len; }) )
-            let firstValue = [0,0];
-            density=[firstValue].concat(density)
-            density.push([dataInput,0])
-            console.log(density);
-            
-            // Plot the area
-            svg.append("path")
-                .attr("class", "mypath")
-                .datum(density)
-                .attr("fill", "#69b3a2")
-                .attr("opacity", ".8")
-                .attr("stroke", "#000")
-                .attr("stroke-width", 1)
-                .attr("stroke-linejoin", "round")
-                .attr("d",  d3.line()
-                    .curve(d3.curveBasis)
-                    .x(function(d) { return x(d[0]); })
-                    .y(function(d) { return y(d[1]); })
-                );
+            // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+            // Its opacity is set to 0: we don't see it by default.
+            var tooltip = d3.select("#my_datavizLENGTH")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "black")
+                .style("color", "white")
+                .style("border-radius", "5px")
+                .style("padding", "10px")
+
+            // A function that change this tooltip when the user hover a point.
+            // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+            var showTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 1)
+                tooltip
+                .html("Range: " + d.x0 + " - " + d.x1)
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            var moveTooltip = function(d) {
+                tooltip
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+            var hideTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 0)
+            }
+
+            // append the bar rectangles to the svg element
+            svg.selectAll("rect")
+                .data(bins)
+                .enter()
+                .append("rect")
+                    .attr("x", 1)
+                    .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+                    .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+                    .attr("height", function(d) { return height - y(d.length); })
+                    .style("fill", "#69b3a2")
+                    // Show tooltip on hover
+                    .on("mouseover", showTooltip )
+                    .on("mousemove", moveTooltip )
+                    .on("mouseleave", hideTooltip )
 
             });
 
         }
 
-        async function createDurationHistogram(dataInput){
+        async function  createDurationHistogram(dataInput){
             // Generate a log-normal distribution with a median of 30 minutes.
             var values = d3.range(1000).map(d3.random.logNormal(Math.log(30), .4));
 
@@ -5693,12 +5808,11 @@ block content
             var formatData1 = d3.timeParse("%Y-%m-%d");
             
 
-            console.log(new Date(minDate).getTime() / 1000)
-            console.log(new Date(dataInput).getTime() / 1000)
+             
             // set the dimensions and margins of the graph
-            var margin = {top: 30, right: 30, bottom: 30, left: 50},
+            var margin = {top: 10, right: 30, bottom: 30, left: 40},
                 width = 400 - margin.left - margin.right,
-                height = 350 - margin.top - margin.bottom;
+                height = 300 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
             var svg = d3.select("#my_datavizTIME")
@@ -5710,49 +5824,82 @@ block content
                     "translate(" + margin.left + "," + margin.top + ")");
 
             // get the data
-            d3.csv("activeCSV/timeFinal.csv",convertTime, function(data) {
-            console.log("in TIME ")
-            // add the x Axis
+            d3.csv("activeCSV/timeFinal.csv", function(data) {
+
+            // X axis: scale and draw:
             var x = d3.scaleTime()
-                        .domain([new Date(minDate).getTime(), new Date(dataInput).getTime()])
-                        .range([0, width]);
+                .domain([new Date(minDate).getTime(), new Date(dataInput).getTime()])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+                .range([0, width]);
             svg.append("g")
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x));
 
-            // add the y Axis
+            // set the parameters for the histogram
+            var histogram = d3.histogram()
+                .value(function(d) {console.log(d.data_time_start);console.log(new Date(d.data_time_start)); return new Date(d.data_time_start).getTime(); })   // I need to give the vector of value
+                .domain(x.domain())  // then the domain of the graphic
+                .thresholds(x.ticks(20)); // then the numbers of bins
+
+            // And apply this function to data to get the bins
+            var bins = histogram(data);
+
+            // Y axis: scale and draw:
             var y = d3.scaleLinear()
-                        .range([height, 0])
-                        .domain([0, 0.01]);
+                .range([height, 0]);
+                y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
             svg.append("g")
                 .call(d3.axisLeft(y));
 
-            // Compute kernel density estimation
-            var kde = kernelDensityEstimator(kernelEpanechnikov(0.1), x.ticks(100))
+            // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+            // Its opacity is set to 0: we don't see it by default.
+            var tooltip = d3.select("#my_datavizTIME")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "black")
+                .style("color", "white")
+                .style("border-radius", "5px")
+                .style("padding", "10px")
 
-            var density =  kde( data.map(function(d){
-                let valueToReturn = new Date(d.data_time_start).getTime();
-                if(valueToReturn != NaN && valueToReturn != null) {return valueToReturn} 
-            }));
-            let firstValue = [new Date(minDate).getTime(),0];
-            density=[firstValue].concat(density)
-            density.push([new Date(dataInput).getTime() ,0])
-            console.log(density);
-            
-            // Plot the area
-            svg.append("path")
-                .attr("class", "mypath")
-                .datum(density)
-                .attr("fill", "#69b3a2")
-                .attr("opacity", ".8")
-                .attr("stroke", "#000")
-                .attr("stroke-width", 1)
-                .attr("stroke-linejoin", "round")
-                .attr("d",  d3.line()
-                    .curve(d3.curveBasis)
-                    .x(function(d) { return x(d[0]); })
-                    .y(function(d) { return y(d[1]); })
-                );
+            // A function that change this tooltip when the user hover a point.
+            // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+            var showTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 1)
+                tooltip
+                .html("Range: " + d.x0 + " - " + d.x1)
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            var moveTooltip = function(d) {
+                tooltip
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+            var hideTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 0)
+            }
+
+            // append the bar rectangles to the svg element
+            svg.selectAll("rect")
+                .data(bins)
+                .enter()
+                .append("rect")
+                    .attr("x", 1)
+                    .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+                    .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+                    .attr("height", function(d) { return height - y(d.length); })
+                    .style("fill", "#69b3a2")
+                    // Show tooltip on hover
+                    .on("mouseover", showTooltip )
+                    .on("mousemove", moveTooltip )
+                    .on("mouseleave", hideTooltip )
 
             });
         }
@@ -5760,10 +5907,10 @@ block content
         function circularHistogram(dataInput,lens){
             // set the dimensions and margins of the graph
             var margin = {top: 100, right: 0, bottom: 0, left: 0},
-                width = 450 - margin.left - margin.right,
-                height = 450 - margin.top - margin.bottom,
+                width = 800 - margin.left - margin.right,
+                height = 800 - margin.top - margin.bottom,
                 innerRadius = 105,
-                outerRadius = Math.min(width, height) / 2;   // the outerRadius goes from the middle of the SVG area to the border
+                outerRadius = 200;   // the outerRadius goes from the middle of the SVG area to the border
 
             // append the svg object
             var svg = d3.select("#my_datavizCIRCULAR")
@@ -5773,9 +5920,18 @@ block content
             .append("g")
                 .attr("transform", "translate(" + (width / 2 + margin.left) + "," + (height / 2 + margin.top) + ")");
             console.log(lens.attArrayCircHistogram)
-            let jsonToUse = lens.attArrayCircHistogram;
-            console.log(jsonToUse)
             
+            
+            let max = 0
+            for(let index = 0; index <= lens.attArrayCircHistogram.length-1;index++){
+                console.log(lens.attArrayCircHistogram[index].value)
+                if(lens.attArrayCircHistogram[index].value > max) max =lens.attArrayCircHistogram[index].value
+            }
+            console.log(max)
+            for(let index = 0; index <= lens.attArrayCircHistogram.length-1;index++){
+                lens.attArrayCircHistogram[index].value =lens.attArrayCircHistogram[index].value + max/100;
+            }
+            let jsonToUse = lens.attArrayCircHistogram;
             // Scales
             var x = d3.scaleBand()
                 .range([(-1 * Math.PI)*0.99, (0.5 * Math.PI)*0.99])    // X axis goes from 0 to 2pi = all around the circle. If I stop at 1Pi, it will be around a half circle
@@ -5783,7 +5939,7 @@ block content
                 .domain(jsonToUse.map(function(d) { return d.name; })); // The domain of the X axis is the list of states.
             var y = d3.scaleRadial()
                 .range([innerRadius, outerRadius])   // Domain will be define later.
-                .domain([0, 1000]); // Domain of Y is from 0 to the max seen in the data
+                .domain([0, max]); // Domain of Y is from 0 to the max seen in the data
             // Add the bars
             svg.append("g")
                 .selectAll("path")
@@ -5813,6 +5969,7 @@ block content
                     .text(function(d){return(d.name)})
                     .attr("transform", function(d) { return (x(d.name) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
                     .style("font-size", "11px")
+                    .style("fill", colorToUseWithMap)
                     .attr("alignment-baseline", "middle")
         }
         
@@ -5865,7 +6022,7 @@ block content
             document.getElementById('type').style.visibility="hidden";
             clicked=false;
             changeRadius=false;
-            lensCanMove = !lensCanMove;
+            lensCanMove = true;
             if(lensCanMove){
                 let mouseDown = false;
                 lens.outsideCircle.on({
