@@ -2572,7 +2572,6 @@ block content
                 },
                 createAreas : function(){
                     this.insertZORDER();
-                    this.assignCircHistogram()
                     this.overallArea = null;
                     this.intersections.splice(0,this.intersections.length);
                     this.addIntersections();
@@ -2594,6 +2593,7 @@ block content
                 },
                 createLayers : function(){
                     
+                    this.assignCircHistogram()
                     this.areas.forEach(function(eachArea, index, array) {
                         eachArea.createLayers();
                     });
@@ -2695,6 +2695,7 @@ block content
                 updateOthersV2 : function( onlyRemoveInter ){
                     //true if areas need to e updated
                     this.removeFromAttLen();
+                    this.assignCircHistogram()
                     if(this.enc == "opacity"){
                         this.removeOpacityArray();
                     }
