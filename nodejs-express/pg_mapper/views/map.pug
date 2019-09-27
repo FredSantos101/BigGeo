@@ -54,14 +54,30 @@ block content
 
                 <p>This is the statistics panel</a>.</p>
                 <p>The data here being displayed is related to the trajectories currently selected</a>.</p>
+                <p>In the following histograms the Y-axis represents the number of trajectories inside each bin. Here the scales change according to the data selected by the filtering lenses</a>.</p>
 
-                <p class="lorem">Total number of trajectories:</p>
-                <p class="lorem">Velocity:</p>
+
+                <p class="lorem" style="font-size: 150%;">Total number of trajectories:</p>
+                <p class="lorem" id="totalNumTracks" style="font-size: 120%;"></p>
+                <h1 style="font-size: 150%">-------------------------</h1>
+                <p class="lorem" style="font-size: 150%;">Velocity</p>
+                <p class="lorem">Average velocity:</p>
+                <p class="lorem" id="averageVelocityValue" style="font-size: 120%;"></p>
                 <div id="my_dataviz"></div>
-                <p class="lorem">Length:</p>
+                <h1 style="font-size: 150%">-------------------------</h1>
+                <p class="lorem" style="font-size: 150%;">Length</p>
+                <p class="lorem">Average:</p>
+                <p class="lorem" id="averageLengthValue" style="font-size: 120%;"></p>
                 <div id="my_datavizLENGTH"></div>
-                <p class="lorem">Time of creation:</p>
+                <h1 style="font-size: 150%">-------------------------</h1>
+                <p class="lorem" style="font-size: 150%;">Time of creation</p>
+                <p class="lorem" id="averageTimeValue" style="font-size: 120%;"></p>
                 <div id="my_datavizTIME"></div>
+                <h1 style="font-size: 150%">-------------------------</h1>
+                <p class="lorem" style="font-size: 150%;">Duration</p>
+                <p class="lorem">Average:</p>
+                <p class="lorem" id="averageDurationValue" style="font-size: 120%;"></p>
+                <div id="my_datavizDURATION"></div>
 
             </div>
 
@@ -849,8 +865,11 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
+                                clearBox("totalNumTracks")
+                                clearBox("averageVelocityValue")
+                                clearBox("averageLengthValue")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
                                 maxArrayValuesGlobal.velocity = newDataMax.responseJSON.velocity
@@ -858,10 +877,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                 //createDurationHistogram(newDataMax.responseJSON.duration);
-                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                createDurationHistogram(newDataMax.responseJSON.duration);
+                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     }); 
@@ -899,7 +922,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -908,10 +931,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(maxArrayValuesGlobal.velocity);
                                 createLengthHistogram(maxArrayValuesGlobal.length);
-                                 //createDurationHistogram(maxArrayValuesGlobal.duration);
-                                 createTimeHistogram(maxArrayValuesGlobal.timemax, maxArrayValuesGlobal.timemin);
+                                createDurationHistogram(maxArrayValuesGlobal.duration);
+                                createTimeHistogram(maxArrayValuesGlobal.timemax, maxArrayValuesGlobal.timemin);
                             });
                         }
                     });
@@ -949,7 +976,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -958,10 +985,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                 //createDurationHistogram(newDataMax.responseJSON.duration);
-                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                createDurationHistogram(newDataMax.responseJSON.duration);
+                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -999,7 +1030,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1008,10 +1039,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                 //createDurationHistogram(newDataMax.responseJSON.duration);
-                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                createDurationHistogram(newDataMax.responseJSON.duration);
+                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1082,7 +1117,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1091,10 +1126,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                 //createDurationHistogram(newDataMax.responseJSON.duration);
-                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                createDurationHistogram(newDataMax.responseJSON.duration);
+                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                         
@@ -1135,7 +1174,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1144,10 +1183,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                 //createDurationHistogram(newDataMax.responseJSON.duration);
-                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                createDurationHistogram(newDataMax.responseJSON.duration);
+                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1187,7 +1230,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1196,10 +1239,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                 //createDurationHistogram(newDataMax.responseJSON.duration);
-                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                createDurationHistogram(newDataMax.responseJSON.duration);
+                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1239,7 +1286,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1248,10 +1295,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                 //createDurationHistogram(newDataMax.responseJSON.duration);
-                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                createDurationHistogram(newDataMax.responseJSON.duration);
+                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1331,7 +1382,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1340,10 +1391,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                 //createDurationHistogram(newDataMax.responseJSON.duration);
-                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                createDurationHistogram(newDataMax.responseJSON.duration);
+                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                         
@@ -1385,7 +1440,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1394,10 +1449,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                 //createDurationHistogram(newDataMax.responseJSON.duration);
-                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                createDurationHistogram(newDataMax.responseJSON.duration);
+                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1438,7 +1497,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1447,10 +1506,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                 //createDurationHistogram(newDataMax.responseJSON.duration);
-                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                createDurationHistogram(newDataMax.responseJSON.duration);
+                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -1491,7 +1554,7 @@ block content
                             $.when(newDataMax).done(function() {
                                 clearBox("my_dataviz")
                                 clearBox("my_datavizLENGTH")
-                                //clearBox("my_datavizDURATION")
+                                clearBox("my_datavizDURATION")
                                 clearBox("my_datavizTIME")
                                 console.log("Im removing the map now and adding new ones afterwards")
                                 console.log(newDataMax)
@@ -1500,10 +1563,14 @@ block content
                                 maxArrayValuesGlobal.duration = newDataMax.responseJSON.duration
                                 maxArrayValuesGlobal.timemax = newDataMax.responseJSON.timemax
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
+                                document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
+                                document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
-                                 //createDurationHistogram(newDataMax.responseJSON.duration);
-                                 createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
+                                createDurationHistogram(newDataMax.responseJSON.duration);
+                                createTimeHistogram(newDataMax.responseJSON.timemax, newDataMax.responseJSON.timemin);
                             });
                         }
                     });
@@ -5421,13 +5488,13 @@ block content
             //if (document.getElementById(elementID).innerHTML )
             /*clearBox("my_dataviz")
             clearBox("my_datavizLENGTH")
-            //clearBox("my_datavizDURATION")
+            clearBox("my_datavizDURATION")
             clearBox("my_datavizTIME")
             if(elementIsClicked){
                 createVelocityHistogram();
                 createLengthHistogram();
-                 //createDurationHistogram();
-                createTimeHistogram();
+                createDurationHistogram();
+               createTimeHistogram();
             }*/
 
         }
@@ -5574,7 +5641,7 @@ block content
             var histogram = d3.histogram()
                 .value(function(d) { return +d.veloc_avg; })   // I need to give the vector of value
                 .domain(x.domain())  // then the domain of the graphic
-                .thresholds(x.ticks(20)); // then the numbers of bins
+                .thresholds(x.ticks(30)); // then the numbers of bins
 
             // And apply this function to data to get the bins
             var bins = histogram(data);
@@ -5605,7 +5672,7 @@ block content
                 .duration(100)
                 .style("opacity", 1)
                 tooltip
-                .html("Range: " + d.x0 + " - " + d.x1)
+                .html("Range: " + d.x0 + "Km/h - " + d.x1+ "Km/h")
                 .style("left", (d3.mouse(this)[0]+20) + "px")
                 .style("top", (d3.mouse(this)[1]) + "px")
             }
@@ -5671,7 +5738,7 @@ block content
             var histogram = d3.histogram()
                 .value(function(d) { return +d.len; })   // I need to give the vector of value
                 .domain(x.domain())  // then the domain of the graphic
-                .thresholds(x.ticks(20)); // then the numbers of bins
+                .thresholds(x.ticks(30)); // then the numbers of bins
 
             // And apply this function to data to get the bins
             var bins = histogram(data);
@@ -5702,7 +5769,7 @@ block content
                 .duration(100)
                 .style("opacity", 1)
                 tooltip
-                .html("Range: " + d.x0 + " - " + d.x1)
+                .html("Range: " + d.x0/100 + "Km - " + d.x1/1000 + "Km")
                 .style("left", (d3.mouse(this)[0]+20) + "px")
                 .style("top", (d3.mouse(this)[1]) + "px")
             }
@@ -5739,75 +5806,150 @@ block content
         }
 
         async function  createDurationHistogram(dataInput){
-            // Generate a log-normal distribution with a median of 30 minutes.
-            var values = d3.range(1000).map(d3.random.logNormal(Math.log(30), .4));
+            var formatData = d3.timeParse("%H:%M:%S");
+            var formatData1 = d3.timeFormat("%H:%M:%S");
+            
+            var formatMillisecond = d3.timeFormat(".%L"),
+                formatSecond = d3.timeFormat(":%S"),
+                formatMinute = d3.timeFormat("%I:%M"),
+                formatHour = d3.timeFormat("%I %p"),
+                formatDay = d3.timeFormat("%a %d"),
+                formatWeek = d3.timeFormat("%b %d"),
+                formatMonth = d3.timeFormat("%b"),
+                formatYear = d3.timeFormat("%Y");
+            
+            // Define filter conditions
+            function multiFormat(date) {
+            return (d3.timeSecond(date) < date ? formatMillisecond
+                : d3.timeMinute(date) < date ? formatSecond
+                : d3.timeHour(date) < date ? formatMinute
+                : d3.timeDay(date) < date ? formatHour
+                : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
+                : d3.timeYear(date) < date ? formatMonth
+                : formatYear)(date);
+            }
+            let maxDurationVal =dataInput.hours + ":" + dataInput.minutes + ":" + dataInput.seconds
+            // set the dimensions and margins of the graph
+            var margin = {top: 10, right: 30, bottom: 30, left: 40},
+                width = 400 - margin.left - margin.right,
+                height = 300 - margin.top - margin.bottom;
 
-            // Formatters for counts and times (converting numbers to Dates).
-            var formatCount = d3.format(",.0f"),
-                formatTime = d3.time.format("%H:%M"),
-                formatMinutes = function(d) { return formatTime(new Date(2012, 0, 1, 0, d)); };
-
-            var margin = {top: 10, right: 30, bottom: 30, left: 30},
-                width = 960 - margin.left - margin.right,
-                height = 500 - margin.top - margin.bottom;
-
-            var x = d3.scale.linear()
-                .domain([0, dataInput])
-                .range([0, width]);
-
-            // Generate a histogram using twenty uniformly-spaced bins.
-            var data = d3.layout.histogram()
-                .bins(x.ticks(20))
-                (values);
-
-            var y = d3.scale.linear()
-                .domain([0, 200])
-                .range([height, 0]);
-
-            var xAxis = d3.svg.axis()
-                .scale(x)
-                .orient("bottom")
-                .tickFormat(formatMinutes);
-
-            var svg = d3.select("body").append("svg")
+            // append the svg object to the body of the page
+            var svg = d3.select("#my_datavizDURATION")
+            .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
             .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
 
-            var bar = svg.selectAll(".bar")
-                .data(data)
-                .enter().append("g")
-                .attr("class", "bar")
-                .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
-
-            bar.append("rect")
-                .attr("x", 1)
-                .attr("width", x(data[0].dx) - 1)
-                .attr("height", function(d) { return height - y(d.y); });
-
-            bar.append("text")
-                .attr("dy", ".75em")
-                .attr("y", 6)
-                .attr("x", x(data[0].dx) / 2)
-                .attr("text-anchor", "middle")
-                .text(function(d) { return formatCount(d.y); });
-
+            // get the data
+            d3.csv("activeCSV/durationFinal.csv", function(data) {
+            
+            // X axis: scale and draw:
+            var x = d3.scaleTime()
+                .domain([formatData("00:00:00").getTime(), formatData(maxDurationVal).getTime()])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+                .range([0, width]);
             svg.append("g")
-                .attr("class", "x axis")
                 .attr("transform", "translate(0," + height + ")")
-                .call(xAxis);
+                .call(d3.axisBottom(x)
+                .tickFormat(multiFormat));
+
+            // set the parameters for the histogram
+            var histogram = d3.histogram()
+                .value(function(d) {console.log(d.duration); return formatData(d.duration).getTime(); })   // I need to give the vector of value
+                .domain(x.domain())  // then the domain of the graphic
+                .thresholds(x.ticks(30)); // then the numbers of bins
+
+            // And apply this function to data to get the bins
+            var bins = histogram(data);
+
+            // Y axis: scale and draw:
+            var y = d3.scaleLinear()
+                .range([height, 0]);
+                y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+            // Its opacity is set to 0: we don't see it by default.
+            var tooltip = d3.select("#my_datavizDURATION")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "black")
+                .style("color", "white")
+                .style("border-radius", "5px")
+                .style("padding", "10px")
+
+            // A function that change this tooltip when the user hover a point.
+            // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+            var showTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 1)
+                tooltip
+                .html("Range: " + formatData1(d.x0) + " - " + formatData1(d.x1))
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            var moveTooltip = function(d) {
+                tooltip
+                .style("left", (d3.mouse(this)[0]+20) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px")
+            }
+            // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+            var hideTooltip = function(d) {
+                tooltip
+                .transition()
+                .duration(100)
+                .style("opacity", 0)
+            }
+
+            // append the bar rectangles to the svg element
+            svg.selectAll("rect")
+                .data(bins)
+                .enter()
+                .append("rect")
+                    .attr("x", 1)
+                    .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+                    .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+                    .attr("height", function(d) { return height - y(d.length); })
+                    .style("fill", "#69b3a2")
+                    // Show tooltip on hover
+                    .on("mouseover", showTooltip )
+                    .on("mousemove", moveTooltip )
+                    .on("mouseleave", hideTooltip )
+
+            });
 
         }
 
         async function createTimeHistogram(dataInput,minDate){  
             
-
-            
             var formatData = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
-            var formatData1 = d3.timeParse("%Y-%m-%d");
+            var formatData1 = d3.timeFormat("%Y-%m-%d");
             
+            var formatMillisecond = d3.timeFormat(".%L"),
+                formatSecond = d3.timeFormat(":%S"),
+                formatMinute = d3.timeFormat("%I:%M"),
+                formatHour = d3.timeFormat("%I %p"),
+                formatDay = d3.timeFormat("%a %d"),
+                formatWeek = d3.timeFormat("%b %d"),
+                formatMonth = d3.timeFormat("%b"),
+                formatYear = d3.timeFormat("%Y");
 
+            // Define filter conditions
+            function multiFormat(date) {
+            return (d3.timeSecond(date) < date ? formatMillisecond
+                : d3.timeMinute(date) < date ? formatSecond
+                : d3.timeHour(date) < date ? formatMinute
+                : d3.timeDay(date) < date ? formatHour
+                : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
+                : d3.timeYear(date) < date ? formatMonth
+                : formatYear)(date);
+            }
              
             // set the dimensions and margins of the graph
             var margin = {top: 10, right: 30, bottom: 30, left: 40},
@@ -5832,13 +5974,14 @@ block content
                 .range([0, width]);
             svg.append("g")
                 .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x));
+                .call(d3.axisBottom(x)
+                .tickFormat(multiFormat));
 
             // set the parameters for the histogram
             var histogram = d3.histogram()
-                .value(function(d) {console.log(d.data_time_start);console.log(new Date(d.data_time_start)); return new Date(d.data_time_start).getTime(); })   // I need to give the vector of value
+                .value(function(d) {return new Date(d.data_time_start).getTime(); })   // I need to give the vector of value
                 .domain(x.domain())  // then the domain of the graphic
-                .thresholds(x.ticks(20)); // then the numbers of bins
+                .thresholds(x.ticks(30)); // then the numbers of bins
 
             // And apply this function to data to get the bins
             var bins = histogram(data);
@@ -5869,7 +6012,7 @@ block content
                 .duration(100)
                 .style("opacity", 1)
                 tooltip
-                .html("Range: " + d.x0 + " - " + d.x1)
+                .html("Range: " + formatData1(d.x0) + " - " + formatData1(d.x1))
                 .style("left", (d3.mouse(this)[0]+20) + "px")
                 .style("top", (d3.mouse(this)[1]) + "px")
             }

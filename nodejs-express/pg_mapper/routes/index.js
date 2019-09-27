@@ -319,7 +319,7 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -332,7 +332,7 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -345,7 +345,7 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -358,7 +358,7 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -521,7 +521,7 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -534,7 +534,7 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -547,7 +547,7 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -560,7 +560,7 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -620,7 +620,7 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -633,7 +633,7 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -646,7 +646,7 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -659,7 +659,7 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
       clientCSV.end()
       startMergingCSVs([newPath +'/activeCSV/velocity.csv', newPath +'/activeCSV/velocity1.csv',newPath +'/activeCSV/velocity2.csv',newPath +'/activeCSV/velocity3.csv'], newPath +'/activeCSV/velocityFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/length.csv', newPath +'/activeCSV/length1.csv',newPath +'/activeCSV/length2.csv',newPath +'/activeCSV/length3.csv'], newPath +'/activeCSV/lengthFinal.csv').then(() => console.log("i did sometinhg"));
-      //startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
+      startMergingCSVs([newPath +'/activeCSV/duration.csv', newPath +'/activeCSV/duration1.csv',newPath +'/activeCSV/duration2.csv',newPath +'/activeCSV/duration3.csv'], newPath +'/activeCSV/durationFinal.csv').then(() => console.log("i did sometinhg"));
       startMergingCSVs([newPath +'/activeCSV/time.csv', newPath +'/activeCSV/time1.csv',newPath +'/activeCSV/time2.csv',newPath +'/activeCSV/time3.csv'], newPath +'/activeCSV/timeFinal.csv').then(() => console.log("i did sometinhg"));
       //.then(() => ...doStuff);
     }
@@ -1278,6 +1278,7 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
   client.connect(); // connect to the client
   let dataNewMaxVel = 0
   let dataNewMaxDur = {"days": 0, "hours":0, "minutes":0, "seconds":0}
+  let dataNEWAVGDur = {"days": 0, "hours":0, "minutes":0, "seconds":0}
   let dataNewMaxLen = 0
   let dataNEWAVGLen = 0
   let dataTotal = 0
@@ -1293,55 +1294,79 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
   query.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
     numberOfConnects = numberOfConnects + 1
+    if(result != null){
+      let thisTotal = +result.rows[0].total
+      //dataNewAVGTime = (dataNewAVGTime*dataTotal + thisTotal*result.rows[0].duration_avg)/(dataTotal + thisTotal)
+      dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
+      dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
 
-    //dataNewAVGTime = (dataNewAVGTime*dataTotal + result.rows[0].total*result.rows[0].duration_avg)/(dataTotal + result.rows[0].total)
-    dataNEWAVGVel = (dataNEWAVGVel*dataTotal + result.rows[0].total*result.rows[0].veloc_avg)/(dataTotal + result.rows[0].total)
-    dataNEWAVGLen = (dataNEWAVGLen*dataTotal + result.rows[0].total*result.rows[0].length_avg)/(dataTotal + result.rows[0].total)
-    dataTotal += result.rows[0].total;
-    if(dataNewMaxVel < result.rows[0].veloc_max && result.rows[0].veloc_max != null){
-      dataNewMaxVel = result.rows[0].veloc_max
-    }
-    let intervalVar = result.rows[0].duration
-
-    console.log(result.rows[0].duration)
-    if(result.rows[0].duration!= null){
-      if(!(result.rows[0].duration.days === 'undefined')){
-        if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
-        dataNewMaxDur.hours =  intervalVar.hours
-        dataNewMaxDur.minutes =  intervalVar.minutes
-        dataNewMaxDur.seconds =  intervalVar.seconds}
+      console.log(result.rows[0].duration_avg)
+      if(result.rows[0].duration_avg != null){
+        if (result.rows[0].duration_avg.hours != null || result.rows[0].duration_avg.hours != undefined )
+          dataNEWAVGDur.hours = Math.floor((dataNEWAVGDur.hours*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.hours)))/(dataTotal + thisTotal)) //i know it isnt like this but time is running out.
+        if (result.rows[0].duration_avg.minutes != null || result.rows[0].duration_avg.minutes != undefined )
+          dataNEWAVGDur.minutes = Math.floor((dataNEWAVGDur.minutes*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.minutes)))/(dataTotal + thisTotal))
+        if (result.rows[0].duration_avg.seconds != null || result.rows[0].duration_avg.seconds != undefined )
+          dataNEWAVGDur.seconds = Math.floor((dataNEWAVGDur.seconds*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.seconds)))/(dataTotal + thisTotal))
       }
-      else if(!(result.rows[0].duration.hours === 'undefined')){
-        if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+      console.log(dataNEWAVGDur)
+
+      if(dataNEWAVGDur.seconds == 0 ) {dataNEWAVGDur.seconds = "00"} //ik its bad
+      else if(dataNEWAVGDur.seconds >= 60 ) {dataNEWAVGDur.seconds = "00"; dataNEWAVGDur.minutes += 1} //ik its bad
+      else if(dataNEWAVGDur.seconds < 10 ) {dataNEWAVGDur.seconds = "0"+dataNEWAVGDur.seconds}
+      if(dataNEWAVGDur.minutes == 0 ) {dataNEWAVGDur.minutes = "00"} //ik its bad
+      else if(dataNEWAVGDur.minutes >= 60 ) {dataNEWAVGDur.minutes = "00"; dataNEWAVGDur.hours += 1}
+      else if(dataNEWAVGDur.minutes < 10 ) {dataNEWAVGDur.minutes = "0"+dataNEWAVGDur.minutes}
+      if(dataNEWAVGDur.hours == 0 ) {dataNEWAVGDur.hours = "00"} //ik its bad
+      else if(dataNEWAVGDur.hours >= 24) dataNEWAVGDur.hours = "23" //ik ik
+      else if(dataNEWAVGDur.hours < 10 ) {dataNEWAVGDur.hours = "0"+dataNEWAVGDur.hours}
+      dataTotal = dataTotal + thisTotal;
+      
+      if(dataNewMaxVel < result.rows[0].veloc_max && result.rows[0].veloc_max != null){
+        dataNewMaxVel = result.rows[0].veloc_max
+      }
+      let intervalVar = result.rows[0].duration
+
+      console.log(result.rows[0].duration)
+      if(result.rows[0].duration!= null){
+        if(!(result.rows[0].duration.days === 'undefined')){
+          if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
           dataNewMaxDur.hours =  intervalVar.hours
           dataNewMaxDur.minutes =  intervalVar.minutes
           dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.hours === 'undefined')){
+          if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+            dataNewMaxDur.hours =  intervalVar.hours
+            dataNewMaxDur.minutes =  intervalVar.minutes
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.minutes === 'undefined')){
+          if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
+            dataNewMaxDur.minutes =  intervalVar.minutes
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.seconds === 'undefined')){
+          if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
       }
-      else if(!(result.rows[0].duration.minutes === 'undefined')){
-        if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
-          dataNewMaxDur.minutes =  intervalVar.minutes
-          dataNewMaxDur.seconds =  intervalVar.seconds}
+      if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
+        dataNewMaxLen = result.rows[0].length
       }
-      else if(!(result.rows[0].duration.seconds === 'undefined')){
-        if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
-          dataNewMaxDur.seconds =  intervalVar.seconds}
+      if(dataNewMaxTime < new Date(result.rows[0].timemax) && result.rows[0].timemax != null){
+        dataNewMaxTime = new Date(result.rows[0].timemax)
       }
-    }
-    if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
-      dataNewMaxLen = result.rows[0].length
-    }
-    if(dataNewMaxTime < new Date(result.rows[0].timemax) && result.rows[0].timemax != null){
-      dataNewMaxTime = new Date(result.rows[0].timemax)
-    }
 
-    console.log(dataNewMinTime)
-    console.log(result.rows[0].timemin)
-    if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
-      dataNewMinTime = new Date(result.rows[0].timemin)
+      console.log(dataNewMinTime)
+      console.log(result.rows[0].timemin)
+      if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
+        dataNewMinTime = new Date(result.rows[0].timemin)
+      }
     }
     if(numberOfConnects == 4){
       console.log("Here  is the max")  //,"timeavg":dataNewAVGTime
-      let maxArrayValues = {"totalTracks": dataTotal, "velocity": dataNewMaxVel,"velocity_avg":dataNEWAVGVel, "duration": dataNewMaxDur, "length":dataNewMaxLen,"length_avg":dataNEWAVGLen ,"timemax": dataNewMaxTime, "timemin": dataNewMinTime }
+      let maxArrayValues = {"totalTracks": dataTotal, "velocity": dataNewMaxVel,"velocity_avg":dataNEWAVGVel, "duration": dataNewMaxDur,"duration_avg":dataNEWAVGDur, "length":dataNewMaxLen,"length_avg":dataNEWAVGLen ,"timemax": dataNewMaxTime, "timemin": dataNewMinTime }
       console.log(maxArrayValues)
       client.end();
       if(maxArrayValues != null){
@@ -1352,53 +1377,77 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
   query1.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
     numberOfConnects = numberOfConnects + 1
+    if(result != null){
+      let thisTotal = +result.rows[0].total
+      //dataNewAVGTime = (dataNewAVGTime*dataTotal + thisTotal*result.rows[0].duration_avg)/(dataTotal + thisTotal)
+      dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
+      dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
 
-    dataNewAVGTime = (dataNewAVGTime*dataTotal + result.rows[0].total*result.rows[0].duration_avg)/(dataTotal + result.rows[0].total)
-    dataNEWAVGVel = (dataNEWAVGVel*dataTotal + result.rows[0].total*result.rows[0].veloc_avg)/(dataTotal + result.rows[0].total)
-    dataNEWAVGLen = (dataNEWAVGLen*dataTotal + result.rows[0].total*result.rows[0].length_avg)/(dataTotal + result.rows[0].total)
-    dataTotal += result.rows[0].total;
+      console.log(result.rows[0].duration_avg)
+      if(result.rows[0].duration_avg != null){
+        if (result.rows[0].duration_avg.hours != null || result.rows[0].duration_avg.hours != undefined )
+          dataNEWAVGDur.hours = Math.floor((dataNEWAVGDur.hours*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.hours)))/(dataTotal + thisTotal)) //i know it isnt like this but time is running out.
+        if (result.rows[0].duration_avg.minutes != null || result.rows[0].duration_avg.minutes != undefined )
+          dataNEWAVGDur.minutes = Math.floor((dataNEWAVGDur.minutes*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.minutes)))/(dataTotal + thisTotal))
+        if (result.rows[0].duration_avg.seconds != null || result.rows[0].duration_avg.seconds != undefined )
+          dataNEWAVGDur.seconds = Math.floor((dataNEWAVGDur.seconds*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.seconds)))/(dataTotal + thisTotal))
+      }console.log(dataNEWAVGDur)
 
-    if(dataNewMaxVel < result.rows[0].veloc_max && result.rows[0].veloc_max != null){
-      dataNewMaxVel = result.rows[0].veloc_max
-    }
-    let intervalVar = result.rows[0].duration
-    
-    console.log(result.rows[0].duration)
-    if(result.rows[0].duration!= null){
-      if(!(result.rows[0].duration.days === 'undefined')){
-        if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
-        dataNewMaxDur.hours =  intervalVar.hours
-        dataNewMaxDur.minutes =  intervalVar.minutes
-        dataNewMaxDur.seconds =  intervalVar.seconds}
+      if(dataNEWAVGDur.seconds == 0 ) {dataNEWAVGDur.seconds = "00"} //ik its bad
+      else if(dataNEWAVGDur.seconds >= 60 ) {dataNEWAVGDur.seconds = "00"; dataNEWAVGDur.minutes += 1} //ik its bad
+      else if(dataNEWAVGDur.seconds < 10 ) {dataNEWAVGDur.seconds = "0"+dataNEWAVGDur.seconds}
+      if(dataNEWAVGDur.minutes == 0 ) {dataNEWAVGDur.minutes = "00"} //ik its bad
+      else if(dataNEWAVGDur.minutes >= 60 ) {dataNEWAVGDur.minutes = "00"; dataNEWAVGDur.hours += 1}
+      else if(dataNEWAVGDur.minutes < 10 ) {dataNEWAVGDur.minutes = "0"+dataNEWAVGDur.minutes}
+      if(dataNEWAVGDur.hours == 0 ) {dataNEWAVGDur.hours = "00"} //ik its bad
+      else if(dataNEWAVGDur.hours >= 24) dataNEWAVGDur.hours = "23" //ik ik
+      else if(dataNEWAVGDur.hours < 10 ) {dataNEWAVGDur.hours = "0"+dataNEWAVGDur.hours}
+      
+      dataTotal = dataTotal + thisTotal;
+      
+
+      if(dataNewMaxVel < result.rows[0].veloc_max && result.rows[0].veloc_max != null){
+        dataNewMaxVel = result.rows[0].veloc_max
       }
-      else if(!(result.rows[0].duration.hours === 'undefined')){
-        if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+      let intervalVar = result.rows[0].duration
+      
+      console.log(result.rows[0].duration)
+      if(result.rows[0].duration!= null){
+        if(!(result.rows[0].duration.days === 'undefined')){
+          if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
           dataNewMaxDur.hours =  intervalVar.hours
           dataNewMaxDur.minutes =  intervalVar.minutes
           dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.hours === 'undefined')){
+          if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+            dataNewMaxDur.hours =  intervalVar.hours
+            dataNewMaxDur.minutes =  intervalVar.minutes
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.minutes === 'undefined')){
+          if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
+            dataNewMaxDur.minutes =  intervalVar.minutes
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.seconds === 'undefined')){
+          if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
       }
-      else if(!(result.rows[0].duration.minutes === 'undefined')){
-        if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
-          dataNewMaxDur.minutes =  intervalVar.minutes
-          dataNewMaxDur.seconds =  intervalVar.seconds}
+      if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
+        dataNewMaxLen = result.rows[0].length
       }
-      else if(!(result.rows[0].duration.seconds === 'undefined')){
-        if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
-          dataNewMaxDur.seconds =  intervalVar.seconds}
+      if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
+        dataNewMaxTime = new Date(result.rows[0].time)
       }
-    }
-    if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
-      dataNewMaxLen = result.rows[0].length
-    }
-    if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
-      dataNewMaxTime = new Date(result.rows[0].time)
-    }
-    if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
-      dataNewMinTime = new Date(result.rows[0].timemin)
+      if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
+        dataNewMinTime = new Date(result.rows[0].timemin)
+      }
     }
     if(numberOfConnects == 4){
       console.log("Here  is the max")
-      let maxArrayValues = {"totalTracks": dataTotal, "velocity": dataNewMaxVel,"velocity_avg":dataNEWAVGVel, "duration": dataNewMaxDur, "length":dataNewMaxLen,"length_avg":dataNEWAVGLen ,"timemax": dataNewMaxTime, "timemin": dataNewMinTime }
+      let maxArrayValues = {"totalTracks": dataTotal, "velocity": dataNewMaxVel,"velocity_avg":dataNEWAVGVel,"duration": dataNewMaxDur,"duration_avg":dataNEWAVGDur, "length":dataNewMaxLen,"length_avg":dataNEWAVGLen ,"timemax": dataNewMaxTime, "timemin": dataNewMinTime }
       console.log(maxArrayValues)
       client.end();
       if(maxArrayValues!= null){
@@ -1410,53 +1459,76 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
   query2.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
     numberOfConnects = numberOfConnects + 1
+    if(result != null){
+      let thisTotal = +result.rows[0].total
+      //dataNewAVGTime = (dataNewAVGTime*dataTotal + thisTotal*result.rows[0].duration_avg)/(dataTotal + thisTotal)
+      dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
+      dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
 
-    dataNewAVGTime = (dataNewAVGTime*dataTotal + result.rows[0].total*result.rows[0].duration_avg)/(dataTotal + result.rows[0].total)
-    dataNEWAVGVel = (dataNEWAVGVel*dataTotal + result.rows[0].total*result.rows[0].veloc_avg)/(dataTotal + result.rows[0].total)
-    dataNEWAVGLen = (dataNEWAVGLen*dataTotal + result.rows[0].total*result.rows[0].length_avg)/(dataTotal + result.rows[0].total)
-    dataTotal += result.rows[0].total;
+      console.log(result.rows[0].duration_avg)
+      if(result.rows[0].duration_avg != null){
+        if (result.rows[0].duration_avg.hours != null || result.rows[0].duration_avg.hours != undefined )
+          dataNEWAVGDur.hours = Math.floor((dataNEWAVGDur.hours*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.hours)))/(dataTotal + thisTotal)) //i know it isnt like this but time is running out.
+        if (result.rows[0].duration_avg.minutes != null || result.rows[0].duration_avg.minutes != undefined )
+          dataNEWAVGDur.minutes = Math.floor((dataNEWAVGDur.minutes*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.minutes)))/(dataTotal + thisTotal))
+        if (result.rows[0].duration_avg.seconds != null || result.rows[0].duration_avg.seconds != undefined )
+          dataNEWAVGDur.seconds = Math.floor((dataNEWAVGDur.seconds*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.seconds)))/(dataTotal + thisTotal))
+      }console.log(dataNEWAVGDur)
 
-    if(dataNewMaxVel < result.rows[0].veloc_max && result.rows[0].veloc_max != null){
-      dataNewMaxVel = result.rows[0].veloc_max
-    }
-    let intervalVar = result.rows[0].duration
-    
-    console.log(result.rows[0].duration)
-    if(result.rows[0].duration!= null){
-      if(!(result.rows[0].duration.days === 'undefined')){
-        if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
-        dataNewMaxDur.hours =  intervalVar.hours
-        dataNewMaxDur.minutes =  intervalVar.minutes
-        dataNewMaxDur.seconds =  intervalVar.seconds}
+      if(dataNEWAVGDur.seconds == 0 ) {dataNEWAVGDur.seconds = "00"} //ik its bad
+      else if(dataNEWAVGDur.seconds >= 60 ) {dataNEWAVGDur.seconds = "00"; dataNEWAVGDur.minutes += 1} //ik its bad
+      else if(dataNEWAVGDur.seconds < 10 ) {dataNEWAVGDur.seconds = "0"+dataNEWAVGDur.seconds}
+      if(dataNEWAVGDur.minutes == 0 ) {dataNEWAVGDur.minutes = "00"} //ik its bad
+      else if(dataNEWAVGDur.minutes >= 60 ) {dataNEWAVGDur.minutes = "00"; dataNEWAVGDur.hours += 1}
+      else if(dataNEWAVGDur.minutes < 10 ) {dataNEWAVGDur.minutes = "0"+dataNEWAVGDur.minutes}
+      if(dataNEWAVGDur.hours == 0 ) {dataNEWAVGDur.hours = "00"} //ik its bad
+      else if(dataNEWAVGDur.hours >= 24) dataNEWAVGDur.hours = "23" //ik ik
+      else if(dataNEWAVGDur.hours < 10 ) {dataNEWAVGDur.hours = "0"+dataNEWAVGDur.hours}
+      dataTotal = dataTotal + thisTotal;
+      
+
+      if(dataNewMaxVel < result.rows[0].veloc_max && result.rows[0].veloc_max != null){
+        dataNewMaxVel = result.rows[0].veloc_max
       }
-      else if(!(result.rows[0].duration.hours === 'undefined')){
-        if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+      let intervalVar = result.rows[0].duration
+      
+      console.log(result.rows[0].duration)
+      if(result.rows[0].duration!= null){
+        if(!(result.rows[0].duration.days === 'undefined')){
+          if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
           dataNewMaxDur.hours =  intervalVar.hours
           dataNewMaxDur.minutes =  intervalVar.minutes
           dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.hours === 'undefined')){
+          if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+            dataNewMaxDur.hours =  intervalVar.hours
+            dataNewMaxDur.minutes =  intervalVar.minutes
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.minutes === 'undefined')){
+          if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
+            dataNewMaxDur.minutes =  intervalVar.minutes
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.seconds === 'undefined')){
+          if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
       }
-      else if(!(result.rows[0].duration.minutes === 'undefined')){
-        if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
-          dataNewMaxDur.minutes =  intervalVar.minutes
-          dataNewMaxDur.seconds =  intervalVar.seconds}
+      if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
+        dataNewMaxLen = result.rows[0].length
       }
-      else if(!(result.rows[0].duration.seconds === 'undefined')){
-        if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
-          dataNewMaxDur.seconds =  intervalVar.seconds}
+      if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
+        dataNewMaxTime = new Date(result.rows[0].time)
       }
-    }
-    if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
-      dataNewMaxLen = result.rows[0].length
-    }
-    if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
-      dataNewMaxTime = new Date(result.rows[0].time)
-    }
-    if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
-      dataNewMinTime = new Date(result.rows[0].timemin)
+      if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
+        dataNewMinTime = new Date(result.rows[0].timemin)
+      }
     }
     if(numberOfConnects == 4){
       console.log("Here  is the max")
-      let maxArrayValues = {"totalTracks": dataTotal, "velocity": dataNewMaxVel,"velocity_avg":dataNEWAVGVel, "duration": dataNewMaxDur, "length":dataNewMaxLen,"length_avg":dataNEWAVGLen ,"timemax": dataNewMaxTime, "timemin": dataNewMinTime }
+      let maxArrayValues = {"totalTracks": dataTotal, "velocity": dataNewMaxVel,"velocity_avg":dataNEWAVGVel,"duration": dataNewMaxDur,"duration_avg":dataNEWAVGDur, "length":dataNewMaxLen,"length_avg":dataNEWAVGLen ,"timemax": dataNewMaxTime, "timemin": dataNewMinTime }
       console.log(maxArrayValues)
       client.end();
       if(maxArrayValues!= null){
@@ -1468,53 +1540,76 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
   query3.on("end", function (result) {
     //let data = require('../public/data/geoJSON.json')
     numberOfConnects = numberOfConnects + 1
+    if(result != null){
+      let thisTotal = +result.rows[0].total
+      //dataNewAVGTime = (dataNewAVGTime*dataTotal + thisTotal*result.rows[0].duration_avg)/(dataTotal + thisTotal)
+      dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
+      dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
 
-    dataNewAVGTime = (dataNewAVGTime*dataTotal + result.rows[0].total*result.rows[0].duration_avg)/(dataTotal + result.rows[0].total)
-    dataNEWAVGVel = (dataNEWAVGVel*dataTotal + result.rows[0].total*result.rows[0].veloc_avg)/(dataTotal + result.rows[0].total)
-    dataNEWAVGLen = (dataNEWAVGLen*dataTotal + result.rows[0].total*result.rows[0].length_avg)/(dataTotal + result.rows[0].total)
-    dataTotal += result.rows[0].total;
+      console.log(result.rows[0].duration_avg)
+      if(result.rows[0].duration_avg != null){
+        if (result.rows[0].duration_avg.hours != null || result.rows[0].duration_avg.hours != undefined )
+          dataNEWAVGDur.hours = Math.floor((dataNEWAVGDur.hours*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.hours)))/(dataTotal + thisTotal)) //i know it isnt like this but time is running out.
+        if (result.rows[0].duration_avg.minutes != null || result.rows[0].duration_avg.minutes != undefined )
+          dataNEWAVGDur.minutes = Math.floor((dataNEWAVGDur.minutes*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.minutes)))/(dataTotal + thisTotal))
+        if (result.rows[0].duration_avg.seconds != null || result.rows[0].duration_avg.seconds != undefined )
+          dataNEWAVGDur.seconds = Math.floor((dataNEWAVGDur.seconds*dataTotal + thisTotal*(Number(result.rows[0].duration_avg.seconds)))/(dataTotal + thisTotal))
+      }console.log(dataNEWAVGDur)
+      if(dataNEWAVGDur.seconds == 0 ) {dataNEWAVGDur.seconds = "00"} //ik its bad
+      else if(dataNEWAVGDur.seconds >= 60 ) {dataNEWAVGDur.seconds = "00"; dataNEWAVGDur.minutes += 1} //ik its bad
+      else if(dataNEWAVGDur.seconds < 10 ) {dataNEWAVGDur.seconds = "0"+dataNEWAVGDur.seconds}
+      if(dataNEWAVGDur.minutes == 0 ) {dataNEWAVGDur.minutes = "00"} //ik its bad
+      else if(dataNEWAVGDur.minutes >= 60 ) {dataNEWAVGDur.minutes = "00"; dataNEWAVGDur.hours += 1}
+      else if(dataNEWAVGDur.minutes < 10 ) {dataNEWAVGDur.minutes = "0"+dataNEWAVGDur.minutes}
+      if(dataNEWAVGDur.hours == 0 ) {dataNEWAVGDur.hours = "00"} //ik its bad
+      else if(dataNEWAVGDur.hours >= 24) dataNEWAVGDur.hours = "23" //ik ik
+      else if(dataNEWAVGDur.hours < 10 ) {dataNEWAVGDur.hours = "0"+dataNEWAVGDur.hours}
+      
+      dataTotal = dataTotal + thisTotal;
+      
 
-    if(dataNewMaxVel < result.rows[0].veloc_max && result.rows[0].veloc_max != null){
-      dataNewMaxVel = result.rows[0].veloc_max
-    }
-    let intervalVar = result.rows[0].duration
-    
-    console.log(result.rows[0].duration)
-    if(result.rows[0].duration!= null){
-      if(!(result.rows[0].duration.days === 'undefined')){
-        if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
-        dataNewMaxDur.hours =  intervalVar.hours
-        dataNewMaxDur.minutes =  intervalVar.minutes
-        dataNewMaxDur.seconds =  intervalVar.seconds}
+      if(dataNewMaxVel < result.rows[0].veloc_max && result.rows[0].veloc_max != null){
+        dataNewMaxVel = result.rows[0].veloc_max
       }
-      else if(!(result.rows[0].duration.hours === 'undefined')){
-        if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+      let intervalVar = result.rows[0].duration
+      
+      console.log(result.rows[0].duration)
+      if(result.rows[0].duration!= null){
+        if(!(result.rows[0].duration.days === 'undefined')){
+          if(dataNewMaxDur.days <  intervalVar.days)  {dataNewMaxDur.days =  intervalVar.days
           dataNewMaxDur.hours =  intervalVar.hours
           dataNewMaxDur.minutes =  intervalVar.minutes
           dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.hours === 'undefined')){
+          if(dataNewMaxDur.hours <  intervalVar.hours && dataNewMaxDur.days == 0)  {
+            dataNewMaxDur.hours =  intervalVar.hours
+            dataNewMaxDur.minutes =  intervalVar.minutes
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.minutes === 'undefined')){
+          if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
+            dataNewMaxDur.minutes =  intervalVar.minutes
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
+        if(!(result.rows[0].duration.seconds === 'undefined')){
+          if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
+            dataNewMaxDur.seconds =  intervalVar.seconds}
+        }
       }
-      else if(!(result.rows[0].duration.minutes === 'undefined')){
-        if(dataNewMaxDur.minutes <  intervalVar.minutes && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0)  {
-          dataNewMaxDur.minutes =  intervalVar.minutes
-          dataNewMaxDur.seconds =  intervalVar.seconds}
+      if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
+        dataNewMaxLen = result.rows[0].length
       }
-      else if(!(result.rows[0].duration.seconds === 'undefined')){
-        if(dataNewMaxDur.seconds <  intervalVar.seconds  && dataNewMaxDur.days == 0 && dataNewMaxDur.hours == 0 && dataNewMaxDur.minutes == 0)  {
-          dataNewMaxDur.seconds =  intervalVar.seconds}
+      if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
+        dataNewMaxTime = new Date(result.rows[0].time)
       }
-    }
-    if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
-      dataNewMaxLen = result.rows[0].length
-    }
-    if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
-      dataNewMaxTime = new Date(result.rows[0].time)
-    }
-    if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
-      dataNewMinTime = new Date(result.rows[0].timemin)
+      if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
+        dataNewMinTime = new Date(result.rows[0].timemin)
+      }
     }
     if(numberOfConnects == 4){
       console.log("Here  is the max")
-      let maxArrayValues = {"totalTracks": dataTotal, "velocity": dataNewMaxVel,"velocity_avg":dataNEWAVGVel, "duration": dataNewMaxDur, "length":dataNewMaxLen,"length_avg":dataNEWAVGLen ,"timemax": dataNewMaxTime, "timemin": dataNewMinTime }
+      let maxArrayValues = {"totalTracks": dataTotal, "velocity": dataNewMaxVel,"velocity_avg":dataNEWAVGVel,"duration": dataNewMaxDur,"duration_avg":dataNEWAVGDur, "length":dataNewMaxLen,"length_avg":dataNEWAVGLen ,"timemax": dataNewMaxTime, "timemin": dataNewMinTime }
       console.log(maxArrayValues)
       client.end();
       if(maxArrayValues!= null){
