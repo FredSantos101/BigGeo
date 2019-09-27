@@ -1297,8 +1297,9 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
     if(result != null){
       let thisTotal = +result.rows[0].total
       //dataNewAVGTime = (dataNewAVGTime*dataTotal + thisTotal*result.rows[0].duration_avg)/(dataTotal + thisTotal)
-      dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
-      dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
+      if(result.rows[0].veloc_avg != null) dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
+      if(result.rows[0].length_avg != null) dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
+
 
       console.log(result.rows[0].duration_avg)
       if(result.rows[0].duration_avg != null){
@@ -1354,6 +1355,8 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
       if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
         dataNewMaxLen = result.rows[0].length
       }
+      console.log(dataNewMaxTime)
+      console.log(result.rows[0].timemax)
       if(dataNewMaxTime < new Date(result.rows[0].timemax) && result.rows[0].timemax != null){
         dataNewMaxTime = new Date(result.rows[0].timemax)
       }
@@ -1380,8 +1383,9 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
     if(result != null){
       let thisTotal = +result.rows[0].total
       //dataNewAVGTime = (dataNewAVGTime*dataTotal + thisTotal*result.rows[0].duration_avg)/(dataTotal + thisTotal)
-      dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
-      dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
+      if(result.rows[0].veloc_avg != null) dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
+      if(result.rows[0].length_avg != null) dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
+
 
       console.log(result.rows[0].duration_avg)
       if(result.rows[0].duration_avg != null){
@@ -1438,8 +1442,10 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
       if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
         dataNewMaxLen = result.rows[0].length
       }
-      if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
-        dataNewMaxTime = new Date(result.rows[0].time)
+      console.log(dataNewMaxTime)
+      console.log(result.rows[0].timemax)
+      if(dataNewMaxTime < new Date(result.rows[0].timemax) && result.rows[0].timemax != null){
+        dataNewMaxTime = new Date(result.rows[0].timemax)
       }
       if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
         dataNewMinTime = new Date(result.rows[0].timemin)
@@ -1462,8 +1468,9 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
     if(result != null){
       let thisTotal = +result.rows[0].total
       //dataNewAVGTime = (dataNewAVGTime*dataTotal + thisTotal*result.rows[0].duration_avg)/(dataTotal + thisTotal)
-      dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
-      dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
+      if(result.rows[0].veloc_avg != null) dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
+      if(result.rows[0].length_avg != null) dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
+
 
       console.log(result.rows[0].duration_avg)
       if(result.rows[0].duration_avg != null){
@@ -1519,8 +1526,10 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
       if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
         dataNewMaxLen = result.rows[0].length
       }
-      if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
-        dataNewMaxTime = new Date(result.rows[0].time)
+      console.log(dataNewMaxTime)
+      console.log(result.rows[0].timemax)
+      if(dataNewMaxTime < new Date(result.rows[0].timemax) && result.rows[0].timemax != null){
+        dataNewMaxTime = new Date(result.rows[0].timemax)
       }
       if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
         dataNewMinTime = new Date(result.rows[0].timemin)
@@ -1543,8 +1552,8 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
     if(result != null){
       let thisTotal = +result.rows[0].total
       //dataNewAVGTime = (dataNewAVGTime*dataTotal + thisTotal*result.rows[0].duration_avg)/(dataTotal + thisTotal)
-      dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
-      dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
+      if(result.rows[0].veloc_avg != null) dataNEWAVGVel = (dataNEWAVGVel*dataTotal + thisTotal*result.rows[0].veloc_avg)/(dataTotal + thisTotal)
+      if(result.rows[0].length_avg != null) dataNEWAVGLen = (dataNEWAVGLen*dataTotal + thisTotal*result.rows[0].length_avg)/(dataTotal + thisTotal)
 
       console.log(result.rows[0].duration_avg)
       if(result.rows[0].duration_avg != null){
@@ -1600,8 +1609,10 @@ router.get('/maxVel/maxLength/maxTime/maxDuration', function(req, res) {
       if(dataNewMaxLen < result.rows[0].length && result.rows[0].length != null){
         dataNewMaxLen = result.rows[0].length
       }
-      if(dataNewMaxTime < new Date(result.rows[0].time) && result.rows[0].time != null){
-        dataNewMaxTime = new Date(result.rows[0].time)
+      console.log(dataNewMaxTime)
+      console.log(result.rows[0].timemax)
+      if(dataNewMaxTime < new Date(result.rows[0].timemax) && result.rows[0].timemax != null){
+        dataNewMaxTime = new Date(result.rows[0].timemax)
       }
       if(dataNewMinTime > new Date(result.rows[0].timemin) && result.rows[0].timemin != null){
         dataNewMinTime = new Date(result.rows[0].timemin)

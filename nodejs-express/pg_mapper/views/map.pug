@@ -5613,9 +5613,9 @@ block content
         function createVelocityHistogram(dataInput){  
              
             // set the dimensions and margins of the graph
-            var margin = {top: 10, right: 30, bottom: 30, left: 40},
-                width = 400 - margin.left - margin.right,
-                height = 300 - margin.top - margin.bottom;
+            var margin = {top: 10, right: 20, bottom: 30, left: 40},
+                width = 410 - margin.left - margin.right,
+                height = 280 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
             var svg = d3.select("#my_dataviz")
@@ -5710,9 +5710,9 @@ block content
         function createLengthHistogram(dataInput){ 
             
             // set the dimensions and margins of the graph
-            var margin = {top: 10, right: 30, bottom: 30, left: 40},
-                width = 400 - margin.left - margin.right,
-                height = 300 - margin.top - margin.bottom;
+            var margin = {top: 10, right: 20, bottom: 30, left: 40},
+                width = 410 - margin.left - margin.right,
+                height = 280 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
             var svg = d3.select("#my_datavizLENGTH")
@@ -5807,12 +5807,13 @@ block content
 
         async function  createDurationHistogram(dataInput){
             var formatData = d3.timeParse("%H:%M:%S");
-            var formatData1 = d3.timeFormat("%H:%M:%S");
+            var formatData1 = d3.timeFormat("%Hh:%Mm");
+            var formatData2 = d3.timeFormat("%H:%M");
             
             var formatMillisecond = d3.timeFormat(".%L"),
                 formatSecond = d3.timeFormat(":%S"),
-                formatMinute = d3.timeFormat("%I:%M"),
-                formatHour = d3.timeFormat("%I %p"),
+                formatMinute = d3.timeFormat(" %H:%M "),
+                formatHour = d3.timeFormat("%H"),
                 formatDay = d3.timeFormat("%a %d"),
                 formatWeek = d3.timeFormat("%b %d"),
                 formatMonth = d3.timeFormat("%b"),
@@ -5830,9 +5831,9 @@ block content
             }
             let maxDurationVal =dataInput.hours + ":" + dataInput.minutes + ":" + dataInput.seconds
             // set the dimensions and margins of the graph
-            var margin = {top: 10, right: 30, bottom: 30, left: 40},
-                width = 400 - margin.left - margin.right,
-                height = 300 - margin.top - margin.bottom;
+            var margin = {top: 10, right: 20, bottom: 30, left: 40},
+                width = 410 - margin.left - margin.right,
+                height = 280 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
             var svg = d3.select("#my_datavizDURATION")
@@ -5927,10 +5928,13 @@ block content
         }
 
         async function createTimeHistogram(dataInput,minDate){  
-            
+            let numberOfTicks = 30
             var formatData = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
             var formatData1 = d3.timeFormat("%Y-%m-%d");
-            
+            let rangeVar = [new Date(minDate).getTime(), new Date(dataInput).getTime()]
+            if(dataInput == minDate) {
+                rangeVar = [new Date(minDate).getTime()-60000*24*3*100, new Date(dataInput).getTime()+60000*24*3*100]
+            }
             var formatMillisecond = d3.timeFormat(".%L"),
                 formatSecond = d3.timeFormat(":%S"),
                 formatMinute = d3.timeFormat("%I:%M"),
@@ -5952,9 +5956,9 @@ block content
             }
              
             // set the dimensions and margins of the graph
-            var margin = {top: 10, right: 30, bottom: 30, left: 40},
-                width = 400 - margin.left - margin.right,
-                height = 300 - margin.top - margin.bottom;
+            var margin = {top: 10, right: 20, bottom: 30, left: 40},
+                width = 410 - margin.left - margin.right,
+                height = 280 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
             var svg = d3.select("#my_datavizTIME")
@@ -5970,7 +5974,7 @@ block content
 
             // X axis: scale and draw:
             var x = d3.scaleTime()
-                .domain([new Date(minDate).getTime(), new Date(dataInput).getTime()])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+                .domain(rangeVar)     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
                 .range([0, width]);
             svg.append("g")
                 .attr("transform", "translate(0," + height + ")")
@@ -5981,7 +5985,7 @@ block content
             var histogram = d3.histogram()
                 .value(function(d) {return new Date(d.data_time_start).getTime(); })   // I need to give the vector of value
                 .domain(x.domain())  // then the domain of the graphic
-                .thresholds(x.ticks(30)); // then the numbers of bins
+                .thresholds(x.ticks(numberOfTicks)); // then the numbers of bins
 
             // And apply this function to data to get the bins
             var bins = histogram(data);
