@@ -290,7 +290,9 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
   let client = new Client(conString); // Setup our Postgres Client
   client.connect(); // connect to the client
 
+  
   var queryToCreate = query_args_ContructorQUERIES(req.params.tab, req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue)
+  
   let data = req.body;
   let stDiffs = "geom";
   let queryOfDiff = "";
@@ -582,6 +584,9 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
 
 });
 
+
+let contToRemove = 0 //when 2 place back at 0 so that it can clean again
+
 router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:longNEW/:latNEW/:radiusNEW/:typeNEW/:minValueNEW/:maxValueNEW', function(req, res) {
   let data = req.body;
   //Radius in meters to degrees
@@ -594,9 +599,20 @@ router.post('/queryMoved/:tab/:long/:lat/:radius/:type/:minValue/:maxValue/:long
   client.connect(); // connect to the client
 
   //DELETE OLD QUERY OF THE LENS
-  let deleteOldPos = query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue);
-  let newQuery = query_args_ContructorQUERIES(req.params.tab,req.params.longNEW, req.params.latNEW, radiusDegreesNEW, req.params.typeNEW, req.params.minValueNEW, req.params.maxValueNEW);
-
+  console.log("Here is the query before any removals")
+  console.log(activeQuery)
+  if(contToRemove == 0){
+    contToRemove += 1
+    let deleteOldPos = query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue);
+    let newQuery = query_args_ContructorQUERIES(req.params.tab,req.params.longNEW, req.params.latNEW, radiusDegreesNEW, req.params.typeNEW, req.params.minValueNEW, req.params.maxValueNEW);
+  }
+  else {
+    contToRemove += 1
+    if(contToRemove == 4)
+      contToRemove = 0
+  }
+  console.log("After")
+  console.log(activeQuery)
   let clientCSV = new Client(conString);
   clientCSV.connect();
   let newPath
@@ -752,9 +768,11 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
-    activeQuery = activeQuery + queryDB;
+    else{
+      activeQuery = activeQuery + queryDB;
 
-    return firstPart + activeQuery + secondPart;
+      return firstPart + activeQuery + secondPart;
+    }
   }
 
   else if (type == "Start"){
@@ -765,9 +783,11 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
-    activeQuery = activeQuery + queryDB;
+    else{
+      activeQuery = activeQuery + queryDB;
 
-    return firstPart + activeQuery + secondPart;
+      return firstPart + activeQuery + secondPart;
+    }
   }
 
   else if (type == "End"){
@@ -777,9 +797,11 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
-    activeQuery = activeQuery + queryDB;
+    else{
+      activeQuery = activeQuery + queryDB;
 
-    return firstPart + activeQuery + secondPart;
+      return firstPart + activeQuery + secondPart;
+    }
   }
   else if (type == "Vel_avg"){
 
@@ -790,9 +812,11 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
-    activeQuery = activeQuery + queryDB;
+    else{
+      activeQuery = activeQuery + queryDB;
 
-    return firstPart + activeQuery + secondPart;
+      return firstPart + activeQuery + secondPart;
+    }
   }
   else if (type == "Length"){
 
@@ -804,23 +828,27 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
-    activeQuery = activeQuery + queryDB;
+    else{
+      activeQuery = activeQuery + queryDB;
 
-    return firstPart + activeQuery + secondPart;
+      return firstPart + activeQuery + secondPart;
+    }
   }
   else if (type == "Time_Interval"){
 
     let minValTime = minValue;  //UNIX TIME
     let maxValTime = maxValue;  //UNIX TIME
-    let queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + ") OR data_time_end BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" + maxValTime + "))";
+    let queryDB = "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + "))";
     if (activeQuery.indexOf(queryDB) !=-1){
 
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
-    activeQuery = activeQuery + queryDB;
+    else{
+      activeQuery = activeQuery + queryDB;
 
-    return firstPart + activeQuery + secondPart;
+      return firstPart + activeQuery + secondPart;
+    }
   }
 
   else if (type == "Time_Duration"){
@@ -831,9 +859,11 @@ function query_args_ContructorQUERIES (tab,long, lat, radius, type, minValue, ma
       activeQuery = activeQuery.slice(0,-5);
       return firstPart + activeQuery + secondPart;
     }
-    activeQuery = activeQuery + queryDB;
+    else{
+      activeQuery = activeQuery + queryDB;
 
-    return firstPart + activeQuery + secondPart;
+      return firstPart + activeQuery + secondPart;
+    }
   }
   else{
     return "";}
@@ -1085,15 +1115,15 @@ function query_args_DecontructorQUERIES (tab ,long, lat, radius, type, minVal, m
   else if (type == "Time_Interval"){
     let minValTime = minVal;  //UNIX TIME
     let maxValTime = maxVal;  //UNIX TIME
-    let queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + ") OR data_time_end BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" + maxValTime + "))";
+    let queryDB = andString + "ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + "))";
 
     console.log("Im on a Time Interval  Lens");
     if (activeQuery.indexOf(queryDB) !=-1){
       console.log("Im on an AND one");
     }
-    else if (activeQuery.indexOf("ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + ") OR data_time_end BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" + maxValTime + "))") !=-1){
+    else if (activeQuery.indexOf("ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + "))") !=-1){
       console.log("Im not on an AND one");
-      queryDB ="ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + ") OR data_time_end BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" + maxValTime + "))";
+      queryDB ="ST_DWithin(geom,ST_SetSRID(ST_MakePoint("+ long + "," + lat+ "),4326),"+ radius +") AND (data_time_start BETWEEN to_timestamp(" + minValTime + ") AND to_timestamp(" +maxValTime + "))";
     }
     else{
       console.log("There was an error as it didnt recognize any of them")

@@ -169,6 +169,7 @@ block content
         //$(window).on("resize", function () { $("#map").height($(window).height()); map.invalidateSize(); }).trigger("resize");
         map.createPane('lensPane');
         map.createPane('outtterLensPane');
+        map.createPane('outtterLensPane2');
         map.createPane('outtterLensDeletePane');
         map.createPane('velPane');
         map.createPane('areaPane');
@@ -177,8 +178,9 @@ block content
         map.createPane('queryLensPane1');
         map.createPane('queryLensPane2');
         map.createPane('queryLensPane3');
-        map.getPane('lensPane').style.zIndex = 600;
+        map.getPane('lensPane').style.zIndex = 640;
         map.getPane('outtterLensPane').style.zIndex = 650;
+        map.getPane('outtterLensPane2').style.zIndex = 630;
         map.getPane('outtterLensDeletePane').style.zIndex = 700;
         map.getPane('attLensPane').style.zIndex = 450;
         map.getPane('queryLensPane').style.zIndex = 400;
@@ -210,11 +212,13 @@ block content
         let attLenResults = L.featureGroup({pane: 'attLensPane'}).addTo(map);
 
         let outterLensesLayer = L.featureGroup({pane: 'outtterLensPane'}).addTo(map);
+        let outterLensesCircularHistoLayer = L.featureGroup({pane: 'outtterLensPane2'}).addTo(map);
         let lensesLayer = L.featureGroup({pane: 'lensPane'}).addTo(map);
         let areasLayer = L.featureGroup({pane: 'areaPane'}).addTo(map);
         
 
         let lensPreCreationLayer = L.layerGroup().addTo(map);
+
         
         let lastMarkerGroupID = null ;
         let lastMarkerGroupID1 = null ;
@@ -228,6 +232,9 @@ block content
         let moved = false;
         let lensCanMove = false;
 
+        let evenTimeStartClicked = false;
+        let evenTimeEndClicked = false;
+
 
         let attributeFuncVar = "length";
         let encodingFuncVar = "color";
@@ -235,6 +242,9 @@ block content
         let attLensesArray = [];
         //opacityLensArray
         let attOPACITYLensesArray = [];
+
+        let iDOfHisto = 0;
+        let idOfHistogram = ""
 
 
         var minTimeValue = 0;
@@ -245,6 +255,10 @@ block content
 
         let maxArrayValuesGlobal = {"velocity":0,"duration":{"hours":0,"minutes":0,"seconds":0},"length":0,"timemin":"","timemax" :""};
         let colorToUseWithMap = "#FFF"
+
+        ////////TESTSSSSS//////////
+        let testsLayer = L.layerGroup().addTo(map);
+        ///////////////////////////
 
         //Change basemaps
         /*var layer = L.esri.basemapLayer('Topographic').addTo(map);
@@ -479,20 +493,27 @@ block content
         let clicked = false;
         let changeRadius = false;
         let correctSizeVar = false;
-        map.on({
-            click:function(e){
-                map.removeEventListener('mousemove');
-                changeRadius = false;
-                //if(!changeRadius){    
-                outterLensesLayer.clearLayers();
-                moved = false;
-                lensCanMove = false;
-                clicked = false;
-                if(activeLENSNEWMENU != null){
-                    activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+        
+        ///////MAP CLICK/////////
+        var _mapClickEffect = function (e){
+            console.log("Map click effect")
+            L.DomEvent.stopPropagation(e); 
+            map.removeEventListener('mousemove');
+            changeRadius = false;
+            //if(!changeRadius){    
+            outterLensesLayer.clearLayers();
+            moved = false;
+            lensCanMove = false;
+            clicked = false;
+            if(activeLENSNEWMENU != null){
+                activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+                if(activeLENSNEWMENU.visibleOutsideMenuFlag == false){
+                    outterLensesCircularHistoLayer.removeLayer(activeLENSNEWMENU.outsideCircleHistogram)
                 }
-                //}
-            },
+            }
+            map.removeEventListener("click",_intervalsClickEffect)
+        }
+        map.on({
             mousedown: function (e) {
                 L.DomEvent.stopPropagation(e);
                 if(createQueryLensesFlag || createAttributeLensesFlag){
@@ -572,7 +593,7 @@ block content
                 map.dragging.enable();
             }
         });
-
+        map.on("click",_mapClickEffect)
         function onMapClick(location,radiusValue) {
             console.log(location);
             console.log(radiusValue);
@@ -639,6 +660,8 @@ block content
                 lID : null,
                 bounds : null,
                 radiusChangeFlag: false,
+                pickerStart: null,
+                pickerEnd: null,
                 getRadiusFlag(){
                     return this.radiusChangeFlag;
                 },
@@ -879,7 +902,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
@@ -933,7 +956,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(maxArrayValuesGlobal.velocity);
                                 createLengthHistogram(maxArrayValuesGlobal.length);
@@ -987,7 +1010,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
@@ -1041,7 +1064,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
@@ -1128,7 +1151,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
@@ -1185,7 +1208,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
@@ -1241,7 +1264,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
@@ -1297,7 +1320,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
@@ -1393,7 +1416,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
@@ -1451,7 +1474,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
@@ -1508,7 +1531,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
@@ -1565,7 +1588,7 @@ block content
                                 maxArrayValuesGlobal.timemin = newDataMax.responseJSON.timemin
                                 document.getElementById("totalNumTracks").innerHTML = newDataMax.responseJSON.totalTracks
                                 document.getElementById("averageVelocityValue").innerHTML = newDataMax.responseJSON.velocity_avg
-                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg
+                                document.getElementById("averageLengthValue").innerHTML = newDataMax.responseJSON.length_avg/1000
                                 document.getElementById("averageDurationValue").innerHTML = newDataMax.responseJSON.duration_avg.hours + ":" + newDataMax.responseJSON.duration_avg.minutes + ":" + newDataMax.responseJSON.duration_avg.seconds
                                 createVelocityHistogram(newDataMax.responseJSON.velocity);
                                 createLengthHistogram(newDataMax.responseJSON.length);
@@ -1674,7 +1697,19 @@ block content
                             "<div id='sliderIntervalVel' align='center' style='z-index:1018;    position: absolute;    top: 50%;left: 50%;transform: translate(-50%, -50%);display:none;'></div>"+
                             "<div id='sliderIntervalLength' align='center' style='z-index:1018;    position: absolute;    top: 50%;left: 50%;transform: translate(-50%, -50%);display:none;'></div>"+
                             "<div id='sliderIntervalDuration' align='center' style='z-index:1018;    position: absolute;    top: 50%;left: 50%;transform: translate(-50%, -50%);display:none;'></div>"+
-                            "<div id='sliderIntervalTime' align='center' style='z-index:1018;    position: absolute;        top: 50%;left: 50%;transform: translate(-50%, -50%);display:none;'></div>"
+                            
+                            "<div id = 'timeSelectionMenu' style='visibility:hidden;margin-left: 88%;margin-top: -60%;width: 200px;height: 80px;background-color: #44444493;'>"+
+                                "<div id='pickerStart' style='top:0px;left:0px'></div>"+
+                                "<div id='pickerEnd' style='top:0px;left:0px'></div>"+
+                                "<button id='toggleStart' class='square_btn start' style='width: 14%;height: 35%;margin: 5px;'><img src='images/timeStart.png' style='position: absolute;width: 25px;margin-top: -4%;margin-left: -4%;'></button>"+
+                                "<input id='demoStart'>"+
+                                "<img id='updateFilterButton' src='images/confirm.png' style='width: 25px;margin-left: 58%;height: 25px;margin-top: -10%;position: absolute;'>"+
+                                "<button id='toggleEnd' class='square_btn end' style='width: 14%;height: 35%;margin: 5px;'><img src='images/timeEnd.png' style='position: absolute;width: 25px;margin-left: -4%;margin-top: -4%;'></button>"+
+                                "<input id='demoEnd'>"+
+                                "<img id='cancelFilterButton' src='images/cancel.png' style='width: 35px;height: 35px;position: absolute;margin-left: 0%;margin-top: 1%;'>"+
+                            "</div>"+
+                            "<div id='sliderIntervalTime' align='center' style='z-index:1018;    position: absolute;        top: 50%;left: 50%;transform: translate(-50%, -50%);display:none;'></div>"+
+                            "<span class='explanation' style='color:"+ colorToUseWithMap+ ";    margin-top: 15%;position: absolute;margin-left: 66%;visibility:hidden'> \n"+lens.getRadius().toFixed(0)/1000+"Kilometers</span>"
                             /*"<button class='myDeleteButton' style='z-index: 1000;display: block;position: relative;margin: 46.5%;'><img src='images/trash.png' style='width: 85%; height: 80%;'></button>"+
                             "<div class='dropdown' style='z-index: 1019;display: block;margin-left: 80%;margin-top: -55%;'><button class='dropbtn'><img src='images/type.png' style='width: 150%;height: 150%;margin: -25%;''></button><div class='dropdown-content'>" + 
                             "<button class='dropbtnOpt-default'>Pass by</button>"+
@@ -1732,6 +1767,9 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#0c270093";
                         }
 
+                        
+                        
+                        
                         /*$('.myDeleteButton').click(function (e) {
                             lensCanMove=false;
                             clicked=false;
@@ -2409,14 +2447,15 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-time')[0].style.background= "#0c270093";
 
                                 document.getElementsByClassName('dropbtnOpt-velocity')[0].style.background= "#44444493";
-                                lens.setMinV(minTimeValue);
-                                lens.setMaxV(maxTimeValue);
+                                lens.setMinV(new Date(maxArrayValuesGlobal.timemin).getTime()/1000);
+                                lens.setMaxV(new Date(maxArrayValuesGlobal.timemax).getTime()/1000);
                                 lens.updateLENS();
                                 lens.setTypeOLD("Time_Interval");
-                                lens.setMinVOLD(minTimeValue);
-                                lens.setMaxVOLD(maxTimeValue);
+                                lens.setMinVOLD(new Date(maxArrayValuesGlobal.timemin).getTime()/1000);
+                                lens.setMaxVOLD(new Date(maxArrayValuesGlobal.timemax).getTime()/1000);
                                 lens.colorSuccess();
                                 lens.areaQuery.setStyle({fillOpacity:0.3})
+                                
                             }
                         });
                         $('.dropbtnOpt-duration').click(function (e) {
@@ -2465,7 +2504,10 @@ block content
                     radius: radiusQuery,
                     pane: 'lensPane'
                 }).addTo(lensesLayer),
+                idOfHistogram:"",
                 outsideCircle : null,
+                outsideCircleHistogram : null,
+                visibleOutsideMenuFlag : false,
                 lngLat : lngLat,
                 radiusQuery : radiusQuery,
                 radiusQueryOLD : radiusQuery,
@@ -2538,6 +2580,9 @@ block content
                 setOutsideCircle: function(circle){
                     this.outsideCircle = circle;
                 },
+                setOutsideCircleHistogram: function(circle){
+                    this.outsideCircleHistogram = circle;
+                },
                 setRadius : function (value){
                     this.areaQuery.setRadius(value);
                     this.radiusQuery = value;
@@ -2572,7 +2617,7 @@ block content
 
                 },
                 deleteFromZORDER(){
-                    for(let i = lensArrayZORDER.length - 1; i >= 0; i--) {
+                    for(let i = 0;i <= lensArrayZORDER.length - 1; i++) {
                         if(lensArrayZORDER[i] === this) {
                             lensArrayZORDER.splice(i, 1);
                             console.log(lensArrayZORDER);
@@ -2665,6 +2710,7 @@ block content
                     });
                     this.colorSuccess();
                     
+                    
                 },
                 updateALL : function (){
                     //TODO CHAMAR ARRAY DE TRAS PARA A FRENTE PARA NAO TER DE FAZER VERIFICACOES  
@@ -2738,7 +2784,6 @@ block content
                     for(let areaIndex = this.areas.length - 1;areaIndex>=0; areaIndex--){
                         this.areas[areaIndex].delete();
                     }
-                    this.deleteFromZORDER();
                 },
                 removeOpacityArray: function(){
                     for(let i = attOPACITYLensesArray.length - 1; i >= 0; i--) {
@@ -2761,6 +2806,7 @@ block content
                 updateOthersV2 : function( onlyRemoveInter ){
                     //true if areas need to e updated
                     this.removeFromAttLen();
+                    this.deleteFromZORDER();
                     this.assignCircHistogram()
                     if(this.enc == "opacity"){
                         this.removeOpacityArray();
@@ -2852,7 +2898,6 @@ block content
             };
 
             lens.setBounds(lens.areaQuery.getBounds());
-            lens.insertZORDER() //insert into z-order array first time
 
             
                     
@@ -2888,6 +2933,10 @@ block content
                         }
                         lens.areaQuery.setStyle({fillOpacity:0.3})
                         //L.DomEvent.stopPropagation(ev);
+
+                        idOfHistogram = "my_datavizCIRCULAR"+iDOfHisto
+                        lens.idOfHistogram = idOfHistogram
+                        iDOfHisto += 1
                         
                             // code stuff
                         let northVar = map.latLngToLayerPoint(lens.areaQuery.getBounds().getNorthWest());
@@ -2903,12 +2952,12 @@ block content
                         "data-wheelnav-titleheight='18' "+
                         "data-wheelnav-cssmode "+
                         "data-wheelnav-init>"+
-                        "<div data-wheelnav-navitemimg='images/attribute.png' onmouseup='attLENSNEWMENU(activeLENSNEWMENU)'></div>"+
-                        "<div data-wheelnav-navitemimg='images/encoding.png' onmouseup='encLENSNEWMENU(activeLENSNEWMENU)'></div>"+
-                        "<div data-wheelnav-navitemimg='images/statistics.png' onmouseup='statsLENSNEWMENU(activeLENSNEWMENU)'></div>"+
-                        "<div data-wheelnav-navitemimg='images/move.png' onmouseup='moveATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
-                        "<div data-wheelnav-navitemimg='images/radius.png' onmouseup='radiusATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
-                        "<div data-wheelnav-navitemimg='images/trash.png'  onmouseup='deleteATTLENSNEWMENU(activeLENSNEWMENU)'></div>"+
+                        "<div data-wheelnav-navitemimg='images/attribute.png' onmouseup='attLENSNEWMENU(activeLENSNEWMENU,activeLENSNEWMENU.idOfHistogram)'></div>"+
+                        "<div data-wheelnav-navitemimg='images/encoding.png' onmouseup='encLENSNEWMENU(activeLENSNEWMENU,activeLENSNEWMENU.idOfHistogram)'></div>"+
+                        "<div data-wheelnav-navitemimg='images/statistics.png' onmouseup='statsLENSNEWMENU(activeLENSNEWMENU,activeLENSNEWMENU.idOfHistogram)'></div>"+
+                        "<div data-wheelnav-navitemimg='images/move.png' onmouseup='moveATTLENSNEWMENU(activeLENSNEWMENU,activeLENSNEWMENU.idOfHistogram)'></div>"+
+                        "<div data-wheelnav-navitemimg='images/radius.png' onmouseup='radiusATTLENSNEWMENU(activeLENSNEWMENU,activeLENSNEWMENU.idOfHistogram)'></div>"+
+                        "<div data-wheelnav-navitemimg='images/trash.png'  onmouseup='deleteATTLENSNEWMENU(activeLENSNEWMENU,activeLENSNEWMENU.idOfHistogram)'></div>"+
                         "</div>"+ 
                         "<div id='attribute' style='margin-left: 88%;margin-top: -40%;visibility:hidden'><ul>"+
                             "<lu><a style='color:#FFF' class='dropbtnOpt-length'>Length</a></lu>"+
@@ -2924,12 +2973,24 @@ block content
                             "<lu><a style='color:#FFF' class='dropbtnOpt-brightness'>Brightness</a></lu>"+
                             "<lu><a style='color:#FFF' class='dropbtnOpt-opacity'>Opacity</a></lu>"+
                         "</ul></div>"+
-                        "<div id='my_datavizCIRCULAR' style='margin-top: -187.5%;margin-left: -83.9%;visibility:hidden'></div>"
+                        "<span class='explanationATT' style='color:"+ colorToUseWithMap+ ";margin-top: -86%;position: absolute;margin-left: 62%;visibility: hidden;'> \n"+lens.getRadius().toFixed(0)/1000+"Kilometers</span>"
                         });
-                        let outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
-                        lens.setOutsideCircle(outsideCircVar);
+
+                        if(lens.outsideCircleHistogram != null){
+                            outterLensesCircularHistoLayer.removeLayer(lens.outsideCircleHistogram)
+                        }
                         
+                        let myOutsideCircleCircularHist = L.divIcon({className: 'outside-Circle', iconSize: [300,200], html: 
+                        "<div id='"+lens.idOfHistogram+"' style='margin-top:  -117.5%;margin-left: -83.9%;visibility:hidden'></div>"})
+                        let outsideCircVar = L.marker(lens.getLngLat(), {icon: myOutsideCircle, pane: 'outtterLensPane'});
+                        let outsideCircHistogramVar = L.marker(lens.getLngLat(), {icon: myOutsideCircleCircularHist, pane: 'outtterLensPane2'});
+                        lens.setOutsideCircle(outsideCircVar);
+                        lens.setOutsideCircleHistogram(outsideCircHistogramVar);
+                        
+                        
+                        outterLensesCircularHistoLayer.addLayer(lens.outsideCircleHistogram)
                         outterLensesLayer.addLayer(lens.outsideCircle);
+
                         activeLENSNEWMENU = lens;
                         var piemenu = new wheelnav('piemenu');
                         piemenu.wheelRadius = piemenu.wheelRadius * 0.83;
@@ -2938,6 +2999,11 @@ block content
                         piemenu.createWheel();
                         
                         document.getElementById("wheelnav-piemenu-slice-5").style.fill = "#94342b"
+                        if(lens.visibleOutsideMenuFlag == true){
+                            document.getElementById("wheelnav-piemenu-slice-2").style.fill = "#879489"
+                            document.getElementById(lens.idOfHistogram).style.visibility = "visible"
+                        }
+
                         if(lens.att == "length")
                             document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#0c270093";
                         else if(lens.att == "velocity")
@@ -3225,7 +3291,7 @@ block content
                             L.DomEvent.stopPropagation(e);
                             if(lens.att != "length"){
                                 //lens.updateOthers();
-                                clearBox("my_datavizCIRCULAR")
+                                clearBox(idOfHistogram)
                                 lens.updateLENS(true,"length");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 
@@ -3236,14 +3302,14 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
 
-                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
+                                circularHistogram(lens)
                             }
                         });
                         $('.dropbtnOpt-velocity').click(function (e) {
                             L.DomEvent.stopPropagation(e);
                             if(lens.att != "velocity"){
                                 //lens.updateOthers();
-                                clearBox("my_datavizCIRCULAR")
+                                clearBox(idOfHistogram)
                                 lens.updateLENS(true,"velocity");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
@@ -3253,7 +3319,7 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
                                 console.log(lens.attArrayCircHistogram)
-                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
+                                circularHistogram(lens)
                             }
                         });
                         $('.dropbtnOpt-time').click(function (e) {
@@ -3261,7 +3327,7 @@ block content
                             if(lens.att != "time"){
                                 //lens.updateOthers();
                                 //lens.att = "time"
-                                clearBox("my_datavizCIRCULAR")
+                                clearBox(idOfHistogram)
                                 lens.updateLENS(true,"time");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
@@ -3270,7 +3336,7 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
-                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
+                                circularHistogram(lens)
                             }
                         });
                         $('.dropbtnOpt-duration').click(function (e) {
@@ -3279,7 +3345,7 @@ block content
                             if(lens.att != "duration"){
                                 //lens.updateOthers();
                                 //lens.att = "duration"
-                                clearBox("my_datavizCIRCULAR")
+                                clearBox(idOfHistogram)
                                 lens.updateLENS(true,"duration");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
@@ -3288,7 +3354,7 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#0c270093";
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
-                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
+                                circularHistogram(lens)
                             }
                         });
                         $('.dropbtnOpt-weekDay').click(function (e) {
@@ -3297,7 +3363,7 @@ block content
                             if(lens.att != "weekday"){
                                 //lens.updateOthers();
                                 //lens.att = "duration"
-                                clearBox("my_datavizCIRCULAR")
+                                clearBox(idOfHistogram)
                                 lens.updateLENS(true,"weekday");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
@@ -3306,7 +3372,7 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#0c270093";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#44444493";
-                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
+                                circularHistogram(lens)
                             }
                         });
                         $('.dropbtnOpt-hourDay').click(function (e) {
@@ -3315,7 +3381,7 @@ block content
                             if(lens.att != "hourday"){
                                 //lens.updateOthers();
                                 //lens.att = "duration"
-                                clearBox("my_datavizCIRCULAR")
+                                clearBox(idOfHistogram)
                                 lens.updateLENS(true,"hourday");
                                 //document.getElementsByClassName('explanation')[0].innerText=capitalizeFirstLetter(lens.att);
                                 document.getElementsByClassName('dropbtnOpt-length')[0].style.background = "#44444493";                        
@@ -3324,7 +3390,7 @@ block content
                                 document.getElementsByClassName('dropbtnOpt-duration')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-weekDay')[0].style.background = "#44444493";
                                 document.getElementsByClassName('dropbtnOpt-hourDay')[0].style.background = "#0c270093";
-                                circularHistogram(maxArrayValuesGlobal.velocity,lens)
+                                circularHistogram(lens)
                             }
                         });
                         $('.dropbtnOpt-color').click(function (e) {
@@ -3423,7 +3489,7 @@ block content
                             }
                             
                         }); 
-                        circularHistogram(maxArrayValuesGlobal.velocity,lens)
+                        circularHistogram(lens)
                     }     
                     //});
                    
@@ -3489,6 +3555,7 @@ block content
                     let urlString1 = "attQueryNEW/trajectory_lines2/" + JSON.stringify(this.area.geometry);
                     let urlString  = "attQueryNEW/trajectory_lines3/" + JSON.stringify(this.area.geometry);
                     
+                    let contadorLayer = 0
                     
                     let thisVar = this;
                     let newData = $.ajax({
@@ -3503,7 +3570,7 @@ block content
                         
                     }) 
                     $.when(newData).done(function() {
-                        
+                        contadorLayer += 1
                         if(newData.responseJSON.features != null){
                             newData.responseJSON.features.forEach(function(item, index, array) {
                                 let tracksToDraw = L.geoJson(item,firstStyleATT);
@@ -3511,8 +3578,15 @@ block content
                                     lens.updateLayer(tracksToDraw,item.properties);
                                 });
                                 tracksToDraw.addTo(_attLayer);
+                                
                             });
                             
+                        }
+                        if(contadorLayer == 4){
+                            if(idOfHistogram!=0 && thisVar.lensArray[0].outsideCircleHistogram != null){
+                                clearBox(thisVar.lensArray[0].idOfHistogram)
+                                circularHistogram(thisVar.lensArray[0])
+                            }
                         }
                     }); 
                     let newData1 = $.ajax({
@@ -3527,6 +3601,7 @@ block content
                         
                     }) 
                     $.when(newData1).done(function() {
+                        contadorLayer += 1
                         if(newData1.responseJSON.features != null){
                             newData1.responseJSON.features.forEach(function(item, index, array) {
                                 let tracksToDraw = L.geoJson(item,firstStyleATT1);
@@ -3534,8 +3609,15 @@ block content
                                     lens.updateLayer(tracksToDraw,item.properties);
                                 });
                                 tracksToDraw.addTo(_attLayer1);
+                                
                             });
                             
+                        }
+                        if(contadorLayer == 4){
+                            if(idOfHistogram!=0 && thisVar.lensArray[0].outsideCircleHistogram != null){
+                                clearBox(thisVar.lensArray[0].idOfHistogram)
+                                circularHistogram(thisVar.lensArray[0])
+                            }
                         }
                     });
                     let newData2 = $.ajax({
@@ -3550,6 +3632,7 @@ block content
                         
                     }) 
                     $.when(newData2).done(function() {
+                        contadorLayer += 1
                         if(newData2.responseJSON.features != null){
                             newData2.responseJSON.features.forEach(function(item, index, array) {
                                 let tracksToDraw = L.geoJson(item,firstStyleATT2);
@@ -3557,8 +3640,15 @@ block content
                                     lens.updateLayer(tracksToDraw,item.properties); 
                                 });
                                 tracksToDraw.addTo(_attLayer2);
+                                
                             });
                             
+                        }
+                        if(contadorLayer == 4){
+                            if(idOfHistogram!=0 && thisVar.lensArray[0].outsideCircleHistogram != null){
+                                clearBox(thisVar.lensArray[0].idOfHistogram)
+                                circularHistogram(thisVar.lensArray[0])
+                            }
                         }
                     });
                     let newData3 = $.ajax({
@@ -3573,6 +3663,7 @@ block content
                         
                     }) 
                     $.when(newData3).done(function() {
+                        contadorLayer += 1
                         if(newData3.responseJSON.features != null){
                             newData3.responseJSON.features.forEach(function(item, index, array) {
                                 let tracksToDraw = L.geoJson(item,firstStyleATT3);
@@ -3580,9 +3671,16 @@ block content
                                     lens.updateLayer(tracksToDraw,item.properties); 
                                 });
                                 tracksToDraw.addTo(_attLayer3);
+                                
                             });
                             
                             
+                        }
+                        if(contadorLayer == 4){
+                            if(idOfHistogram!=0 && thisVar.lensArray[0].outsideCircleHistogram != null){
+                                clearBox(thisVar.lensArray[0].idOfHistogram)
+                                circularHistogram(thisVar.lensArray[0])
+                            }
                         }
                     });
                     
@@ -3783,39 +3881,39 @@ block content
                         }
                     else if(velAtt <= 20)   {
                         attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
-                        layer.setStyle({"weight": 1.4});
+                        layer.setStyle({"weight": 2});
                         }
                     else if(velAtt <= 30)   {
                         attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
-                        layer.setStyle({"weight": 1.8});
+                        layer.setStyle({"weight": 2.5});
                         }
                     else if(velAtt <= 40)   {
                         attArrayCircHistogram[3].value = attArrayCircHistogram[3].value  + 1
-                        layer.setStyle({"weight": 2.2});
+                        layer.setStyle({"weight": 2.8});
                         }
                     else if(velAtt <= 50)   {
                         attArrayCircHistogram[4].value = attArrayCircHistogram[4].value  + 1
-                        layer.setStyle({"weight": 2.6});
+                        layer.setStyle({"weight": 3.3});
                         }
                     else if(velAtt <= 60)   {
                         attArrayCircHistogram[5].value = attArrayCircHistogram[5].value  + 1
-                        layer.setStyle({"weight": 3});
+                        layer.setStyle({"weight": 3.6});
                         }
                     else if(velAtt <= 70)   {
                         attArrayCircHistogram[6].value = attArrayCircHistogram[6].value  + 1
-                        layer.setStyle({"weight": 3.4});
+                        layer.setStyle({"weight": 4});
                         }
                     else if(velAtt <= 80)   {
                         attArrayCircHistogram[7].value = attArrayCircHistogram[7].value  + 1
-                        layer.setStyle({"weight": 3.8});
+                        layer.setStyle({"weight": 4.5});
                         }
                     else if(velAtt <= 90)   {
                         attArrayCircHistogram[8].value = attArrayCircHistogram[8].value  + 1
-                        layer.setStyle({"weight": 4.2});
+                        layer.setStyle({"weight": 5});
                         }
                     else                    {
                         attArrayCircHistogram[9].value = attArrayCircHistogram[9].value  + 1
-                        layer.setStyle({"weight": 4.6});
+                        layer.setStyle({"weight": 6});
                         }
                     break;
             }
@@ -4130,8 +4228,6 @@ block content
             // code block
             let tim = new Date(properties.f3)/1000;
             var timeNow = new Date(Date.now());
-            console.log("Here comes the now")
-            console.log(timeNow)
             var diffIntervals = (maxTimeValue - minTimeValue)/24
             switch(encoding){
                 case "color":
@@ -4584,8 +4680,6 @@ block content
 
             
             var day = weekday[d1.getUTCDay()];
-            console.log("Here come the weekdays")
-            console.log(day);
             //console.log(day1);
 
             var diffIntervals = (maxTimeValue - minTimeValue)/10
@@ -4726,8 +4820,6 @@ block content
             // code block
             let time = new Date(properties.f3);
             var tim = time.getHours();
-            console.log("Here come the hours")
-            console.log(tim);
             var diffIntervals = (maxTimeValue - minTimeValue)/10
             switch(encoding){
                 case "color":
@@ -5189,6 +5281,18 @@ block content
 
             return stringDate;
         }
+        function getUnixTime(t){
+            let dt = new Date(t);
+            let stringDate = dt.getTime();
+            /*let year = dt.getFullYear();
+            let month = dt.getMonth();
+            let day = dt.getDay();
+            let hour = dt.getHours();
+            let minute = dt.getMinutes();
+            let seconds = dt.getSeconds();*/
+
+            return stringDate;
+        }
 
         function isEqual(a, b) { 
             // if length is not equal 
@@ -5610,7 +5714,7 @@ block content
                 data_time_start: parseData2(d.data_time_start)     
             };
         } 
-        function createVelocityHistogram(dataInput){  
+        async function createVelocityHistogram(dataInput){  
              
             // set the dimensions and margins of the graph
             var margin = {top: 10, right: 20, bottom: 30, left: 40},
@@ -5707,7 +5811,7 @@ block content
             });
         }
         
-        function createLengthHistogram(dataInput){ 
+        async function createLengthHistogram(dataInput){ 
             
             // set the dimensions and margins of the graph
             var margin = {top: 10, right: 20, bottom: 30, left: 40},
@@ -5769,7 +5873,7 @@ block content
                 .duration(100)
                 .style("opacity", 1)
                 tooltip
-                .html("Range: " + d.x0/100 + "Km - " + d.x1/1000 + "Km")
+                .html("Range: " + d.x0/1000 + "Km - " + d.x1/1000 + "Km")
                 .style("left", (d3.mouse(this)[0]+20) + "px")
                 .style("top", (d3.mouse(this)[1]) + "px")
             }
@@ -5858,7 +5962,7 @@ block content
 
             // set the parameters for the histogram
             var histogram = d3.histogram()
-                .value(function(d) {console.log(d.duration); return formatData(d.duration).getTime(); })   // I need to give the vector of value
+                .value(function(d) {return formatData(d.duration).getTime(); })   // I need to give the vector of value
                 .domain(x.domain())  // then the domain of the graphic
                 .thresholds(x.ticks(30)); // then the numbers of bins
 
@@ -5933,7 +6037,8 @@ block content
             var formatData1 = d3.timeFormat("%Y-%m-%d");
             let rangeVar = [new Date(minDate).getTime(), new Date(dataInput).getTime()]
             if(dataInput == minDate) {
-                rangeVar = [new Date(minDate).getTime()-60000*24*3*100, new Date(dataInput).getTime()+60000*24*3*100]
+                rangeVar = [new Date(minDate).getTime()-1000, new Date(dataInput).getTime()+1000]
+                numberOfTicks = 2
             }
             var formatMillisecond = d3.timeFormat(".%L"),
                 formatSecond = d3.timeFormat(":%S"),
@@ -6051,16 +6156,17 @@ block content
             });
         }
 
-        function circularHistogram(dataInput,lens){
+        async function circularHistogram(lens){
             // set the dimensions and margins of the graph
             var margin = {top: 100, right: 0, bottom: 0, left: 0},
                 width = 800 - margin.left - margin.right,
                 height = 800 - margin.top - margin.bottom,
                 innerRadius = 105,
                 outerRadius = 200;   // the outerRadius goes from the middle of the SVG area to the border
-
+            var nameOfHisto = "#"+lens.idOfHistogram
+            console.log(nameOfHisto)
             // append the svg object
-            var svg = d3.select("#my_datavizCIRCULAR")
+            var svg = d3.select(nameOfHisto)
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -6119,7 +6225,7 @@ block content
                     .style("fill", colorToUseWithMap)
                     .attr("alignment-baseline", "middle")
         }
-        
+
 
         //////////////////////////////////////////
         //////////////////////////////////////////
@@ -6167,6 +6273,8 @@ block content
         //NEW MENU RELATED STUFF
         function moveLENSNEWMENU(lens){
             document.getElementById('type').style.visibility="hidden";
+            document.getElementById("timeSelectionMenu").style.visibility="hidden";
+            document.getElementsByClassName('explanation')[0].style.visibility="hidden"
             clicked=false;
             changeRadius=false;
             lensCanMove = true;
@@ -6244,6 +6352,9 @@ block content
         }
         function radiusLENSNEWMENU(lens){
             document.getElementById('type').style.visibility="hidden";
+            document.getElementById("timeSelectionMenu").style.visibility="hidden";
+
+            document.getElementsByClassName('explanation')[0].style.visibility="visible"
             clicked=false;
             changeRadius = true;
             lensCanMove = false;
@@ -6284,6 +6395,7 @@ block content
                                         correctSizeVar = true;
                                         lens.colorSuccess();
                                         lens.setRadius(radiusValue);
+                                        document.getElementsByClassName('explanation')[0].innerText = lens.getRadius().toFixed(0)/1000+"Kilometers";
                                     } else {
                                         correctSizeVar = false;
                                         lens.areaQuery.setStyle({fillColor: 'DarkRed',color:'red'});
@@ -6349,6 +6461,9 @@ block content
             lensCanMove = false;
             changeRadius = false;
             document.getElementById('type').style.visibility = "visible";
+            document.getElementById("timeSelectionMenu").style.visibility="hidden";
+            document.getElementsByClassName('explanation')[0].style.visibility="hidden"
+                                    
         }
 
         function intervalsLENSNEWMENU(lens){
@@ -6356,11 +6471,16 @@ block content
             lensCanMove = false;
             changeRadius = false;
             document.getElementById('type').style.visibility = "hidden";
+            document.getElementsByClassName('explanation')[0].style.visibility="hidden"
+                    
 
             //if(document.getElementById("sliderRadius").style.display=='none'){
             if(lens.getType() == "Vel_avg") {
 
                 if(document.getElementById("sliderIntervalVel").style.display=='none'){
+
+                    map.removeEventListener("click",_mapClickEffect)
+                    map.on("click",_intervalsClickEffect)
                     lens.areaQuery.setStyle({fillOpacity: 0.6})
                     //document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                     document.getElementById("sliderIntervalVel").style.display="block";
@@ -6376,11 +6496,15 @@ block content
                 else {
                     document.getElementById("sliderIntervalVel").style.display="none";
                     lens.areaQuery.setStyle({fillOpacity: 0.0})
+                    map.on("click",_mapClickEffect)
                     //document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
                 }
             }
             else if(lens.getType() == "Length") {
                 if(document.getElementById("sliderIntervalLength").style.display=='none'){
+
+                    map.removeEventListener("click",_mapClickEffect)
+                    map.on("click",_intervalsClickEffect)
                     lens.areaQuery.setStyle({fillOpacity: 0.6})
                     //document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                     document.getElementById("sliderIntervalLength").style.display="block";
@@ -6390,17 +6514,23 @@ block content
                         //TODO VELOCITY REMOVING BADLY??
                         L.DomEvent.stopPropagation(e);
                         map.dragging.disable();
+
                         e.originalEvent.preventDefault();
                     });
                 }
                 else {
                     document.getElementById("sliderIntervalLength").style.display="none";
                     lens.areaQuery.setStyle({fillOpacity: 0.0})
+                    map.on("click",_mapClickEffect)
+                    map.removeEventListener("click",_intervalsClickEffect)
                     //document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
                 }
             }
             else if(lens.getType() == "Time_Duration") {
                 if(document.getElementById("sliderIntervalDuration").style.display=='none'){
+
+                    map.removeEventListener("click",_mapClickEffect)
+                    map.on("click",_intervalsClickEffect)
                     lens.areaQuery.setStyle({fillOpacity: 0.6})
                     //document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
                     document.getElementById("sliderIntervalDuration").style.display="block";
@@ -6416,34 +6546,128 @@ block content
                 else {
                     document.getElementById("sliderIntervalDuration").style.display="none";
                     lens.areaQuery.setStyle({fillOpacity: 0.0})
+                    map.on("click",_mapClickEffect)
+                    map.removeEventListener("click",_intervalsClickEffect)
                     //document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
                 }
             }
             else if(lens.getType() == "Time_Interval") {
-                if(document.getElementById("sliderIntervalTime").style.display=='none'){
-                    lens.areaQuery.setStyle({fillOpacity: 0.6})
-                    //document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff0000";
-                    document.getElementById("sliderIntervalTime").style.display="block";
-
-                    let $sliderIntervalTime = $('#sliderIntervalTime');
-                    $sliderIntervalTime.mousedown( function (e){
-                        //TODO VELOCITY REMOVING BADLY??
-                        L.DomEvent.stopPropagation(e);
-                        map.dragging.disable();
-                        e.originalEvent.preventDefault();
+                var previousValueEnd = null 
+                var previousValueStart = null
+                if(document.getElementById("timeSelectionMenu").style.visibility=='hidden'){
+                    //NEW TIME PICKER
+                    lens.pickerStart = new WindowDatePicker({
+                        value: new Date(maxArrayValuesGlobal.timemin).getTime(),
+                        // selectors
+                        el: '#pickerStart',
+                        inputEl: '#demoStart',
+                        toggleEl: null,
+                        // or 'HOUR', 'DATE'
+                        type: "DATEHOUR",// date format
+                        dateType: "YYYY/MM/DD HH:MM:SS",
+                        // or '12'
+                        hourType: "24"
                     });
+                    lens.pickerEnd = new WindowDatePicker({
+                        value: new Date(maxArrayValuesGlobal.timemax).getTime(),
+                        // selectors
+                        el: '#pickerEnd',
+                        inputEl: '#demoEnd',
+                        toggleEl: null,
+                        // or 'HOUR', 'DATE'
+                        type: "DATEHOUR",// date format
+                        dateType: "YYYY/MM/DD",
+                        // or '12'
+                        hourType: "24"
+                    });
+
+                    previousValueEnd = lens.pickerEnd.get().value
+                    previousValueStart = lens.pickerStart.get().value
+
+                    document.getElementById("timeSelectionMenu").style.visibility="visible";
+
+                    let toggledStart = false;
+                    let toggledEnd = false;
+                    $("#toggleEnd").click(function(e){
+                        
+                        L.DomEvent.stopPropagation(e);
+                        map.removeEventListener("click",_mapClickEffect)
+
+                        console.log("YOOO BITCH")
+                        
+
+                        lens.pickerEnd.toggle();
+                        
+                        /*lens.pickerEnd.el.addEventListener('wdp.open', () => {
+                            map.removeEventListener("click",_mapClickEffect)
+
+                            evenTimeEndClicked = true;
+                            evenTimeStartClicked = false;
+                            lens.pickerEnd.el.addEventListener('wdp.change', eveTimeChangeEnd(lens,previousValueEnd));
+                            //lens.pickerEnd.el.addEventListener('wdp.save', eveTimeEnd(lens));
+                        });
+                        
+                        lens.pickerEnd.el.addEventListener('wdp.close', () => {
+                            map.addEventListener("click")
+                            evenTimeStartClicked = false
+                            lens.pickerEnd.el.removeEventListener('wdp.change', eveTimeChangeEnd(lens,previousValueEnd));
+                        });*/
+                    })
+                    lens.pickerEnd.el.addEventListener('wdp.open', () => {
+                        map.removeEventListener("click",_intervalsClickEffect)
+                        map.removeEventListener("click",_mapClickEffect)
+                    });
+                    lens.pickerEnd.el.addEventListener('wdp.close', () => {
+                        console.log("On close")
+                        map.on("click",_intervalsClickEffect)
+                    });
+                    $("#toggleStart").click(function(e){
+                        
+                        L.DomEvent.stopPropagation(e);
+                        map.removeEventListener("click",_mapClickEffect)
+                        console.log("SCIENCE BITCH")
+                        lens.pickerStart.toggle();
+                        /*lens.pickerStart.el.addEventListener('wdp.open', () => {
+                            map.removeEventListener("click",_mapClickEffect)
+                            evenTimeStartClicked = true;
+                            evenTimeEndClicked = false;
+                            lens.pickerStart.el.addEventListener('wdp.change', eveTimeChangeStart(lens,previousValueStart));
+                            //lens.pickerStart.el.addEventListener('wdp.save', eveTimeStart(lens));
+                        });*/
+                    
+
+                    });
+                    lens.pickerStart.el.addEventListener('wdp.open', () => {
+                        map.removeEventListener("click",_intervalsClickEffect)
+                        map.removeEventListener("click",_mapClickEffect)
+                    });
+                    lens.pickerStart.el.addEventListener('wdp.close', () => {
+                        console.log("On close")
+                        map.on("click",_intervalsClickEffect)
+                    });
+                    $("#updateFilterButton").click(function(e){
+                        eveTimeToChange(lens,previousValueStart,previousValueEnd)
+                    })
+                    $("#cancelFilterButton").click(function(e){
+                        cancelationButton(lens)
+                    })
+                    
                 }
                 else {
-                    document.getElementById("sliderIntervalTime").style.display="none";
-                    lens.areaQuery.setStyle({fillOpacity: 0.0})
-                    //document.getElementsByClassName('myIntervalsButton')[0].style.backgroundColor = "#ff8400";
+                    document.getElementById("timeSelectionMenu").style.visibility="hidden";
+                    map.on("click",_mapClickEffect)
+                    //lens.pickerEnd.el.removeEventListener('wdp.change', eveTimeChangeEnd(lens,previousValueEnd));
+                    //lens.pickerEnd.el.removeEventListener('wdp.save', eveTimeEnd(lens));
+                    
+                    //lens.pickerStart.el.removeEventListener('wdp.change', eveTimeChangeStart(lens,previousValueStart));
+                    //lens.pickerStart.el.removeEventListener('wdp.save', eveTimeStart(lens));
                 }
             }
             else{
                 console.log("Lens not of the type that allows for intervals");
             }
             //}
-        
+            
             $(function(){
                 $("#sliderIntervalVel").roundSlider({
                     sliderType: "range",
@@ -6568,78 +6792,24 @@ block content
                     }
                 });
                 
-                $("#sliderIntervalTime").roundSlider({
-                    sliderType: "range",
-                    radius: "130px",
-                    value: lens.getMinV() + "," + lens.getMaxV(),
-                    min: minTimeValue , // 2008-02-02 13:30:44
-                    max: maxTimeValue , // 2008-02-08 17:39:18
-                    //lineCap: "round",
-                    width: 5,
-                    handleSize: "+10",
-                    handleShape: "dot",
-                    tooltipFormat: function (e) {
-                        // Unixtimestamp
-                        let unixtimestamp = e.value;
-                        // Convert timestamp to milliseconds
-                        let date = new Date(unixtimestamp*1000);
-                        // Year
-                        let year = date.getFullYear();
-                        // Month
-                        let month = date.getMonth();
-                        // Day
-                        let day = date.getDate();
-                        // Hours
-                        let hours = date.getHours();
-                        // Minutes
-                        let minutes = "0" + date.getMinutes();
-                        // Seconds
-                        let seconds = "0" + date.getSeconds();
-                        // Display date time in MM-dd-yyyy h:m:s format
-                        let convdataTime = month+'-'+day+'-'+year+' '+hours + ':' + minutes.substr(-2);
-                        
-                        return convdataTime;
-                    },
-                    drag: function (e) {
-                        L.DomEvent.stopPropagation(e);
-                        
-                        let index = e.value.indexOf(",");  // Gets the first index where a , occours
-                        let firstPart = e.value.substr(0, index); // Gets the first part
-                        let secondPart = e.value.substr(index + 1);  // Gets the text part
-                        lens.setMinV(firstPart);
-                        lens.setMaxV(secondPart);
-                        console.log(lens.getMinV());
-                        console.log(lens.getMaxV());
-                    },
-                    start: function(e) {
-                        
-                    },
-                    stop: function (e) {
-                        L.DomEvent.stopPropagation(e);
-                        map.dragging.enable();
-                        lens.updateLENS();
-                        lens.setMinVOLD(lens.getMinV());
-                        lens.setMaxVOLD(lens.getMaxV());
-                    }
-                });
+                
             });
 
         }
 
-        function deleteATTLENSNEWMENU(lens){
+        function deleteATTLENSNEWMENU(lens,idOfHistogram){
             clicked=false;
             changeRadius = false;
             lensCanMove = false;
 
-            lens.deleteFromZORDER();
             document.getElementById('attribute').style.display = "none";
             document.getElementById('attribute').style.visibility = "hidden";
 
             document.getElementById('encoding').style.display = "none";
             document.getElementById('encoding').style.visibility = "hidden";
-
-            document.getElementById('my_datavizCIRCULAR').style.visibility = "hidden";
+            
             outterLensesLayer.removeLayer(lens.outsideCircle);
+            outterLensesCircularHistoLayer.removeLayer(lens.outsideCircleHistogram);
             lensesLayer.removeLayer(lens.areaQuery);
             
             lens.delete();
@@ -6657,13 +6827,13 @@ block content
             }
         }
 
-        function radiusATTLENSNEWMENU(lens){
+        function radiusATTLENSNEWMENU(lens,idOfHistogram){
             document.getElementById('attribute').style.display = "none";
             document.getElementById('attribute').style.visibility = "hidden";
             document.getElementById('encoding').style.display = "none";
             document.getElementById('encoding').style.visibility = "hidden";
 
-            document.getElementById('my_datavizCIRCULAR').style.visibility = "hidden";
+            document.getElementsByClassName('explanationATT')[0].style.visibility="visible"
             clicked=false;
             changeRadius = true;
             lensCanMove = false;
@@ -6714,6 +6884,8 @@ block content
                                         correctSizeVar = true;
                                         lens.colorSuccess();
                                         lens.setRadius(radiusValue);
+                                        document.getElementsByClassName('explanation')[0].innerText = lens.getRadius().toFixed(0)/1000+"Kilometers";
+                                    
                                     } else {
                                         correctSizeVar = false;
                                         lens.areaQuery.setStyle({fillColor: 'DarkRed',color:'red'});
@@ -6754,6 +6926,7 @@ block content
                                     }
                                 }
                                 attLensArrayToServer();
+
                             }
                             lens.setBounds(lens.areaQuery.getBounds());
                             
@@ -6772,14 +6945,16 @@ block content
             });
         }
 
-        function moveATTLENSNEWMENU(lens){
+        function moveATTLENSNEWMENU(lens,idOfHistogram){
             document.getElementById('attribute').style.display = "none";
             document.getElementById('attribute').style.visibility = "hidden";
 
             document.getElementById('encoding').style.display = "none";
             document.getElementById('encoding').style.visibility = "hidden";
 
-            document.getElementById('my_datavizCIRCULAR').style.visibility = "hidden";
+            if(lens.visibleOutsideMenuFlag == false){
+                document.getElementById(idOfHistogram).style.visibility = "hidden";
+            }
             clicked = false; 
             changeRadius = false;
             lensCanMove = true;
@@ -6829,6 +7004,7 @@ block content
                             moved = true;
                             lens.areaQuery.setLatLng(e.latlng);
                             lens.outsideCircle.setLatLng(e.latlng);
+                            lens.outsideCircleHistogram.setLatLng(e.latlng);
                             lens.lngLat = e.latlng;
                             lens.setBounds(lens.areaQuery.getBounds());
                             map.panInside(lens.getLngLat(),{padding:[200,200],duration:0.3});
@@ -6871,7 +7047,9 @@ block content
                                 attLensArrayToServer();
                             }
                             //lens.createLayers();
+
                             lens.setBounds(lens.areaQuery.getBounds());
+                            
 
                         }
                     }
@@ -6879,7 +7057,7 @@ block content
             });
         }
 
-        function attLENSNEWMENU(lens){
+        function attLENSNEWMENU(lens,idOfHistogram){
             clicked = false; 
             changeRadius = false;
             lensCanMove = false;
@@ -6890,10 +7068,12 @@ block content
             document.getElementById('encoding').style.display = "none";
             document.getElementById('encoding').style.visibility = "hidden";
 
-            document.getElementById('my_datavizCIRCULAR').style.visibility = "hidden";
+            if(lens.visibleOutsideMenuFlag == false){
+                document.getElementById(idOfHistogram).style.visibility = "hidden";
+            }
         }
 
-        function encLENSNEWMENU(lens){
+        function encLENSNEWMENU(lens,idOfHistogram){
             clicked = false; 
             changeRadius = false;
             lensCanMove = false;
@@ -6902,10 +7082,12 @@ block content
             document.getElementById('encoding').style.visibility = "visible";
             document.getElementById('attribute').style.display = "none";
             document.getElementById('attribute').style.visibility = "hidden";
-            document.getElementById('my_datavizCIRCULAR').style.visibility = "hidden";
+            if(lens.visibleOutsideMenuFlag == false){
+                document.getElementById(idOfHistogram).style.visibility = "hidden";
+            }
         }
 
-        function statsLENSNEWMENU(lens){
+        function statsLENSNEWMENU(lens,idOfHistogram){
             clicked = false; 
             changeRadius = false;
             lensCanMove = false;
@@ -6914,7 +7096,18 @@ block content
             document.getElementById('encoding').style.visibility = "hidden";
             document.getElementById('attribute').style.display = "none";
             document.getElementById('attribute').style.visibility = "hidden";
-            document.getElementById('my_datavizCIRCULAR').style.visibility = "visible";
+            console.log(idOfHistogram)
+            if(document.getElementById(idOfHistogram).style.visibility == "hidden")
+                document.getElementById(idOfHistogram).style.visibility = "visible";
+            else if(document.getElementById(idOfHistogram).style.visibility == "visible" && lens.visibleOutsideMenuFlag == false){
+                lens.visibleOutsideMenuFlag = true;
+                document.getElementById("wheelnav-piemenu-slice-2").style.fill = "#879489"
+            }
+            else{
+                lens.visibleOutsideMenuFlag = false;
+                document.getElementById("wheelnav-piemenu-slice-2").style.fill = "#497F4C"
+                document.getElementById(idOfHistogram).style.visibility = "hidden"
+            }
         }
 
         ///////Z-ORDER/////
@@ -6925,4 +7118,155 @@ block content
                 console.log(lensArrayZORDER[ind].areaQuery)
             }
         }
-        
+
+        ///////TIME SELECTION/////
+        function eveTimeEnd(lens){
+            console.log("Got called 'save'")
+            if(getUnixTime(lens.pickerEnd.get().value)/1000 > lens.getMinV() && evenTimeEndClicked == true){
+                evenTimeEndClicked = false
+                console.log("Value is ok will now update")
+                lens.setMaxV(new Date(lens.pickerEnd.get().value).getTime()/1000);
+                console.log("Value is ok will now update1")
+                lens.updateLENS();
+                console.log("Value is ok will now update2")
+                lens.setMaxVOLD(lens.getMaxV());
+            }
+            else{
+                console.log("WONT UPDATE")
+                lens.setMaxV(lens.getMaxVOLD());
+                lens.pickerEnd.set(lens.getMaxVOLD()*1000);
+            }
+        }
+        function eveTimeStart(lens){
+            // when the value changed
+            console.log("Got called 'save'")
+            if(getUnixTime(lens.pickerStart.get().value)/1000 < lens.getMaxV() && evenTimeStartClicked == true){
+                evenTimeStartClicked = false
+                console.log("Value is ok will now update")
+                lens.setMinV(getUnixTime(lens.pickerStart.get().value)/1000);
+                console.log("Value is ok will now update 1")
+                lens.updateLENS();
+                console.log("Value is ok will now update 2")
+                lens.setMinVOLD(lens.getMinV());
+            }
+            else{
+                console.log("WONT UPDATE")
+                lens.setMinV(lens.getMinVOLD());
+                lens.pickerStart.set(lens.getMinVOLD()*1000);
+
+            }
+        }
+
+        function eveTimeToChange(lens){
+            // when the value changed
+            console.log("Got called 'change'")
+            if(new Date(lens.pickerStart.get().value+":00").getTime()/1000!=lens.getMinVOLD() || new Date(lens.pickerEnd.get().value+":00").getTime()/1000!=lens.getMaxVOLD()){
+                console.log(lens.pickerEnd.get() + " cenas " +  lens.pickerStart.get())
+                var timeEndVar = new Date(lens.pickerEnd.get().year,lens.pickerEnd.get().month,lens.pickerEnd.get().day,lens.pickerEnd.get().hour,lens.pickerEnd.get().minute,0);
+                var timeStartVar = new Date(lens.pickerStart.get().year,lens.pickerStart.get().month,lens.pickerStart.get().day,lens.pickerStart.get().hour,lens.pickerStart.get().minute,0);
+                if (timeEndVar >= timeStartVar){
+                    
+                    console.log("Value is ok will now update")
+                    lens.setMinV(timeStartVar.getTime()/1000);
+                    lens.setMaxV(timeEndVar.getTime()/1000);
+                    console.log(lens.pickerStart.get().value)
+                    console.log(lens.pickerEnd.get().value)
+                    console.log(lens.getMinV())
+                    console.log(lens.getMaxV())
+                    lens.updateLENS();
+                    console.log("Value is ok will now update 2")
+                    lens.setMinVOLD(lens.getMinV());
+                    lens.setMaxVOLD(lens.getMaxV());
+                }
+                else{
+                    console.log("Intervals were wrong")
+                    cancelationButton(lens);
+                }
+            }
+            else{
+                console.log("WONT UPDATE, values didnt change")
+                
+
+            }
+        }
+        function cancelationButton(lens){
+            lens.pickerStart.set(lens.getMinVOLD()*1000);
+            lens.pickerEnd.set(lens.getMaxVOLD()*1000);
+        }
+        var _intervalsClickEffect = function(e){
+            L.DomEvent.stopPropagation(e); 
+            console.log("Interval click effect")
+            document.getElementById("sliderIntervalDuration").style.display="none";
+            document.getElementById("sliderIntervalLength").style.display="none";
+            document.getElementById("sliderIntervalVel").style.display="none";
+            //document.getElementById("timeSelectionMenu").style.visibility="hidden";
+            map.on("click",_mapClickEffect)
+        }
+        /*function eveTimeChangeEnd(lens,previousValueEnd){
+            // when the value changed
+            console.log("Got called 'change'")
+            if(lens.pickerEnd.get().value!=previousValueEnd  && getUnixTime(lens.pickerEnd.get().value)/1000 > lens.getMinV() && evenTimeEndClicked == true){
+                previousValueEnd=lens.pickerEnd.get().value
+                lens.pickerEnd.save()
+                evenTimeEndClicked = false
+                console.log("Value is ok will now update")
+                lens.setMaxV(new Date(lens.pickerEnd.get().value).getTime()/1000);
+                console.log("Value is ok will now update1")
+                lens.updateLENS();
+                console.log("Value is ok will now update2")
+                lens.setMaxVOLD(lens.getMaxV());
+            }
+            else{
+                console.log("WONT UPDATE")
+                lens.setMaxV(lens.getMaxVOLD());
+                lens.pickerEnd.set(lens.getMaxVOLD()*1000);
+            }
+        }*/
+
+
+
+        //////////////////////////
+        //////////////////////////
+        //////////////////////////
+        //////////TESTS///////////
+        //////////////////////////
+        //////////////////////////
+        //////////////////////////
+
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode == 48){
+                testsLayer.clearLayers()
+            }
+            if (e.keyCode == 49){//1
+                testsLayer.clearLayers()
+                var marker = L.marker([39.76210275375139, 2.726669311523438]).addTo(testsLayer);//any size, needs to use statistics menu which gives exact answer
+            }
+            else if (e.keyCode == 50){//2
+                testsLayer.clearLayers()
+
+                var marker = L.marker([39.79343340955507, 3.024901449680329]).addTo(testsLayer);//4.5Km
+            }
+            else if (e.keyCode == 51){//3
+                testsLayer.clearLayers()
+                var marker = L.marker([39.56950657835579, 3.281462788581848]).addTo(testsLayer);//9km----E a maior
+            }
+            else if (e.keyCode == 52){//4
+                testsLayer.clearLayers()
+                var marker = L.marker([39.74415422820842,3.3467102050781254]).addTo(testsLayer);//5.6km -- domingo
+                
+            }
+            else if (e.keyCode == 53){//5
+                testsLayer.clearLayers()
+                var marker = L.marker([39.53650624031114,2.717203795909882]).addTo(testsLayer);//2.4km -- zona junto ao mar
+
+            }
+            else if (e.keyCode == 54){//6
+                testsLayer.clearLayers()
+                var marker = L.marker([39.557811060494615,2.676768153905869]).addTo(testsLayer);//0.5km --- 25 min+-
+            }
+        });
+
+
+
+
+

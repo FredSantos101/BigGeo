@@ -762,61 +762,77 @@ h1
 
 
 
-  #piemenu > svg { width: 110%; height: 110%; }
-  #piemenu { height: 250px; width: 250px; margin-top: -12.3%; margin-left: 4.2%;}
-  @media (max-width: 300px) { #piemenu { height: 200px; width: 200px; } }
-  
-  [class|=wheelnav-piemenu-slice-basic] { fill: #497F4C; stroke: none; }
-  [class|=wheelnav-piemenu-slice-selected] { fill: #497F4C; stroke: none; }
-  [class|=wheelnav-piemenu-slice-hover] { fill: #497F4C;  stroke: none; fill-opacity: 0.77; cursor: pointer; }
-  
-  [class|=wheelnav-piemenu-title-basic] { fill: #333; stroke: none; }
-  [class|=wheelnav-piemenu-title-selected] { fill: #fff; stroke: none; }
-  [class|=wheelnav-piemenu-title-hover] { fill: #222; stroke: none; cursor: pointer; }
-  
-  .wheelnav-piemenu-marker { stroke: #444; stroke-width: 2; }
-  
-  ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-  }
-  
-  lu {
-    font: 200 15px/1.5 Helvetica, Verdana, sans-serif;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  lu:last-child {
-    border: none;
-  }
-  
-  lu a {
-    text-decoration: none;
-    outline: none;
-    border: none;
-    -moz-outline-style: none;
-    color: #ffffff;
-    background: #44444493;
-    -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
-    -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
-    -o-transition: font-size 0.3s ease, background-color 0.3s ease;
-    -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
-    transition: font-size 0.3s ease, background-color 0.3s ease;
-    display: block;
-    width: 200px;
-  }
-  
-  lu a:hover {
-    font-size: 20px;
-    background: #0c270093;
-  }
-  lu a:hover {
-    outline: none;
-    border: none;
-    -moz-outline-style: none;
+#piemenu > svg { width: 110%; height: 110%; }
+#piemenu { height: 250px; width: 250px; margin-top: -12.3%; margin-left: 4.2%;}
+@media (max-width: 300px) { #piemenu { height: 200px; width: 200px; } }
+
+[class|=wheelnav-piemenu-slice-basic] { fill: #497F4C; stroke: none; }
+[class|=wheelnav-piemenu-slice-selected] { fill: #497F4C; stroke: none; }
+[class|=wheelnav-piemenu-slice-hover] { fill: #497F4C;  stroke: none; fill-opacity: 0.77; cursor: pointer; }
+
+[class|=wheelnav-piemenu-title-basic] { fill: #333; stroke: none; }
+[class|=wheelnav-piemenu-title-selected] { fill: #fff; stroke: none; }
+[class|=wheelnav-piemenu-title-hover] { fill: #222; stroke: none; cursor: pointer; }
+
+.wheelnav-piemenu-marker { stroke: #444; stroke-width: 2; }
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+lu {
+  font: 200 15px/1.5 Helvetica, Verdana, sans-serif;
+  border-bottom: 1px solid #ccc;
+}
+
+lu:last-child {
+  border: none;
+}
+
+lu a {
+  text-decoration: none;
+  outline: none;
+  border: none;
+  -moz-outline-style: none;
+  color: #ffffff;
+  background: #44444493;
+  -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
+  -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
+  -o-transition: font-size 0.3s ease, background-color 0.3s ease;
+  -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
+  transition: font-size 0.3s ease, background-color 0.3s ease;
+  display: block;
+  width: 200px;
+}
+
+lu a:hover {
+  font-size: 20px;
+  background: #0c270093;
+}
+lu a:hover {
+  outline: none;
+  border: none;
+  -moz-outline-style: none;
+}
+
+lu a:visited { outline: none; }
+
+.square_btn{
+  display: inline-block;
+  padding: 0.5em 1em;
+  text-decoration: none;
+  color: #67c5ff;
+  border: dashed 1px #67c5ff;
+  background: #f2fcff;
+  border-radius: 3px;
+  transition: .4s;
   }
 
-  lu a:visited { outline: none; }
+  .square_btn:hover {
+      background: #cbedff;
+      color: #FFF;
+  }
   
   
