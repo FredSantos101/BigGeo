@@ -1642,6 +1642,9 @@ block content
                         console.log("Im on the move event again...");
                         if(activeLENSNEWMENU != null){
                             activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+                            if(activeLENSNEWMENU.visibleOutsideMenuFlag == false){
+                                outterLensesCircularHistoLayer.removeLayer(activeLENSNEWMENU.outsideCircleHistogram)
+                            }
                         }
                         lens.areaQuery.setStyle({fillOpacity:0.3})
                         // code stuff
@@ -2930,6 +2933,9 @@ block content
                         console.log("Im on the move event again...");
                         if(activeLENSNEWMENU != null){
                             activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+                            if(activeLENSNEWMENU.visibleOutsideMenuFlag == false){
+                                outterLensesCircularHistoLayer.removeLayer(activeLENSNEWMENU.outsideCircleHistogram)
+                            }
                         }
                         lens.areaQuery.setStyle({fillOpacity:0.3})
                         //L.DomEvent.stopPropagation(ev);
@@ -2973,7 +2979,7 @@ block content
                             "<lu><a style='color:#FFF' class='dropbtnOpt-brightness'>Brightness</a></lu>"+
                             "<lu><a style='color:#FFF' class='dropbtnOpt-opacity'>Opacity</a></lu>"+
                         "</ul></div>"+
-                        "<span class='explanationATT' style='color:"+ colorToUseWithMap+ ";margin-top: -86%;position: absolute;margin-left: 62%;visibility: hidden;'> \n"+lens.getRadius().toFixed(0)/1000+"Kilometers</span>"
+                        "<span class='explanationATT' style='color:"+ colorToUseWithMap+ ";margin-top: -5%;position: absolute;margin-left: 62%;visibility: hidden;'> \n"+lens.getRadius().toFixed(0)/1000+"Kilometers</span>"
                         });
 
                         if(lens.outsideCircleHistogram != null){
@@ -3583,7 +3589,7 @@ block content
                             
                         }
                         if(contadorLayer == 4){
-                            if(idOfHistogram!=0 && thisVar.lensArray[0].outsideCircleHistogram != null){
+                            if(thisVar.lensArray[0].idOfHistogram != "" && thisVar.lensArray[0].visibleOutsideMenuFlag == true){
                                 clearBox(thisVar.lensArray[0].idOfHistogram)
                                 circularHistogram(thisVar.lensArray[0])
                             }
@@ -3614,7 +3620,7 @@ block content
                             
                         }
                         if(contadorLayer == 4){
-                            if(idOfHistogram!=0 && thisVar.lensArray[0].outsideCircleHistogram != null){
+                            if(thisVar.lensArray[0].idOfHistogram != "" && thisVar.lensArray[0].visibleOutsideMenuFlag == true){
                                 clearBox(thisVar.lensArray[0].idOfHistogram)
                                 circularHistogram(thisVar.lensArray[0])
                             }
@@ -3645,7 +3651,7 @@ block content
                             
                         }
                         if(contadorLayer == 4){
-                            if(idOfHistogram!=0 && thisVar.lensArray[0].outsideCircleHistogram != null){
+                            if(thisVar.lensArray[0].idOfHistogram != "" && thisVar.lensArray[0].visibleOutsideMenuFlag == true){
                                 clearBox(thisVar.lensArray[0].idOfHistogram)
                                 circularHistogram(thisVar.lensArray[0])
                             }
@@ -3677,7 +3683,7 @@ block content
                             
                         }
                         if(contadorLayer == 4){
-                            if(idOfHistogram!=0 && thisVar.lensArray[0].outsideCircleHistogram != null){
+                            if(thisVar.lensArray[0].idOfHistogram != "" && thisVar.lensArray[0].visibleOutsideMenuFlag == true){
                                 clearBox(thisVar.lensArray[0].idOfHistogram)
                                 circularHistogram(thisVar.lensArray[0])
                             }
@@ -5624,6 +5630,8 @@ block content
             clicked = false;
             if(activeLENSNEWMENU != null){
                 activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+                outterLensesCircularHistoLayer.clearLayers()
+                
             }
             map.removeLayer(activeMap);
             blackNoLabel.addTo(map);
@@ -5638,6 +5646,8 @@ block content
             clicked = false;
             if(activeLENSNEWMENU != null){
                 activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+                outterLensesCircularHistoLayer.clearLayers()
+                
             }
             map.removeLayer(activeMap);
             CartoDB_DarkMatter.addTo(map);
@@ -5652,6 +5662,8 @@ block content
             clicked = false;
             if(activeLENSNEWMENU != null){
                 activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+                outterLensesCircularHistoLayer.clearLayers()
+                
             }
             map.removeLayer(activeMap);
             Hydda_Full.addTo(map);
@@ -5666,6 +5678,8 @@ block content
             clicked = false;
             if(activeLENSNEWMENU != null){
                 activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+                outterLensesCircularHistoLayer.clearLayers()
+                
             }
             map.removeLayer(activeMap);
             CartoDB_Voyager.addTo(map);
@@ -5680,6 +5694,8 @@ block content
             clicked = false;
             if(activeLENSNEWMENU != null){
                 activeLENSNEWMENU.areaQuery.setStyle({fillOpacity:0})
+                outterLensesCircularHistoLayer.clearLayers()
+                
             }
             map.removeLayer(activeMap);
             CartoDB_VoyagerNoLabels.addTo(map);
