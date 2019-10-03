@@ -834,5 +834,17 @@ lu a:visited { outline: none; }
       background: #cbedff;
       color: #FFF;
   }
-  
+
+  .axisWhite line{
+    stroke: white;
+  }
+
+  .axisWhite path{
+    stroke: white;
+  }
+
+  .axisWhite text{
+    fill: white;
+  } 
+
   
