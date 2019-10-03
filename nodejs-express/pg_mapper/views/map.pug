@@ -144,15 +144,18 @@ block content
                 </div> 
                 <h1 style="font-size: 150%">---------------------</h1>
                 <div id="biggerContainerMenu">
-                    <h1 style="font-size: 150%">Intervals</h1>
-                    <h1 style="font-size: 80%">The first opThe intervals are smaller when the are several trajectories with the same attribute values and bigger when there are less trajectories.</h1>
+                    <h1 style="font-size: 150%">Scales</h1>
+                    <h1 style="font-size: 80%">Here you can change the scales of the Y axis from the histograms/barplots.</h1>
                     <div id="smallContainerMenu">
                         <label class="control control--radio">
-                        <input type="radio" class="" name="radio2" checked="checked"/>Equal sized intervals
+                        <input type="radio" class="linScale" name="radio2" checked="checked"/>Linear scale
                         <div class="control__indicator"></div>
                         </label>
                         <label class="control control--radio">
-                        <input type="radio" class="" name="radio2"/>Different sized intervals
+                        <input type="radio" class="powScale" name="radio2"/>Power scale
+                        <div class="control__indicator"></div>
+                        <label class="control control--radio">
+                        <input type="radio" class="logScale" name="radio2"/>Logaritmic scale
                         <div class="control__indicator"></div>
                         </label>
                     </div>
@@ -5793,7 +5796,7 @@ block content
              
             // set the dimensions and margins of the graph
             var margin = {top: 10, right: 20, bottom: 30, left: 40},
-                width = 400 - margin.left - margin.right,
+                width = 385 - margin.left - margin.right,
                 height = 200 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
@@ -5892,7 +5895,7 @@ block content
             
             // set the dimensions and margins of the graph
             var margin = {top: 10, right: 20, bottom: 30, left: 40},
-                width = 400 - margin.left - margin.right,
+                width = 385 - margin.left - margin.right,
                 height = 200 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
@@ -5909,7 +5912,7 @@ block content
 
             // X axis: scale and draw:
             var x = d3.scaleLinear()
-                .domain([0, dataInput])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+                .domain([0, (dataInput/1000).toFixed(2)])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
                 .range([0, width]);
             svg.append("g")
                 .attr("transform", "translate(0," + height + ")")
@@ -5918,7 +5921,7 @@ block content
 
             // set the parameters for the histogram
             var histogram = d3.histogram()
-                .value(function(d) { return +d.len; })   // I need to give the vector of value
+                .value(function(d) { return (+d.len/1000).toFixed(2); })   // I need to give the vector of value
                 .domain(x.domain())  // then the domain of the graphic
                 .thresholds(x.ticks(30)); // then the numbers of bins
 
@@ -5952,7 +5955,7 @@ block content
                 .duration(100)
                 .style("opacity", 1)
                 tooltip
-                .html("Range: " + d.x0/1000 + "Km - " + d.x1/1000 + "Km")
+                .html("Range: " + d.x0 + "Km - " + d.x1 + "Km")
                 .style("left", (d3.mouse(this)[0]+20) + "px")
                 .style("top", (d3.mouse(this)[1]) + "px")
             }
@@ -6015,7 +6018,7 @@ block content
             let maxDurationVal =dataInput.hours + ":" + dataInput.minutes + ":" + dataInput.seconds
             // set the dimensions and margins of the graph
             var margin = {top: 10, right: 20, bottom: 30, left: 40},
-                width = 400 - margin.left - margin.right,
+                width = 385 - margin.left - margin.right,
                 height = 200 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
@@ -6143,7 +6146,7 @@ block content
              
             // set the dimensions and margins of the graph
             var margin = {top: 10, right: 20, bottom: 30, left: 40},
-                width = 400 - margin.left - margin.right,
+                width = 385 - margin.left - margin.right,
                 height = 200 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
@@ -6247,7 +6250,7 @@ block content
              
             // set the dimensions and margins of the graph
             var margin = {top: 10, right: 20, bottom: 30, left: 40},
-                width = 400 - margin.left - margin.right,
+                width = 385 - margin.left - margin.right,
                 height = 200 - margin.top - margin.bottom;
             // append the svg object to the body of the page
             // set the ranges
@@ -6319,7 +6322,7 @@ block content
              
             // set the dimensions and margins of the graph
             var margin = {top: 10, right: 20, bottom: 30, left: 40},
-                width = 400 - margin.left - margin.right,
+                width = 385 - margin.left - margin.right,
                 height = 200 - margin.top - margin.bottom;
             // append the svg object to the body of the page
             // set the ranges
@@ -6590,15 +6593,11 @@ block content
             lens.setRadiusFlag(true);
             //map.zoomOut(1, true);
             lens.outsideCircle.on({
-                click: function(e){
-                    L.DomEvent.stopPropagation(e);
-                    mapPressForCreation = false;
-                    correctSizeVar = false;
-                },
                 mousedown: function (e) {
-                    
+                    L.DomEvent.stopPropagation(e);
                     if(changeRadius){  
-                        L.DomEvent.stopPropagation(e);
+                        
+                        map.removeEventListener("click",_mapClickEffect)
                         console.log(lens.getRadiusFlag())  
                         let from = turf.point(lens.getLngLat());
                         let optionsCreateCirc = {units: 'kilometers'};
@@ -6624,7 +6623,6 @@ block content
                                         lens.setRadius(radiusValue);
                                         document.getElementsByClassName('explanation')[0].innerText = lens.getRadius().toFixed(0)/1000+"Kilometers";
                                     } else {
-                                        correctSizeVar = false;
                                         lens.areaQuery.setStyle({fillColor: 'DarkRed',color:'red'});
                                     }
                                 }
@@ -6635,15 +6633,16 @@ block content
                     }
                 },
                 mouseup: function (e) {
-                    
+                    L.DomEvent.stopPropagation(e);
                     if(changeRadius && lens.getRadiusFlag()){
-                        L.DomEvent.stopPropagation(e);
+                        
                         map.removeEventListener('mousemove');
                         document.getElementById('piemenu').style.visibility = "visible";
                         
                         console.log(correctSizeVar);
                         if (mapPressForCreation && correctSizeVar) {
-
+                            mapPressForCreation = false;
+                            correctSizeVar = false;
                             lens.updateLENS();
                             lens.setBounds(lens.areaQuery.getBounds());
                             
@@ -6653,16 +6652,18 @@ block content
                             lens.setRadiusOLD(lens.getRadius());
                         }
                         else{
+                            mapPressForCreation = false;
+                            correctSizeVar = false;
                             lens.setRadius(lens.getRadiusOLD());
                         }
 
                         //map.fitBounds(lens.getBound());
-                        mapPressForCreation = false;
-                        correctSizeVar = false;
+                        
                         
                     }
+                    
                     map.dragging.enable();
-
+                    map.on("click",_mapClickEffect)
                 }
             });
             /*} else {
@@ -7072,8 +7073,10 @@ block content
             console.log("OK TOU NA FUNCAO")
             lens.outsideCircle.on({
                 mousedown: function (e) {
+                    L.DomEvent.stopPropagation(e);
                     if(changeRadius){  
-                        L.DomEvent.stopPropagation(e);
+                        map.removeEventListener("click",_mapClickEffect)
+                        
                         console.log("OK TOU No mouse down")
                         let from = turf.point([lens.getLngLat().lat,lens.getLngLat().lng]);
                         let optionsCreateCirc = {units: 'kilometers'};
@@ -7129,6 +7132,7 @@ block content
                     console.log("OK TOU No mouse up")
                     map.removeEventListener('mousemove');
                     map.dragging.enable();
+                    map.on("click",_mapClickEffect)
                     once = true;
                     if(changeRadius && lens.getRadiusFlag()){
                         
