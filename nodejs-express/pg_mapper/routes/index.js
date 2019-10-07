@@ -429,37 +429,6 @@ router.post('/query/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', function
 
 });
 
-/*router.get('/attQuery/:tab/:long/:lat/:radius', function(req, res) {
-
-
-  //Radius in meters to degrees
-  let radiusDegrees = (req.params.radius/ 111120).toFixed(8);
-
-  //let minDegrees = req.params.minValue/ 111120;
-
-  let client = new Client(conString); // Setup our Postgres Client
-  client.connect(); // connect to the client
-  let query = client.query(new Query(query_args_ContructorATTQUERIES(req.params.tab, req.params.long, req.params.lat, radiusDegrees))); // Run our Query
-  query.on("row", function (row, result) {
-      result.addRow(row);
-  });
-
-  let timefetch = Math.floor( new Date().getTime()/1000);
-  let timeafterGet = timefetch-timeB4draw;
-  console.log("Updating map");
-  // Pass the result to the map page
-  query.on("end", function (result) {
-      //let data = require('../public/data/geoJSON.json')
-      let dataNew = result.rows[0].row_to_json // Save the JSON as variable data
-      res.send(dataNew);
-
-      console.log("DATA PASSED TO BE DRAWN");
-      let timeAdraw = Math.floor( new Date().getTime()/1000);
-      console.log(timeAdraw-timefetch);
-      client.end();
-  });
-
-});*/
 
 router.post('/attQueryNEW/:tab/:geom', function(req, res) {
 
@@ -1198,10 +1167,12 @@ router.get('/interdif/:firstGeom/:secondGeom', function(req, res) {
       res.send(JSON.stringify(list));
     }
     else{
+      console.log("it has a null area")
       res.send(JSON.stringify([null, null]));
     }
   }
   else{
+    console.log("One of the geojsons is null")
     res.send(JSON.stringify([null, null]));
   }
 
