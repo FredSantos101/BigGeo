@@ -204,6 +204,10 @@ function startMap( res){
         clientFetchFirst = new Client(conString); // Setup our Postgres Client
         clientFetchFirst.connect(); // connect to the client
         console.log("Fetching on database");
+
+        ////TODO METER TEMPO AQUI
+        let timeBeforeQueryMadeToDB = new Date();
+
         let queryFinal = clientFetchFirst.query(new Query(drawTracksMap)); // Run our Query
         queryFinal.on("row", function (row, result) {
             result.addRow(row);
@@ -212,7 +216,7 @@ function startMap( res){
         let clientCSV = new Client(conString);
         clientCSV.connect();
         let newPath
-        console.log(appDir);
+        //console.log(appDir);
 
         newPath =replaceGlobally(appDir,"bin","public")
         
@@ -225,7 +229,7 @@ function startMap( res){
         let contador = 0
         let queryVelCSV = clientCSV.query(new Query("COPY (SELECT g.veloc_avg FROM trajectory_lines3 AS g ORDER BY g.veloc_avg ASC) TO '"+ newPathVelocity + "' DELIMITER ';' CSV HEADER"))
         queryVelCSV.on("end", function (result) {
-          console.log("Velocity csv ended")
+          //console.log("Velocity csv ended")
           contador += 1
           if (contador == 4)
             clientCSV.end()
@@ -233,7 +237,7 @@ function startMap( res){
         });
         let queryLenCSV = clientCSV.query(new Query("COPY (SELECT g.length AS len FROM trajectory_lines3 AS g ORDER BY g.length ASC) TO '"+ newPathLength + "' DELIMITER ';' CSV HEADER"))
         queryLenCSV.on("end", function (result) {
-          console.log("Length csv ended")
+          //console.log("Length csv ended")
           contador += 1
           if (contador == 4)
             clientCSV.end()
@@ -241,7 +245,7 @@ function startMap( res){
         });
         let queryDurCSV = clientCSV.query(new Query("COPY (SELECT g.duration FROM trajectory_lines3 AS g ORDER BY g.duration ASC) TO '"+ newPathDuration + "' DELIMITER ';' CSV HEADER"))
         queryDurCSV.on("end", function (result) {
-          console.log("Duration csv ended")
+          //console.log("Duration csv ended")
           contador += 1
           if (contador == 4)
             clientCSV.end()
@@ -263,8 +267,15 @@ function startMap( res){
             console.log(result)
             console.log("Passing data to frontend");
             //let data = require('../public/data/geoJSON.json')
+
+            //TODO  METER TEMPO AQUI
+            //VER DIFERENCA
+            let timeAfterQueryMadeToDB = new Date();
+            console.log("Here comes the time difference")
+            console.log((timeAfterQueryMadeToDB - timeBeforeQueryMadeToDB)/1000)
+
             let data = result.rows[0].row_to_json // Save the JSON as variable data
-            console.log(data)
+            //console.log(data)
             res.render('map', {
                 title: "BigGeo", // Give a title to our page
                 jsonData: data // Pass data to the View
@@ -462,7 +473,7 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
   let client1 = new Client(conString); 
    // connect to the client
   client1.connect();
-  
+  let timeBeforeQueryMadeToDB = new Date();
   let query = client1.query(new Query(query_args_DecontructorQUERIES(req.params.tab,req.params.long, req.params.lat, radiusDegrees, req.params.type, req.params.minValue, req.params.maxValue))); // Run our Query
   query.on("row", function (row, result) {
       result.addRow(row);
@@ -547,6 +558,9 @@ router.get('/queryRemoval/:tab/:long/:lat/:radius/:type/:minValue/:maxValue', fu
       let dataNew = result.rows[0].row_to_json // Save the JSON as variable data
       res.send(dataNew);
 
+      let timeAfterQueryMadeToDB = new Date();
+      console.log("Here comes the time difference")
+      console.log((timeAfterQueryMadeToDB - timeBeforeQueryMadeToDB)/1000)
       let timeAdraw = Math.floor( new Date().getTime()/1000);
       client1.end();
   });

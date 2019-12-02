@@ -303,7 +303,12 @@ block content
         var sidebar = L.control.sidebar('sidebar').addTo(map);
 
         let activeLENSNEWMENU=null
+
+        let timeBeforeQueryMadeToDB = new Date();
+
+
         //let myData = jsonData;
+        
         let myData = !{JSON.stringify(jsonData)};
         // Create variable to hold map element, give initial settings to map
         /*let container1 = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
@@ -446,8 +451,15 @@ block content
         };
         let defaultLayer = null;
         // Add JSON to map
+        //TODO METER TEMPO AQUI
+
+        
         if(myData.features != null){
             defaultLayer = new L.geoJson(myData,firstStyle).addTo(map);
+            
+            let timeAfterQueryMadeToDB = new Date();
+            console.log("Here comes the time difference")
+            console.log((timeAfterQueryMadeToDB - timeBeforeQueryMadeToDB)/1000)
             map.panTo(defaultLayer.getBounds().getCenter());
         }
 
@@ -1123,6 +1135,7 @@ block content
                     let urlString1 = "queryRemoval/trajectory_lines2/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
                     let urlString  = "queryRemoval/trajectory_lines3/" + this.getLngLat()[1] + "/" + this.getLngLat()[0] + "/" + this.getRadius() + "/" + this.getType()  + "/" + this.getMinV() + "/" + this.getMaxV();
                     let contadordeCenas = 0
+                    let timeBeforeQueryMadeToDB = new Date();
                     let newData = $.ajax({
                         url: urlString,
                         type: 'GET',
@@ -1139,6 +1152,10 @@ block content
                         
                         if(newData.responseJSON.features != null){
                             let tracksToDraw = L.geoJson(newData.responseJSON,firstStyle);
+
+                            let timeAfterQueryMadeToDB = new Date();
+                            console.log("Here comes the time difference")
+                            console.log((timeAfterQueryMadeToDB - timeBeforeQueryMadeToDB)/1000)
                             tracksToDraw.addTo(markerGroup);
                             let idTracks = tracksToDraw._leaflet_id;
                             lastMarkerGroupID = tracksToDraw._leaflet_id;
@@ -1201,6 +1218,11 @@ block content
                         
                         if(newData1.responseJSON.features != null){
                             let tracksToDraw = L.geoJson(newData1.responseJSON,firstStyle1);
+
+                            let timeAfterQueryMadeToDB = new Date();
+                            console.log("Here comes the time difference")
+                            console.log((timeAfterQueryMadeToDB - timeBeforeQueryMadeToDB)/1000)
+
                             tracksToDraw.addTo(markerGroup1);
                             lastMarkerGroupID1 = tracksToDraw._leaflet_id;
                             
@@ -1261,6 +1283,11 @@ block content
                         
                         if(newData2.responseJSON.features != null){
                             let tracksToDraw = L.geoJson(newData2.responseJSON,firstStyle2);
+
+                            let timeAfterQueryMadeToDB = new Date();
+                            console.log("Here comes the time difference")
+                            console.log((timeAfterQueryMadeToDB - timeBeforeQueryMadeToDB)/1000)
+
                             tracksToDraw.addTo(markerGroup2);
                             lastMarkerGroupID2 = tracksToDraw._leaflet_id;
                             
@@ -1321,6 +1348,11 @@ block content
                         
                         if(newData3.responseJSON.features != null){
                             let tracksToDraw = L.geoJson(newData3.responseJSON,firstStyle3);
+
+                            let timeAfterQueryMadeToDB = new Date();
+                            console.log("Here comes the time difference")
+                            console.log((timeAfterQueryMadeToDB - timeBeforeQueryMadeToDB)/1000)
+                            
                             tracksToDraw.addTo(markerGroup3);
                             lastMarkerGroupID3 = tracksToDraw._leaflet_id;
                             
@@ -2402,7 +2434,7 @@ block content
                 },
                 assignCircHistogram: function(){
                     if(this.att == "velocity"){ 
-                        lens.attArrayCircHistogram = [{name:"[0-9]km/h", value:0},{name:"[10-16]km/h",value:0},{name:"[17-25]km/h",value:0},{name:"[26-40]km/h",value:0},{name:"[41-50]km/h",value:0},{name:"[51-60]km/h" ,value:0},{name:"[61-70]km/h" ,value:0},{name:"[71-80]km/h"  ,value:0},{name:"[81-90]km/h" , value:0},{name:"[91-300]km/h" , value:0}];
+                        lens.attArrayCircHistogram = [{name:"[0-6]km/h", value:0},{name:"[7-16]km/h",value:0},{name:"[17-25]km/h",value:0},{name:"[26-40]km/h",value:0},{name:"[41-50]km/h",value:0},{name:"[51-60]km/h" ,value:0},{name:"[61-70]km/h" ,value:0},{name:"[71-80]km/h"  ,value:0},{name:"[81-90]km/h" , value:0},{name:"[91-300]km/h" , value:0}];
                         if(localScale){
                             let diffIntervals = maxArrayValuesGlobal.velocity/ 10;
                             for(let i = 0 ; i<=lens.attArrayCircHistogram.length - 1;i++){
@@ -3123,7 +3155,7 @@ block content
             if(globalScale){
                 switch(encoding){
                     case "color":
-                        if(velAtt <= 9)          {
+                        if(velAtt <= 6)          {
                             attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
                             layer.setStyle({color :'#ff3232'});
                         }
@@ -3164,17 +3196,17 @@ block content
                             layer.setStyle({color :'#00ff00'});}
                         break;
                     case "brightness":
-                        if(velAtt <= 10)          {
+                        if(velAtt <= 6)          {
                             attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
                             let colr = ColorLuminance(layer.options.color,-0.9);
                             layer.setStyle({"color":colr});
                         }
-                        else if(velAtt <= 20)     {
+                        else if(velAtt <= 16)     {
                             attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
                             let colr = ColorLuminance(layer.options.color,-0.7);
                             layer.setStyle({"color":colr});
                         }
-                        else if(velAtt <= 30)    {
+                        else if(velAtt <= 25)    {
                             attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
                             let colr = ColorLuminance(layer.options.color,-0.5);
                             layer.setStyle({"color":colr});
@@ -3216,15 +3248,15 @@ block content
                         }            
                         break;
                     case "opacity":
-                        if(velAtt <= 10)          {
+                        if(velAtt <= 6)          {
                             attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
                             layer.setStyle({opacity : 0.1});
                         }
-                        else if(velAtt <= 20)     {
+                        else if(velAtt <= 16)     {
                             attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
                             layer.setStyle({opacity : 0.2});
                         }
-                        else if(velAtt <= 30)    {
+                        else if(velAtt <= 25)    {
                             attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
                             layer.setStyle({opacity : 0.3});
                         }
@@ -3258,15 +3290,15 @@ block content
                         }
                         break;
                     case "width":
-                        if(velAtt <= 10)        {
+                        if(velAtt <= 6)        {
                             attArrayCircHistogram[0].value = attArrayCircHistogram[0].value  + 1
                             layer.setStyle({"weight": 1});
                             }
-                        else if(velAtt <= 20)   {
+                        else if(velAtt <= 16)   {
                             attArrayCircHistogram[1].value = attArrayCircHistogram[1].value  + 1
                             layer.setStyle({"weight": 2});
                             }
-                        else if(velAtt <= 30)   {
+                        else if(velAtt <= 25)   {
                             attArrayCircHistogram[2].value = attArrayCircHistogram[2].value  + 1
                             layer.setStyle({"weight": 2.5});
                             }
@@ -3304,10 +3336,7 @@ block content
             else if(localScale){
                 //yup vais ter de por o outro assim ;)
                 //sry about that 
-                let currMaxValue = maxArrayValuesGlobal.velocity  //max
-                let currInterval = maxArrayValuesGlobal.velocity/10
-
-                let diffIntervals = Math.round( (maxArrayValuesGlobal.velocity) * 10 ) / 100;
+                let diffIntervals = maxArrayValuesGlobal.velocity / 10 ;
                 for(let i = 0 ; i<=lens.attArrayCircHistogram.length - 1;i++){
                     let binMax = ((i+1)*diffIntervals) 
                     if(velAtt<=binMax){
@@ -4743,12 +4772,12 @@ block content
                         
                         color2= "rgb("+r+" ,"+g+","+ b+")"; 
                         let randomColor = Math.floor(Math.random()*16777215).toString(16);
-                        let cona = L.geoJson(responseInter[0], {
+                        let pintarInt = L.geoJson(responseInter[0], {
                             color: '#ff3636',
                             fillColor: color2,
                             fillOpacity:1
                         });
-                        cona.addTo(areasLayer);*/
+                        pintarInt.addTo(areasLayer);*/
                         //})
                         
                         j++;
@@ -6522,6 +6551,110 @@ block content
             correctSizeVar = false;
             console.log("OK TOU NA FUNCAO")
             lens.outsideCircle.on({
+                mousedown: function (e) {
+                    L.DomEvent.stopPropagation(e);
+                    if(changeRadius){  
+                        map.removeEventListener("click",_mapClickEffect)
+                        
+                        console.log("OK TOU No mouse down")
+                        let from = turf.point([lens.getLngLat().lat,lens.getLngLat().lng]);
+                        let optionsCreateCirc = {units: 'kilometers'};
+                        
+                        mapPressForCreation = true;
+                        map.on('mousemove', function (event) {
+                            if(lens.getRadiusFlag()){
+                                L.DomEvent.stopPropagation(event);
+                                console.log("OK TOU No map move")
+                                if(once){
+                                    document.getElementById('piemenu').style.visibility="hidden";
+                                    lens.delete();
+                                    lens.updateOthersV2(true);
+                                    if(lens.hasBeenOpacity){
+                                        for(let j = 0; j < lens.intersections.length; j++){
+                                            lens.intersections[j].removeOpacityLens(lens);
+                                            for(let i = 0; i < lens.intersections[j].areas.length; i++){
+                                                lens.intersections[j].areas[i].delete();
+                                                lens.intersections[j].areas[i].createLayers();
+                                            }
+                                        }
+                                    }
+                                    once = false;
+                                }
+                                if (mapPressForCreation && changeRadius) {
+                                    
+                                    
+                                    map.dragging.disable();
+
+                                    let to = turf.point([event.latlng.lat, event.latlng.lng]);
+
+                                    let distance = turf.distance(from, to, optionsCreateCirc);
+                                    radiusValue = distance * 1000;
+                                    if (radiusValue >= 50 && radiusValue <= 25000) {
+                                        correctSizeVar = true;
+                                        lens.colorSuccess();
+                                        lens.setRadius(radiusValue);
+                                        document.getElementsByClassName('explanationATT')[0].innerText = lens.getRadius().toFixed(0)/1000+"Kilometers";
+                                    
+                                    } else {
+                                        correctSizeVar = false;
+                                        lens.areaQuery.setStyle({fillColor: 'DarkRed',color:'red'});
+                                    }
+                                }
+                                else
+                                    console.log("Mouse down but flags are false :S");
+                            }
+                        });
+                    }
+                },
+                mouseup: function (e) {
+                    L.DomEvent.stopPropagation(e);
+                    console.log("OK TOU No mouse up")
+                    
+                    once = true;
+                    if(changeRadius && lens.getRadiusFlag()){
+                        
+                        document.getElementById('piemenu').style.visibility="visible";
+                        map.removeEventListener('mousemove');
+                        map.dragging.enable();
+                        map.on("click",_mapClickEffect)
+                        console.log(correctSizeVar);
+                        if (mapPressForCreation,correctSizeVar) {
+                            
+
+                            lens.createAreas();
+                            if(lens.hasBeenOpacity){
+                                if(lens.enc != "opacity"){
+                                    lens.hasBeenOpacity = false;
+                                }
+                                else{
+                                    attOPACITYLensesArray.push(lens);
+                                    for(let j = 0; j < lens.intersections.length; j++){
+                                        lens.intersections[j].addOpacityLens(lens);
+                                        for(let i = 0; i < lens.intersections[j].areas.length; i++){
+                                            lens.intersections[j].areas[i].delete();
+                                            lens.intersections[j].areas[i].createLayers();
+                                        }
+                                    }
+                                }
+                                attLensArrayToServer();
+
+                            }
+                            lens.setBounds(lens.areaQuery.getBounds());
+                            
+                            lens.setRadiusOLD(lens.getRadius());
+                        }
+                        else{
+                            lens.colorSuccess();
+                            lens.setRadius(lens.getRadiusOLD());
+                        }
+
+                        mapPressForCreation = false;
+                        correctSizeVar = false;
+                    }
+                    
+                }
+            });
+            lens.areaQuery.on({
                 mousedown: function (e) {
                     L.DomEvent.stopPropagation(e);
                     if(changeRadius){  
