@@ -21,7 +21,7 @@
     "count-lines-in-file": "^1.1.0",
     "debug": "~2.6.9",
     "express": "~4.16.0",
-    "fast-csv": "^3.4.0",
+    "fast-csv": "^4.3.6",
     "fs-extra": "^8.1.0",
     "geojson-vt": "^3.2.1",
     "http-errors": "~1.6.2",
