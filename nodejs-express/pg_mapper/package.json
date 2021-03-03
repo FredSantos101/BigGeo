@@ -37,7 +37,7 @@
     "nouislider": "^13.1.5",
     "pg": "*",
     "postgres-interval": "^1.2.0",
-    "pug": "^2.0.3",
+    "pug": "^3.0.1",
     "randomcolor": "^0.5.4",
     "round-slider": "^1.3.3",
     "turf": "^7.0.0-alpha.1",
